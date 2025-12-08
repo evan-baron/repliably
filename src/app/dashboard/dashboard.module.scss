@@ -1,0 +1,94 @@
+.dashboardLayout {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	background: var(--background-primary);
+	// border: 5px solid red;
+
+	// main content (side bar + dashboard)
+	.mainContent {
+		display: flex;
+		flex: 1;
+
+		.dashboardContent {
+			flex: 1;
+			padding: 1.5rem;
+			overflow-y: auto;
+			background: var(--background-tertiary);
+
+			// Dashboard home page styles
+			.dashboardHome {
+				display: flex;
+				flex-direction: column;
+				min-height: 100%;
+				margin: 0 auto;
+				padding: 0 2rem;
+				gap: 1.5rem;
+
+				.welcomeSection {
+					text-align: center;
+
+					.welcomeTitle {
+						font-size: 2.5rem;
+						font-weight: 700;
+						background: var(--gradient-primary);
+						-webkit-background-clip: text;
+						-webkit-text-fill-color: transparent;
+						background-clip: text;
+						margin-bottom: 0.5rem;
+					}
+
+					.welcomeSubtitle {
+						color: var(--text-secondary);
+						font-size: 1.2rem;
+					}
+				}
+
+				.previewTiles,
+				.quickActions {
+					outline: 1px solid teal;
+					flex: 1;
+				}
+
+				.previewTiles {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+					gap: 1.5rem;
+				}
+
+				.quickActions {
+				}
+
+				.sectionTitle {
+					font-size: 1.5rem;
+					font-weight: 600;
+					color: var(--text-primary);
+				}
+			}
+		}
+	}
+}
+
+// Responsive design
+@media (max-width: 768px) {
+	.welcomeTitle {
+		font-size: 2rem;
+	}
+}
+
+@media (max-width: 640px) {
+	.mainContent {
+		flex-direction: column;
+	}
+
+	.content {
+		padding: 1rem;
+		order: 1;
+		flex: none;
+		min-height: 60vh;
+	}
+
+	.welcomeTitle {
+		font-size: 1.75rem;
+	}
+}

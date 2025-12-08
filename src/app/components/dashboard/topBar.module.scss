@@ -1,0 +1,71 @@
+.topBar {
+	background: var(--background-secondary);
+	border-bottom: 0.0625rem solid var(--border-light);
+	padding: 0 2rem;
+	box-shadow: var(--shadow-md);
+	z-index: 1000;
+	position: relative;
+
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 0.1875rem;
+		background: var(--gradient-primary);
+	}
+
+	.topBarContent {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 4rem;
+
+		.appTitle {
+			margin: 0;
+			font-size: 1.5rem;
+			font-weight: 700;
+			background: var(--gradient-primary);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+
+			span {
+				font-style: italic;
+				padding: 0 0.0625rem;
+				background: linear-gradient(
+					90deg,
+					hsl(38, 92%, 50%),
+					hsl(38, 92%, 65%)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+		}
+
+		.userSection {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+
+			.welcomeText {
+				color: var(--text-secondary);
+				font-size: 0.9rem;
+				font-weight: 500;
+			}
+		}
+	}
+}
+
+// Responsive design
+@media (max-width: 768px) {
+	.topBarContent {
+		padding: 0 1rem;
+	}
+
+	.appTitle {
+		font-size: 1.2rem;
+	}
+}

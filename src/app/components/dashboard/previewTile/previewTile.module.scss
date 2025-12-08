@@ -1,0 +1,10 @@
+.tileWrapper {
+	display: flex;
+	outline: 1px solid red;
+
+	.tileTitle {
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+}
