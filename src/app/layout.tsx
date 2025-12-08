@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Auth0Provider } from '@auth0/nextjs-auth0';
 import './reset.css';
-import './globals.css';
+import './globals.scss';
 
 export const metadata: Metadata = {
 	title:
