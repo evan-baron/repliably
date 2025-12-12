@@ -6,6 +6,9 @@ import React from 'react';
 // Styles imports
 import styles from './newEmail.module.scss';
 
+// Components imports
+import NewEmailForm from '../../components/forms/newEmail/NewEmailForm';
+
 const Page = () => {
 	return (
 		<div className={styles['page-wrapper']}>
@@ -18,7 +21,9 @@ const Page = () => {
 				</p>
 			</section>
 
-			<section className={styles['email-form-section']}></section>
+			<section className={styles['email-form-section']}>
+				<NewEmailForm />
+			</section>
 		</div>
 	);
 };
