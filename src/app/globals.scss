@@ -202,3 +202,11 @@ a {
 	justify-content: center;
 	cursor: pointer;
 }
+
+.tiptap {
+	border: 0.0625rem solid var(--border-light);
+	border-radius: var(--border-radius-sm);
+	background: var(--background-secondary);
+	box-shadow: var(--shadow-sm);
+	padding: 1rem;
+}

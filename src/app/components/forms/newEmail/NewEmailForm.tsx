@@ -8,8 +8,6 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 // Styles imports
 import styles from './newEmailForm.module.scss';
 
-// Components imports
-
 // Context imports
 
 interface EmailFormData {
