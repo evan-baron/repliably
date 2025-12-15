@@ -8,7 +8,8 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 // Styles imports
 import styles from './newEmailForm.module.scss';
 
-// Context imports
+// Component imports
+import RichTextEditor from '../../editor/RichTextEditor';
 
 interface EmailFormData {
 	to: string;
@@ -128,7 +129,9 @@ const NewEmailForm = () => {
 					</div>
 
 					{/* Email Body - RTE */}
-					<div className={styles['rte-wrapper']}></div>
+					<div className={styles['rte-wrapper']}>
+						<RichTextEditor />
+					</div>
 
 					{/* Buttons */}
 					<div>
