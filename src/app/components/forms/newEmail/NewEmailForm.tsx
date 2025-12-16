@@ -1,6 +1,7 @@
 'use client';
 
 // Library imports
+import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
@@ -9,7 +10,8 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import styles from './newEmailForm.module.scss';
 
 // Component imports
-import RichTextEditor from '../../editor/RichTextEditor';
+import TinyEditor from '../../editor/TinyEditor';
+import TestButton from '../../testComponents/TestButton';
 
 interface EmailFormData {
 	to: string;
@@ -20,6 +22,10 @@ interface EmailFormData {
 }
 
 const NewEmailForm = () => {
+	const [editorContent, setEditorContent] = useState<string>('');
+	const [emailTo, setEmailTo] = useState<string>('');
+	const [emailSubject, setEmailSubject] = useState<string>('');
+
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
 	const {
@@ -35,16 +41,6 @@ const NewEmailForm = () => {
 			sendWithoutReviewAfter: '',
 		},
 	});
-
-	const onPreviewMessage = (data: EmailFormData) => {
-		console.log('Preview Message:');
-		// Handle preview logic here
-	};
-
-	const onSendWithoutPreview = (data: EmailFormData) => {
-		console.log('Send Without Preview:');
-		// Handle send without preview logic here
-	};
 
 	return (
 		<div className={styles['newemailform-wrapper']}>
@@ -113,6 +109,7 @@ const NewEmailForm = () => {
 									message: 'Invalid email address',
 								},
 							})}
+							onChange={(e) => setEmailTo(e.target.value)}
 						/>
 						{errors.to && <span>{errors.to.message}</span>}
 					</div>
@@ -124,24 +121,22 @@ const NewEmailForm = () => {
 							type='text'
 							id='subject'
 							{...register('subject', { required: 'Subject is required' })}
+							onChange={(e) => setEmailSubject(e.target.value)}
 						/>
 						{errors.subject && <span>{errors.subject.message}</span>}
 					</div>
 
 					{/* Email Body - RTE */}
 					<div className={styles['rte-wrapper']}>
-						<RichTextEditor />
+						<TinyEditor setEditorContent={setEditorContent} />
 					</div>
 
-					{/* Buttons */}
-					<div>
-						<button type='button' onClick={handleSubmit(onPreviewMessage)}>
-							Preview Email
-						</button>
-						<button type='button' onClick={handleSubmit(onSendWithoutPreview)}>
-							Send without Preview
-						</button>
-					</div>
+					{/* Send Buttons */}
+					<TestButton
+						emailText={editorContent}
+						emailTo={emailTo}
+						emailSubject={emailSubject}
+					/>
 				</section>
 			</form>
 		</div>

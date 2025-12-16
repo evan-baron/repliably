@@ -29,7 +29,7 @@ const Dashboard = () => {
 				>
 					Welcome to your application follow-up management center
 				</p>
-				<TestButton />
+				{/* <TestButton /> */}
 			</section>
 
 			<section

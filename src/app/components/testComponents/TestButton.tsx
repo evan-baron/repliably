@@ -3,7 +3,13 @@
 // Library imports
 import React, { useState } from 'react';
 
-const TestButton = () => {
+interface TestButtonProps {
+	emailText?: String;
+	emailTo: String;
+	emailSubject?: String;
+}
+
+const TestButton = ({ emailText, emailTo, emailSubject }: TestButtonProps) => {
 	const [sending, setSending] = useState(false);
 	const [message, setMessage] = useState('');
 
@@ -17,10 +23,10 @@ const TestButton = () => {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					to: 'egbaron@gmail.com',
-					subject: 'Test Email from Application',
+					to: emailTo,
+					subject: emailSubject || 'Test Email from Application',
 					body:
-						message ||
+						emailText ||
 						'This is a test email from the application automation system.',
 				}),
 			});
@@ -43,13 +49,13 @@ const TestButton = () => {
 
 	return (
 		<div>
-			<input
+			{/* <input
 				type='text'
 				placeholder='Enter your test message'
 				value={message}
 				onChange={(e) => setMessage(e.target.value)}
 				style={{ marginRight: '10px', padding: '5px' }}
-			/>
+			/> */}
 			<button onClick={handleClick} disabled={sending}>
 				{sending ? 'Sending...' : 'Send Test Email'}
 			</button>
