@@ -33,8 +33,8 @@ model User {
 
 model Contact {
   id             Int       @id @default(autoincrement())
-  userId         Int
-  owner          User      @relation(fields: [userId], references: [id])
+  ownerId        Int
+  owner          User      @relation(fields: [ownerId], references: [id])
   email          String
   firstName      String?
   lastName       String?
@@ -51,6 +51,7 @@ model Contact {
 
   messages       Message[]
   sequences      Sequence[]  @relation("ContactSequences")
+  emailReplies   EmailReply[]
 }
 
 model Message {
@@ -76,10 +77,14 @@ model Message {
 
 model EmailReply {
   id            Int       @id @default(autoincrement())
+  ownerId       Int
   originalMessageId String
   replyMessageId    String
   contactId     Int
+  contact       Contact   @relation(fields: [contactId], references: [id])
+  replySubject  String
   replyContent  String
+  replyHistory  String?
   replyDate     DateTime
   processed     Boolean   @default(false)
   createdAt     DateTime  @default(now())

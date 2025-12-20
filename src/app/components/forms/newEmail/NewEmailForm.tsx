@@ -23,8 +23,8 @@ interface EmailFormData {
 
 const NewEmailForm = () => {
 	const [editorContent, setEditorContent] = useState<string>('');
-	const [emailTo, setEmailTo] = useState<string>('');
-	const [emailSubject, setEmailSubject] = useState<string>('');
+	const [sending, setSending] = useState<boolean>(false);
+	const [message, setMessage] = useState('');
 
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -32,6 +32,7 @@ const NewEmailForm = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
+		reset,
 	} = useForm<EmailFormData>({
 		defaultValues: {
 			to: '',
@@ -42,9 +43,45 @@ const NewEmailForm = () => {
 		},
 	});
 
+	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
+		setSending(true);
+
+		try {
+			const response = await fetch('/api/send-email', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					to: data.to,
+					subject: data.subject || 'Email from Application',
+					body:
+						editorContent ||
+						'This is an email from the application automation system.',
+				}),
+			});
+
+			const result = await response.json();
+
+			if (response.ok) {
+				alert('Email sent successfully!');
+				setMessage('');
+				setEditorContent('');
+				reset(); // Reset form fields
+			} else {
+				alert(`Failed to send email: ${result.error || 'Unknown error'}`);
+			}
+		} catch (error) {
+			console.error('Error sending email:', error);
+			alert('Error sending email. Check console for details.');
+		} finally {
+			setSending(false);
+		}
+	};
+
 	return (
 		<div className={styles['newemailform-wrapper']}>
-			<form>
+			<form onSubmit={handleSubmit(onSubmit)}>
 				<section className={styles['form-settings']}>
 					<h2>Follow-up Settings</h2>
 					{/* Follow-up Cadence */}
@@ -52,9 +89,9 @@ const NewEmailForm = () => {
 						<label htmlFor='followUpCadence'>Follow-up Cadence:</label>
 						<select
 							id='followUpCadence'
-							{...register('followUpCadence', {
-								required: 'Please select a follow-up cadence',
-							})}
+							// {...register('followUpCadence', {
+							// 	required: 'Please select a follow-up cadence',
+							// })}
 						>
 							<option value=''>Select cadence...</option>
 							<option value='2day'>Every 2 days</option>
@@ -109,7 +146,6 @@ const NewEmailForm = () => {
 									message: 'Invalid email address',
 								},
 							})}
-							onChange={(e) => setEmailTo(e.target.value)}
 						/>
 						{errors.to && <span>{errors.to.message}</span>}
 					</div>
@@ -121,7 +157,6 @@ const NewEmailForm = () => {
 							type='text'
 							id='subject'
 							{...register('subject', { required: 'Subject is required' })}
-							onChange={(e) => setEmailSubject(e.target.value)}
 						/>
 						{errors.subject && <span>{errors.subject.message}</span>}
 					</div>
@@ -132,11 +167,9 @@ const NewEmailForm = () => {
 					</div>
 
 					{/* Send Buttons */}
-					<TestButton
-						emailText={editorContent}
-						emailTo={emailTo}
-						emailSubject={emailSubject}
-					/>
+					<button type='submit' disabled={sending}>
+						{sending ? 'Sending...' : 'Send Test Email'}
+					</button>
 				</section>
 			</form>
 		</div>

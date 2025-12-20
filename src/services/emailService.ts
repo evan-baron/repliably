@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 
-export async function findOrCreateContact(email: string, userId: number) {
+export async function findOrCreateContact(email: string, ownerId: number) {
 	let contact = await prisma.contact.findFirst({
 		where: {
 			email: email,
-			userId: userId,
+			ownerId: ownerId,
 		},
 	});
 
@@ -12,7 +12,7 @@ export async function findOrCreateContact(email: string, userId: number) {
 		contact = await prisma.contact.create({
 			data: {
 				email: email,
-				userId: userId,
+				ownerId: ownerId,
 				firstName: null,
 				lastName: null,
 				company: null,

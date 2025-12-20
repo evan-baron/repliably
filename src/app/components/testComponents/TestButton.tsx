@@ -48,18 +48,9 @@ const TestButton = ({ emailText, emailTo, emailSubject }: TestButtonProps) => {
 	};
 
 	return (
-		<div>
-			{/* <input
-				type='text'
-				placeholder='Enter your test message'
-				value={message}
-				onChange={(e) => setMessage(e.target.value)}
-				style={{ marginRight: '10px', padding: '5px' }}
-			/> */}
-			<button onClick={handleClick} disabled={sending}>
-				{sending ? 'Sending...' : 'Send Test Email'}
-			</button>
-		</div>
+		<button onClick={handleClick} disabled={sending}>
+			{sending ? 'Sending...' : 'Send Test Email'}
+		</button>
 	);
 };
 

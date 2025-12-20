@@ -11,6 +11,7 @@ import NavigationItem from './NavigationItem';
 const navigationItems = [
 	{ href: '/dashboard/new-email', label: 'New Email' },
 	{ href: '/dashboard', label: 'Dashboard' },
+	{ href: '/dashboard/replies', label: 'Replies' },
 	{ href: '/dashboard/analytics', label: 'Analytics' },
 	{ href: '/dashboard/contacts', label: 'Contacts' },
 	{ href: '/dashboard/sequences', label: 'Sequences' },
