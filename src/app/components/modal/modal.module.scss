@@ -1,37 +1,39 @@
 .modalContent {
 	background: white;
-	border-radius: var(--border-radius-lg);
 	width: 100%;
 	max-height: 90vh;
-	overflow-y: auto;
-	animation: modalSlideIn 0.3s ease-out;
-}
+	// animation: modalSlideIn 0.3s ease-out;
 
-@keyframes modalSlideIn {
-	from {
-		opacity: 0;
-		transform: translateY(-20px) scale(0.95);
+	.modalHeader {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-bottom: 1px solid var(--border-light);
+		margin-bottom: 1.5rem;
+		text-align: center;
+
+		h2 {
+			margin: 0;
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--text-primary);
+		}
 	}
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
-}
 
-.modalHeader {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border-bottom: 1px solid var(--border-light);
-	margin-bottom: 1.5rem;
-
-	h2 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: var(--text-primary);
+	.modalBody {
 	}
 }
+
+// @keyframes modalSlideIn {
+// 	from {
+// 		opacity: 0;
+// 		transform: translateY(-20px) scale(0.95);
+// 	}
+// 	to {
+// 		opacity: 1;
+// 		transform: translateY(0) scale(1);
+// 	}
+// }
 
 // Auth Modal Specific Styles
 .authModal {

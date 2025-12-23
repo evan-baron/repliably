@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 
 import styles from './home.module.scss';
 
-import AuthSection from './components/auth/AuthSection';
+// import AuthSection from './components/modals/modalTypes/auth/AuthSection';
+import Modal from './components/modal/Modal';
 
 export default async function Home() {
 	const session = await auth0.getSession();
@@ -27,7 +28,7 @@ export default async function Home() {
 					role='region'
 				>
 					<div className={styles['auth-container']}>
-						<AuthSection />
+						<Modal />
 					</div>
 				</section>
 			</div>

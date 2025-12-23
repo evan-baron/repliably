@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { Auth0Provider } from '@auth0/nextjs-auth0';
+
+// Styles imports
 import './reset.css';
 import './globals.scss';
+
+// Component imports
+import { ContextProvider } from './context/AppContext';
 
 export const metadata: Metadata = {
 	title: 'Application Automation - Automate Your Job Application Follow-ups',
@@ -17,12 +22,14 @@ export default function RootLayout({
 	return (
 		<html lang='en'>
 			<body>
-				<Auth0Provider>
-					<div id='root' role='application'>
-						{children}
-					</div>
-					<div id='modal-root' aria-live='polite' aria-atomic='true'></div>
-				</Auth0Provider>
+				<ContextProvider>
+					<Auth0Provider>
+						<div id='root' role='application'>
+							{children}
+						</div>
+						<div id='modal-root' aria-live='polite' aria-atomic='true'></div>
+					</Auth0Provider>
+				</ContextProvider>
 			</body>
 		</html>
 	);
