@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
+import { useEmailSend } from '@/hooks/useEmail';
 
 // Styles imports
 import styles from './newEmailForm.module.scss';
@@ -25,9 +26,9 @@ interface EmailFormData {
 
 const NewEmailForm = () => {
 	const { setModalType } = useAppContext();
+	const { mutate: sendEmail, loading: sending } = useEmailSend();
 
 	const [editorContent, setEditorContent] = useState<string>('');
-	const [sending, setSending] = useState<boolean>(false);
 
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -47,37 +48,20 @@ const NewEmailForm = () => {
 	});
 
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
-		setSending(true);
-
 		try {
-			const response = await fetch('/api/send-email', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					to: data.to,
-					subject: data.subject || 'Email from Application',
-					body:
-						editorContent ||
-						'This is an email from the application automation system.',
-				}),
+			await sendEmail({
+				to: data.to,
+				subject: data.subject || 'Email from Application',
+				body:
+					editorContent ||
+					'This is an email from the application automation system.',
 			});
 
-			const result = await response.json();
-
-			if (response.ok) {
-				alert('Email sent successfully!');
-				setEditorContent('');
-				reset(); // Reset form fields
-			} else {
-				alert(`Failed to send email: ${result.error || 'Unknown error'}`);
-			}
+			// Success handling is done in the hook
+			setEditorContent('');
+			reset(); // Reset form fields
 		} catch (error) {
-			console.error('Error sending email:', error);
-			alert('Error sending email. Check console for details.');
-		} finally {
-			setSending(false);
+			// Error handling is done in the hook
 		}
 	};
 

@@ -1,67 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useReplies, useCheckReplies } from '@/hooks/useReplies';
 import styles from './repliesPage.module.scss';
 
-interface Reply {
-	id: number;
-	replySubject: string;
-	replyContent: string;
-	date: string;
-	contact: {
-		email: string;
-		firstName?: string;
-		lastName?: string;
-	};
-}
-
 export default function RepliesPage() {
-	const [replies, setReplies] = useState<Reply[]>([]);
-	const [loading, setLoading] = useState(false);
-	const [checking, setChecking] = useState(false);
+	const { data: replies = [], loading, refetch } = useReplies();
+	const { mutate: checkForNewReplies, loading: checking } = useCheckReplies();
 
-	const fetchReplies = async () => {
+	const handleCheckReplies = async () => {
 		try {
-			const response = await fetch('/api/replies');
-			const data = await response.json();
-			setReplies(data);
-			console.log(data);
+			await checkForNewReplies(undefined);
+			refetch(); // Refresh replies after checking
 		} catch (error) {
-			console.error('Error fetching replies:', error);
+			// Error handling is done in the hook
 		}
 	};
-
-	const checkForNewReplies = async () => {
-		setChecking(true);
-		try {
-			const response = await fetch('/api/check-replies', { method: 'POST' });
-			const result = await response.json();
-
-			if (result.success) {
-				alert('Checked for replies successfully!');
-				// Refresh the replies list
-				await fetchReplies();
-			} else {
-				alert('Error checking for replies: ' + result.error);
-			}
-		} catch (error) {
-			console.error('Error:', error);
-			alert('Error checking for replies');
-		} finally {
-			setChecking(false);
-		}
-	};
-
-	useEffect(() => {
-		fetchReplies();
-	}, []);
 
 	return (
 		<div className={styles.repliesPage}>
 			<div className={styles.header}>
 				<h1>Email Replies</h1>
 				<button
-					onClick={checkForNewReplies}
+					onClick={handleCheckReplies}
 					disabled={checking}
 					className={styles.checkButton}
 				>
@@ -69,7 +29,7 @@ export default function RepliesPage() {
 				</button>
 			</div>
 
-			{replies.length === 0 ? (
+			{!replies || replies.length === 0 ? (
 				<div className={styles.emptyState}>
 					<p>No replies yet. Send some emails and check back!</p>
 				</div>
