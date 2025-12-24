@@ -1,5 +1,4 @@
 // Library imports
-import React from 'react';
 
 // Hooks imports
 

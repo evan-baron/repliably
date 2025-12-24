@@ -1,7 +1,7 @@
 'use client';
 
 // Library imports
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
@@ -28,7 +28,6 @@ const NewEmailForm = () => {
 
 	const [editorContent, setEditorContent] = useState<string>('');
 	const [sending, setSending] = useState<boolean>(false);
-	const [message, setMessage] = useState('');
 
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -69,7 +68,6 @@ const NewEmailForm = () => {
 
 			if (response.ok) {
 				alert('Email sent successfully!');
-				setMessage('');
 				setEditorContent('');
 				reset(); // Reset form fields
 			} else {

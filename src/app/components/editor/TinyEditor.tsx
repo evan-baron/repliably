@@ -1,18 +1,12 @@
 'use client';
 
 // Library imports
-import React, { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-// Hooks imports
-
 // Styles imports
 import styles from './tinyEditor.module.scss';
-
-// Components imports
-
-// Context imports
 
 const TinyEditor = ({
 	setEditorContent,
