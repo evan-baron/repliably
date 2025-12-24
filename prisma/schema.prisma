@@ -40,6 +40,8 @@ model Contact {
   lastName       String?
   company        String?
   phone          String?
+  linkedIn       String?
+  importance     Int?
   associatedRole String?   // e.g. "Junior Engineer"
   active         Boolean   @default(true )
   lastActivity   DateTime?
