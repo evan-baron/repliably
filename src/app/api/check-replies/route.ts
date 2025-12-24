@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 	}
 }
 
-// Reuse your existing processMessage function logic
+// Reuse existing processMessage function logic
 async function checkForReplies(gmail: any) {
 	console.log('Fetching recent messages from Gmail...');
 
@@ -63,11 +63,11 @@ async function processMessage(gmail: any, messageId: string) {
 		const headers = message.data.payload.headers;
 		const threadId = message.data.threadId;
 
-		// Extract sender email and USE it for validation
+		// Extract sender email and use it for validation
 		const from = headers.find((h: any) => h.name === 'From')?.value;
 		const senderEmail = extractEmailFromHeader(from);
 
-		// Check if this is a reply to one of our sent emails
+		// Check if this is a reply to one of user's sent emails
 		const sentMessage = await prisma.message.findFirst({
 			where: {
 				threadId: threadId,
@@ -79,13 +79,13 @@ async function processMessage(gmail: any, messageId: string) {
 		});
 
 		if (sentMessage) {
-			// Validate that the reply is from the same contact we sent to
+			// Validate that the reply is from the same contact user sent to
 			if (senderEmail !== sentMessage.contact.email) {
 				//Reply from different email than original contact, SKIP
 				return;
 			}
 
-			// Check if we've already processed this reply
+			// Check if reply already exists in DB
 			const existingReply = await prisma.emailReply.findFirst({
 				where: { replyMessageId: messageId },
 			});
