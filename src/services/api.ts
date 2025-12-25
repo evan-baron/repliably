@@ -46,4 +46,20 @@ export const contactAPI = {
 			method: 'POST',
 			body: JSON.stringify(contactData),
 		}),
+	update: (contactData: {
+		id: number;
+		firstName?: string;
+		lastName?: string;
+		company?: string;
+		title?: string;
+		email?: string;
+		phone?: string;
+		linkedIn?: string;
+		importance?: string;
+		associatedRole?: string;
+	}) =>
+		apiCall(`/api/contacts/${contactData.id}`, {
+			method: 'PUT',
+			body: JSON.stringify(contactData),
+		}),
 };

@@ -2,7 +2,7 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
-import { useContactCreate } from '@/hooks/useContact';
+import { useContactCreate, useContactUpdate } from '@/hooks/useContact';
 import { useDuplicateContactHandler } from '@/hooks/useDuplicateContactHandler';
 
 // Styles imports
@@ -29,6 +29,7 @@ const NewContactModal = () => {
 	const { setModalType, duplicateContact, setDuplicateContact } =
 		useAppContext();
 	const { mutate: createContact, loading: saving } = useContactCreate();
+	const { mutate: updateContact, loading: updating } = useContactUpdate();
 
 	const {
 		register,
@@ -50,13 +51,49 @@ const NewContactModal = () => {
 	});
 
 	const {
+		mismatchFields,
 		isDuplicateMode,
+		contactId,
 		processDuplicate,
 		clearDuplicateState,
 		isFieldDifferent,
 	} = useDuplicateContactHandler();
 
 	const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
+		if (duplicateContact) {
+			try {
+				// Ensure contactId exists
+				if (!contactId) {
+					console.error('Contact ID is missing');
+					return;
+				}
+
+				const changedFields = mismatchFields.reduce(
+					(acc: Record<string, string>, fieldName) => {
+						acc[fieldName] = data[fieldName as keyof ContactFormData];
+						return acc;
+					},
+					{} as Record<string, string>
+				);
+
+				const updateData = {
+					id: contactId,
+					...changedFields,
+				};
+
+				await updateContact(updateData);
+
+				// Handle success
+				reset();
+				setModalType(null);
+				clearDuplicateState();
+				setDuplicateContact(false);
+			} catch (error) {
+				// Error handling is done in the hook
+			}
+			return;
+		}
+
 		try {
 			const response = await createContact(data);
 
@@ -289,7 +326,7 @@ const NewContactModal = () => {
 						className={`${styles['save-button']} button contact`}
 					>
 						{duplicateContact
-							? saving
+							? updating
 								? 'Updating...'
 								: 'Update Contact'
 							: saving

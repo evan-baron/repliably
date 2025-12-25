@@ -1,5 +1,6 @@
 // src/hooks/useDuplicateContactHandler.ts
 import { useState } from 'react';
+import { set } from 'react-hook-form';
 
 interface ContactFormData {
 	firstName: string;
@@ -23,6 +24,7 @@ export const useDuplicateContactHandler = () => {
 		null
 	);
 	const [isDuplicateMode, setIsDuplicateMode] = useState(false);
+	const [contactId, setContactId] = useState<number | null>(null);
 
 	// Step 2: Move your utility functions here
 	const normalizeValue = (value: any) => {
@@ -34,6 +36,9 @@ export const useDuplicateContactHandler = () => {
 	const processDuplicate = (formData: ContactFormData, apiContact: any) => {
 		// Store what user originally submitted
 		setSubmittedData(formData);
+
+		// Store contact ID
+		setContactId(apiContact.id);
 
 		// Convert API contact to form format
 		const normalizedApiContact: ContactFormData = {
@@ -62,12 +67,6 @@ export const useDuplicateContactHandler = () => {
 		setMismatchFields(fieldsWithDifferences);
 		setIsDuplicateMode(true);
 
-		console.log('Processed duplicate:', {
-			submitted: formData,
-			existing: normalizedApiContact,
-			mismatches: fieldsWithDifferences,
-		});
-
 		// Return the normalized data so it can be used immediately
 		return normalizedApiContact;
 	};
@@ -78,6 +77,7 @@ export const useDuplicateContactHandler = () => {
 		setDuplicateData(null);
 		setSubmittedData(null);
 		setIsDuplicateMode(false);
+		setContactId(null);
 	};
 
 	// Step 5: Create isFieldDifferent helper
@@ -91,6 +91,7 @@ export const useDuplicateContactHandler = () => {
 		duplicateData,
 		submittedData,
 		isDuplicateMode,
+		contactId,
 		processDuplicate,
 		clearDuplicateState,
 		isFieldDifferent,

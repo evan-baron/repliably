@@ -45,6 +45,19 @@ interface ContactResponse {
 	};
 }
 
+interface ContactUpdateData {
+	id: number;
+	firstName?: string;
+	lastName?: string;
+	company?: string;
+	title?: string;
+	email?: string;
+	phone?: string;
+	linkedIn?: string;
+	importance?: string;
+	associatedRole?: string;
+}
+
 export const useContactCreate = () => {
 	const { setDuplicateContact } = useAppContext();
 
@@ -63,6 +76,24 @@ export const useContactCreate = () => {
 		onError: (error, contactData) => {
 			console.error('Failed to create contact:', error);
 			alert(`Failed to create contact: ${error.message}`);
+		},
+	});
+};
+
+export const useContactUpdate = () => {
+	const { setDuplicateContact } = useAppContext();
+
+	return useMutation<ContactResponse, ContactUpdateData>(contactAPI.update, {
+		onSuccess: (response, contactData) => {
+			setDuplicateContact(false);
+			console.log('Contact updated successfully:', response.contact);
+			alert(
+				`Contact updated successfully! ${response.contact.firstName} ${response.contact.lastName}`
+			);
+		},
+		onError: (error, contactData) => {
+			console.error('Failed to update contact:', error);
+			alert(`Failed to update contact: ${error.message}`);
 		},
 	});
 };
