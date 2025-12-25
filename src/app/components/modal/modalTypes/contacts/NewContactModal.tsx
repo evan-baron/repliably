@@ -1,9 +1,9 @@
 // Library imports
-import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
 import { useContactCreate } from '@/hooks/useContact';
+import { useDuplicateContactHandler } from '@/hooks/useDuplicateContactHandler';
 
 // Styles imports
 import styles from './newContactModal.module.scss';
@@ -14,25 +14,13 @@ import styles from './newContactModal.module.scss';
 import { useAppContext } from '@/app/context/AppContext';
 
 interface ContactFormData {
-	first: string;
-	last: string;
+	firstName: string;
+	lastName: string;
 	company: string;
 	title: string;
 	email: string;
 	phone: string;
-	linkedin: string;
-	importance: string;
-	associatedRole?: string;
-}
-
-interface DuplicateContact {
-	first: string;
-	last: string;
-	company: string;
-	title: string;
-	email: string;
-	phone: string;
-	linkedin: string;
+	linkedIn: string;
 	importance: string;
 	associatedRole: string;
 }
@@ -41,12 +29,6 @@ const NewContactModal = () => {
 	const { setModalType, duplicateContact, setDuplicateContact } =
 		useAppContext();
 	const { mutate: createContact, loading: saving } = useContactCreate();
-	const [submittedData, setSubmittedData] = useState<ContactFormData | null>(
-		null
-	);
-	const [duplicateData, setDuplicateData] = useState<DuplicateContact | null>(
-		null
-	);
 
 	const {
 		register,
@@ -55,17 +37,24 @@ const NewContactModal = () => {
 		reset,
 	} = useForm<ContactFormData>({
 		defaultValues: {
-			first: '',
-			last: '',
+			firstName: '',
+			lastName: '',
 			company: '',
 			title: '',
 			email: '',
 			phone: '',
-			linkedin: '',
+			linkedIn: '',
 			importance: '',
 			associatedRole: '',
 		},
 	});
+
+	const {
+		isDuplicateMode,
+		processDuplicate,
+		clearDuplicateState,
+		isFieldDifferent,
+	} = useDuplicateContactHandler();
 
 	const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
 		try {
@@ -73,30 +62,14 @@ const NewContactModal = () => {
 
 			// Handle duplicate contact scenario
 			if (response.success === false && response.duplicate) {
-				setSubmittedData(data);
-				console.log('Duplicate contact detected:', response.existingContact);
-				const duplicateData: DuplicateContact = {
-					first: response.existingContact?.firstName || '',
-					last: response.existingContact?.lastName || '',
-					company: response.existingContact?.company || '',
-					title: response.existingContact?.title || '',
-					email: response.existingContact?.email || '',
-					phone: response.existingContact?.phone || '',
-					linkedin: response.existingContact?.linkedIn || '',
-					importance: response.existingContact?.importance?.toString() || '',
-					associatedRole: response.existingContact?.associatedRole || '',
-				};
-
-				setDuplicateData(duplicateData);
-				reset({
-					...duplicateData,
-				});
+				const normalizedData = processDuplicate(data, response.existingContact);
+				reset(normalizedData);
 				return;
 			}
 
 			reset();
 			setModalType(null);
-			setSubmittedData(null);
+			clearDuplicateState();
 			setDuplicateContact(false);
 		} catch (error) {
 			// Error handling is done in the hook
@@ -106,6 +79,7 @@ const NewContactModal = () => {
 	const handleCancel = () => {
 		reset();
 		setModalType(null);
+		clearDuplicateState();
 	};
 
 	return (
@@ -120,24 +94,23 @@ const NewContactModal = () => {
 						<label htmlFor='first'>First Name *</label>
 						<input
 							type='text'
-							id='first'
-							{...register('first', {
+							id='firstName'
+							{...register('firstName', {
 								required: 'First name is required',
 								minLength: {
 									value: 2,
 									message: 'First name must be at least 2 characters',
 								},
 							})}
-							className={`${errors.first ? styles.error : ''} ${
-								submittedData?.first !== duplicateData?.first &&
-								!touchedFields.first
+							className={`${errors.firstName ? styles.error : ''} ${
+								isFieldDifferent('firstName', touchedFields.firstName)
 									? styles['field-updated']
 									: ''
 							}`}
 						/>
-						{errors.first && (
+						{errors.firstName && (
 							<span className={styles['error-message']}>
-								{errors.first.message}
+								{errors.firstName.message}
 							</span>
 						)}
 					</div>
@@ -146,24 +119,23 @@ const NewContactModal = () => {
 						<label htmlFor='last'>Last Name *</label>
 						<input
 							type='text'
-							id='last'
-							{...register('last', {
+							id='lastName'
+							{...register('lastName', {
 								required: 'Last name is required',
 								minLength: {
 									value: 2,
 									message: 'Last name must be at least 2 characters',
 								},
 							})}
-							className={`${errors.last ? styles.error : ''} ${
-								submittedData?.last !== duplicateData?.last &&
-								!touchedFields.last
+							className={`${errors.lastName ? styles.error : ''} ${
+								isFieldDifferent('lastName', touchedFields.lastName)
 									? styles['field-updated']
 									: ''
 							}`}
 						/>
-						{errors.last && (
+						{errors.lastName && (
 							<span className={styles['error-message']}>
-								{errors.last.message}
+								{errors.lastName.message}
 							</span>
 						)}
 					</div>
@@ -178,8 +150,7 @@ const NewContactModal = () => {
 							id='company'
 							{...register('company')}
 							className={`${
-								submittedData?.company !== duplicateData?.company &&
-								!touchedFields.company
+								isFieldDifferent('company', touchedFields.company)
 									? styles['field-updated']
 									: ''
 							}`}
@@ -193,8 +164,7 @@ const NewContactModal = () => {
 							id='title'
 							{...register('title')}
 							className={`${
-								submittedData?.title !== duplicateData?.title &&
-								!touchedFields.title
+								isFieldDifferent('title', touchedFields.title)
 									? styles['field-updated']
 									: ''
 							}`}
@@ -217,8 +187,7 @@ const NewContactModal = () => {
 								},
 							})}
 							className={`${errors.email ? styles.error : ''} ${
-								submittedData?.email !== duplicateData?.email &&
-								!touchedFields.email
+								isFieldDifferent('email', touchedFields.email)
 									? styles['field-updated']
 									: ''
 							}`}
@@ -237,8 +206,7 @@ const NewContactModal = () => {
 							id='phone'
 							{...register('phone')}
 							className={`${
-								submittedData?.phone !== duplicateData?.phone &&
-								!touchedFields.phone
+								isFieldDifferent('phone', touchedFields.phone)
 									? styles['field-updated']
 									: ''
 							}`}
@@ -252,23 +220,22 @@ const NewContactModal = () => {
 						<label htmlFor='linkedin'>LinkedIn Profile</label>
 						<input
 							type='url'
-							id='linkedin'
-							{...register('linkedin', {
+							id='linkedIn'
+							{...register('linkedIn', {
 								pattern: {
 									value: /^(https?:\/\/)?(www\.)?linkedin\.com\/.*$/i,
 									message: 'Please enter a valid LinkedIn URL',
 								},
 							})}
-							className={`${errors.linkedin ? styles.error : ''} ${
-								submittedData?.linkedin !== duplicateData?.linkedin &&
-								!touchedFields.linkedin
+							className={`${errors.linkedIn ? styles.error : ''} ${
+								isFieldDifferent('linkedIn', touchedFields.linkedIn)
 									? styles['field-updated']
 									: ''
 							}`}
 						/>
-						{errors.linkedin && (
+						{errors.linkedIn && (
 							<span className={styles['error-message']}>
-								{errors.linkedin.message}
+								{errors.linkedIn.message}
 							</span>
 						)}
 					</div>
@@ -279,8 +246,7 @@ const NewContactModal = () => {
 							id='importance'
 							{...register('importance')}
 							className={`${
-								submittedData?.importance !== duplicateData?.importance &&
-								!touchedFields.importance
+								isFieldDifferent('importance', touchedFields.importance)
 									? styles['field-updated']
 									: ''
 							}`}
@@ -303,8 +269,7 @@ const NewContactModal = () => {
 						id='associatedRole'
 						{...register('associatedRole')}
 						className={`${errors.associatedRole ? styles.error : ''} ${
-							submittedData?.associatedRole !== duplicateData?.associatedRole &&
-							!touchedFields.associatedRole
+							isFieldDifferent('associatedRole', touchedFields.associatedRole)
 								? styles['field-updated']
 								: ''
 						}`}
@@ -341,7 +306,7 @@ const NewContactModal = () => {
 				</div>
 
 				{/* Error Detected */}
-				{duplicateContact && !Object.values(touchedFields).some(Boolean) && (
+				{isDuplicateMode && !Object.values(touchedFields).some(Boolean) && (
 					<div className={styles['error-duplicate']}>
 						<h3>Duplicate Contact Detected</h3>
 					</div>

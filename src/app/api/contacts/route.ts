@@ -21,21 +21,21 @@ export async function POST(req: NextRequest) {
 
 		// 3. Parse request body
 		const {
-			first,
-			last,
+			firstName,
+			lastName,
 			company,
 			title,
 			email,
 			phone,
-			linkedin,
+			linkedIn,
 			importance,
 			associatedRole,
 		} = await req.json();
 
 		// 4. Validate required fields
-		if (!first || !last || !email) {
+		if (!firstName || !lastName || !email) {
 			return NextResponse.json(
-				{ error: 'Missing required fields: first, last, email' },
+				{ error: 'Missing required fields: firstName, lastName, email' },
 				{ status: 400 }
 			);
 		}
@@ -50,13 +50,13 @@ export async function POST(req: NextRequest) {
 
 		if (existingContact) {
 			const isIdentical =
-				existingContact.firstName === first &&
-				existingContact.lastName === last &&
+				existingContact.firstName === firstName &&
+				existingContact.lastName === lastName &&
 				existingContact.company === (company || null) &&
 				existingContact.title === (title || null) &&
 				existingContact.email === email &&
 				existingContact.phone === (phone || null) &&
-				existingContact.linkedIn === (linkedin || null) &&
+				existingContact.linkedIn === (linkedIn || null) &&
 				existingContact.importance === parseInt(importance) &&
 				existingContact.associatedRole === (associatedRole || null);
 
@@ -98,13 +98,13 @@ export async function POST(req: NextRequest) {
 					associatedRole: existingContact.associatedRole,
 				},
 				submittedData: {
-					first,
-					last,
+					firstName,
+					lastName,
 					company: company || null,
 					title: title || null,
 					email,
 					phone: phone || null,
-					linkedin: linkedin || null,
+					linkedIn: linkedIn || null,
 					importance: parseInt(importance),
 					associatedRole: associatedRole || null,
 				},
@@ -115,13 +115,13 @@ export async function POST(req: NextRequest) {
 		const contact = await prisma.contact.create({
 			data: {
 				ownerId: user.id,
-				firstName: first,
-				lastName: last,
+				firstName: firstName,
+				lastName: lastName,
 				company: company || null,
 				title: title || null,
 				email,
 				phone: phone || null,
-				linkedIn: linkedin || null,
+				linkedIn: linkedIn || null,
 				importance: parseInt(importance),
 				associatedRole: associatedRole || null,
 			},

@@ -1,16 +1,15 @@
 import { useMutation } from './api';
 import { contactAPI } from '@/services/api';
 import { useAppContext } from '@/app/context/AppContext';
-import { set } from 'react-hook-form';
 
 interface ContactData {
-	first: string;
-	last: string;
+	firstName: string;
+	lastName: string;
 	company?: string;
 	title?: string;
 	email: string;
 	phone?: string;
-	linkedin?: string;
+	linkedIn?: string;
 	importance?: string;
 	associatedRole?: string;
 }

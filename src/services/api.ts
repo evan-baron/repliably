@@ -32,13 +32,13 @@ export const repliesAPI = {
 // Contact API functions
 export const contactAPI = {
 	create: (contactData: {
-		first: string;
-		last: string;
+		firstName: string;
+		lastName: string;
 		company?: string;
 		title?: string;
 		email: string;
 		phone?: string;
-		linkedin?: string;
+		linkedIn?: string;
 		importance?: string;
 		associatedRole?: string;
 	}) =>
