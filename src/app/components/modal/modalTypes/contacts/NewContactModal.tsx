@@ -5,6 +5,9 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useContactCreate, useContactUpdate } from '@/hooks/useContact';
 import { useDuplicateContactHandler } from '@/hooks/useDuplicateContactHandler';
 
+// Types imports
+import { ContactFormData } from '@/types/contactTypes';
+
 // Styles imports
 import styles from './newContactModal.module.scss';
 
@@ -12,18 +15,6 @@ import styles from './newContactModal.module.scss';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
-
-interface ContactFormData {
-	firstName: string;
-	lastName: string;
-	company: string;
-	title: string;
-	email: string;
-	phone: string;
-	linkedIn: string;
-	importance: string;
-	associatedRole: string;
-}
 
 const NewContactModal = () => {
 	const { setModalType, duplicateContact, setDuplicateContact } =
@@ -117,6 +108,7 @@ const NewContactModal = () => {
 		reset();
 		setModalType(null);
 		clearDuplicateState();
+		setDuplicateContact(false);
 	};
 
 	return (
@@ -263,7 +255,18 @@ const NewContactModal = () => {
 									value: /^(https?:\/\/)?(www\.)?linkedin\.com\/.*$/i,
 									message: 'Please enter a valid LinkedIn URL',
 								},
+								onChange: (e) => {
+									const value = e.target.value;
+									if (
+										value &&
+										!value.startsWith('http') &&
+										(value.startsWith('www') || value.startsWith('linkedin'))
+									) {
+										e.target.value = `https://${value}`;
+									}
+								},
 							})}
+							placeholder='https://'
 							className={`${errors.linkedIn ? styles.error : ''} ${
 								isFieldDifferent('linkedIn', touchedFields.linkedIn)
 									? styles['field-updated']

@@ -2,17 +2,8 @@
 import { useState } from 'react';
 import { set } from 'react-hook-form';
 
-interface ContactFormData {
-	firstName: string;
-	lastName: string;
-	company: string;
-	title: string;
-	email: string;
-	phone: string;
-	linkedIn: string;
-	importance: string;
-	associatedRole: string;
-}
+// Types imports
+import { ContactFormData } from '@/types/contactTypes';
 
 export const useDuplicateContactHandler = () => {
 	// Step 1: Add all your state here

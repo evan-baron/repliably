@@ -1,3 +1,6 @@
+// Types imports
+import { ContactData, ContactUpdateData } from '@/types/contactTypes';
+
 // Generic fetch wrapper
 const apiCall = async (url: string, options: RequestInit = {}) => {
 	const response = await fetch(url, {
@@ -31,33 +34,12 @@ export const repliesAPI = {
 
 // Contact API functions
 export const contactAPI = {
-	create: (contactData: {
-		firstName: string;
-		lastName: string;
-		company?: string;
-		title?: string;
-		email: string;
-		phone?: string;
-		linkedIn?: string;
-		importance?: string;
-		associatedRole?: string;
-	}) =>
+	create: (contactData: ContactData) =>
 		apiCall('/api/contacts', {
 			method: 'POST',
 			body: JSON.stringify(contactData),
 		}),
-	update: (contactData: {
-		id: number;
-		firstName?: string;
-		lastName?: string;
-		company?: string;
-		title?: string;
-		email?: string;
-		phone?: string;
-		linkedIn?: string;
-		importance?: string;
-		associatedRole?: string;
-	}) =>
+	update: (contactData: ContactUpdateData) =>
 		apiCall(`/api/contacts/${contactData.id}`, {
 			method: 'PUT',
 			body: JSON.stringify(contactData),

@@ -1,62 +1,11 @@
 import { useMutation } from './api';
 import { contactAPI } from '@/services/api';
 import { useAppContext } from '@/app/context/AppContext';
-
-interface ContactData {
-	firstName: string;
-	lastName: string;
-	company?: string;
-	title?: string;
-	email: string;
-	phone?: string;
-	linkedIn?: string;
-	importance?: string;
-	associatedRole?: string;
-}
-
-interface ContactResponse {
-	success: boolean;
-	duplicate?: boolean;
-	existingContact?: {
-		id: number;
-		firstName: string;
-		lastName: string;
-		company: string;
-		title: string;
-		email: string;
-		phone: string;
-		linkedIn: string;
-		importance: number;
-		associatedRole: string;
-	};
-	contact: {
-		id: number;
-		firstName: string;
-		lastName: string;
-		company?: string;
-		title?: string;
-		email: string;
-		phone?: string;
-		linkedIn?: string;
-		importance?: number;
-		associatedRole?: string;
-		createdAt: string;
-		updatedAt: string;
-	};
-}
-
-interface ContactUpdateData {
-	id: number;
-	firstName?: string;
-	lastName?: string;
-	company?: string;
-	title?: string;
-	email?: string;
-	phone?: string;
-	linkedIn?: string;
-	importance?: string;
-	associatedRole?: string;
-}
+import {
+	ContactData,
+	ContactResponse,
+	ContactUpdateData,
+} from '@/types/contactTypes';
 
 export const useContactCreate = () => {
 	const { setDuplicateContact } = useAppContext();
