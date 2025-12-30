@@ -26,7 +26,7 @@ interface EmailFormData {
 
 const NewEmailForm = () => {
 	const { setModalType, selectedContact, setSelectedContact } = useAppContext();
-	const { mutate: sendEmail, loading: sending } = useEmailSend();
+	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
 
 	const [editorContent, setEditorContent] = useState<string>('');
 

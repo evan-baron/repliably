@@ -1,4 +1,3 @@
-// import { useMutation } from './api';
 import { contactAPI } from '@/services/api';
 import { useAppContext } from '@/app/context/AppContext';
 import {
@@ -16,16 +15,6 @@ export const useContactsGetAll = () => {
 		queryKey: ['contacts-get-all'],
 		queryFn: contactAPI.read,
 	});
-
-	// return useQuery<ContactsResponse>('contacts-get-all', contactAPI.read, {
-	// 	immediate: true,
-	// 	onSuccess: (response) => {
-	// 		console.log('Contacts fetched successfully:', response.contacts);
-	// 	},
-	// 	onError: (error) => {
-	// 		console.error('Failed to fetch contacts:', error);
-	// 	},
-	// });
 };
 
 export const useContactCreate = () => {
@@ -39,7 +28,16 @@ export const useContactCreate = () => {
 				setDuplicateContact(true);
 				return;
 			}
+
+			// Update the cached contacts list so the table updates immediately
+			queryClient.setQueryData(['contacts-get-all'], (old: any) => {
+				const prev = old?.contacts || [];
+				return { contacts: [response.contact, ...prev] };
+			});
+
+			// Also invalidate to ensure server truth eventually
 			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+
 			alert(
 				`Contact created successfully! ${response.contact.firstName} ${response.contact.lastName}`
 			);

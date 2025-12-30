@@ -1,5 +1,4 @@
 // Library imports
-import React from 'react';
 
 // Hooks imports
 
@@ -7,7 +6,6 @@ import React from 'react';
 import styles from './contacts.module.scss';
 
 // MUI imports
-import { Add } from '@mui/icons-material';
 
 // Components imports
 import SearchBar from '@/app/components/contacts/searchBar/SearchBar';

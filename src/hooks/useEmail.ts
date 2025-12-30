@@ -1,5 +1,7 @@
-import { useMutation } from './api';
 import { emailAPI } from '@/services/api';
+
+// Tanstack React Query
+import { useMutation } from '@tanstack/react-query';
 
 interface EmailData {
 	to: string;
@@ -14,11 +16,13 @@ interface EmailResponse {
 }
 
 export const useEmailSend = () => {
-	return useMutation<EmailResponse, EmailData>(emailAPI.send, {
-		onSuccess: (response) => {
+	return useMutation({
+		mutationFn: emailAPI.send,
+		onSuccess: (response: EmailResponse, emailData: EmailData) => {
 			alert(`Email sent successfully! Message ID: ${response.messageId}`);
 		},
-		onError: (error) => {
+		onError: (error: Error, emailData: EmailData) => {
+			console.error('Error sending email:', error);
 			alert(`Failed to send email: ${error.message}`);
 		},
 	});
