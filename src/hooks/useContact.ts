@@ -17,16 +17,11 @@ export const useContactsGetAll = () => {
 	});
 };
 
-type CreateContext = {
-	previous?: ContactsResponse | undefined;
-	tempId?: number | string;
-};
-
 export const useContactCreate = () => {
 	const { setDuplicateContact } = useAppContext();
 	const queryClient = useQueryClient();
 
-	return useMutation<ContactResponse, Error, ContactData, CreateContext>({
+	return useMutation<ContactResponse, Error, ContactData>({
 		mutationFn: contactAPI.create,
 
 		onError: (error: Error) => {
@@ -69,15 +64,11 @@ export const useContactCreate = () => {
 	});
 };
 
-type UpdateContext = {
-	previous?: ContactsResponse | undefined;
-};
-
 export const useContactUpdate = () => {
 	const { setDuplicateContact } = useAppContext();
 	const queryClient = useQueryClient();
 
-	return useMutation<ContactResponse, Error, ContactUpdateData, UpdateContext>({
+	return useMutation<ContactResponse, Error, ContactUpdateData>({
 		mutationFn: contactAPI.update,
 
 		// No optimistic update: only update cache after server confirms
