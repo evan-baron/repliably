@@ -89,5 +89,5 @@ export interface ContactFromDB {
 
 // For contact of contacts (response from get all)
 export interface ContactsResponse {
-	contacts: [ContactFromDB];
+	contacts: ContactFromDB[];
 }

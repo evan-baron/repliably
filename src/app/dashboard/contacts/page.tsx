@@ -2,6 +2,9 @@
 
 // Hooks imports
 
+// Services imports
+import { getAllContacts } from '@/services/contactsService';
+
 // Styles imports
 import styles from './contacts.module.scss';
 
@@ -10,8 +13,11 @@ import styles from './contacts.module.scss';
 // Components imports
 import SearchBar from '@/app/components/contacts/searchBar/SearchBar';
 import NewContactButton from '@/app/components/buttons/NewContact';
+import ContactsClient from './ContactsClient';
 
-const Page = () => {
+const Page = async () => {
+	const contacts = await getAllContacts();
+
 	return (
 		<div className={styles['page-wrapper']}>
 			<section className={styles['header-section']}>
@@ -32,7 +38,9 @@ const Page = () => {
 				<NewContactButton />
 			</section>
 
-			<section className={styles['contacts-table']}></section>
+			<section className={styles['contacts-table']}>
+				<ContactsClient initialContacts={contacts} />
+			</section>
 		</div>
 	);
 };

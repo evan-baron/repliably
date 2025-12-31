@@ -25,7 +25,7 @@ const ContactsTable = ({
 	columns,
 }: {
 	contacts: ContactFromDB[];
-	onRowClick: (contact: ContactFromDB) => void;
+	onRowClick?: () => void;
 	columns: {
 		associatedRole: boolean;
 		importance: boolean;
@@ -36,7 +36,13 @@ const ContactsTable = ({
 	};
 }) => {
 	const { setSelectedContact } = useAppContext();
-	type SortableContactColumn = 'firstName' | 'lastName' | 'company';
+	type SortableContactColumn =
+		| 'firstName'
+		| 'lastName'
+		| 'company'
+		| 'importance'
+		| 'replied'
+		| 'lastActivity';
 
 	const [sortBy, setSortBy] = useState<SortableContactColumn | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -52,7 +58,7 @@ const ContactsTable = ({
 
 	const handleClick = (contact: ContactFromDB) => {
 		setSelectedContact(contact);
-		onRowClick(contact);
+		if (onRowClick) onRowClick();
 	};
 
 	const sortedContacts = [...contacts].sort((a, b) => {
@@ -87,14 +93,33 @@ const ContactsTable = ({
 						</span>
 					</th>
 					<th className={styles.md}>Title</th>
-					{columns.importance && <th className={styles.sm}>Priority</th>}
+					{columns.importance && (
+						<th className={styles.sm} onClick={() => handleSort('importance')}>
+							<span className={styles.sort}>
+								Priority <SwapVert fontSize='small' />
+							</span>
+						</th>
+					)}
 					{columns.phone && <th className={styles.md}>Phone</th>}
 					<th className={styles.lrg}>Email</th>
 					{columns.linkedIn && <th className={styles.md}>LinkedIn</th>}
 					{columns.lastActivity && (
-						<th className={styles.sm}>Last Contacted</th>
+						<th
+							className={styles.sm}
+							onClick={() => handleSort('lastActivity')}
+						>
+							<span className={styles.sort}>
+								Last Contacted <SwapVert fontSize='small' />
+							</span>
+						</th>
 					)}
-					{columns.replied && <th className={styles.sm}>Replied</th>}
+					{columns.replied && (
+						<th className={styles.sm} onClick={() => handleSort('replied')}>
+							<span className={styles.sort}>
+								Replied <SwapVert fontSize='small' />
+							</span>
+						</th>
+					)}
 					{columns.associatedRole && (
 						<th className={styles.lrg}>Role Applied</th>
 					)}
@@ -102,7 +127,10 @@ const ContactsTable = ({
 			</thead>
 			<tbody>
 				{sortedContacts.map((contact) => (
-					<tr key={contact.email} onClick={() => handleClick(contact)}>
+					<tr
+						key={contact.id ?? contact.email}
+						onClick={() => handleClick(contact)}
+					>
 						<td className={styles.sm}>{contact.firstName}</td>
 						<td className={styles.sm}>{contact.lastName}</td>
 						<td className={styles.md}>{contact.company}</td>
