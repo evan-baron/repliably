@@ -24,7 +24,7 @@ interface EmailFormData {
 	sendWithoutReviewAfter: string;
 }
 
-const NewEmailForm = () => {
+const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 	const { setModalType, selectedContact, setSelectedContact } = useAppContext();
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
 
@@ -41,7 +41,7 @@ const NewEmailForm = () => {
 		setValue,
 	} = useForm<EmailFormData>({
 		defaultValues: {
-			to: '',
+			to: contactEmail || '',
 			subject: '',
 			followUpCadence: '',
 			reviewBeforeSending: false,
@@ -61,7 +61,7 @@ const NewEmailForm = () => {
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
 		try {
 			await sendEmail({
-				to: data.to,
+				to: contactEmail ? contactEmail : data.to,
 				subject: data.subject || 'Email from Application',
 				body:
 					editorContent ||
@@ -82,34 +82,36 @@ const NewEmailForm = () => {
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className={styles['form-email-wrapper']}>
 					<section className={styles['form-email']}>
-						<h2>Email:</h2>
+						{!contactEmail && <h2>Email:</h2>}
 
 						{/* To Field */}
-						<div className={styles['input-group']}>
-							<div className={styles.input}>
-								<label htmlFor='to'>To:</label>
-								<input
-									type='email'
-									id='to'
-									{...register('to', {
-										required: 'Email address is required',
-										pattern: {
-											value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-											message: 'Invalid email address',
-										},
-									})}
-								/>
-								<button
-									type='button'
-									className={styles['contact-select']}
-									data-tooltip='Select from contacts'
-									onClick={() => setModalType('searchContacts')}
-								>
-									...
-								</button>
+						{!contactEmail && (
+							<div className={styles['input-group']}>
+								<div className={styles.input}>
+									<label htmlFor='to'>To:</label>
+									<input
+										type='email'
+										id='to'
+										{...register('to', {
+											required: 'Email address is required',
+											pattern: {
+												value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+												message: 'Invalid email address',
+											},
+										})}
+									/>
+									<button
+										type='button'
+										className={styles['contact-select']}
+										data-tooltip='Select from contacts'
+										onClick={() => setModalType('searchContacts')}
+									>
+										...
+									</button>
+								</div>
+								{errors.to && <span>{errors.to.message}</span>}
 							</div>
-							{errors.to && <span>{errors.to.message}</span>}
-						</div>
+						)}
 
 						{/* Subject Field */}
 						<div className={styles['input-group']}>

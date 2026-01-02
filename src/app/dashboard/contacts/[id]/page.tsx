@@ -8,6 +8,7 @@ import styles from './contactPage.module.scss';
 
 // Component imports
 import ContactDetailsClient from './ContactDetailsClient';
+import ContactActivities from './ContactActivities';
 
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	const { id } = await params;
@@ -27,15 +28,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	return (
 		<div className={styles['page-wrapper']}>
 			<ContactDetailsClient initialContact={contact} />
-			<section className={styles['activities-section']}>
-				<div className={styles.nav}>
-					<h2>Activity</h2>
-					<h2>Send an Email</h2>
-				</div>
-				<div className={styles.content}>
-					<p>No recent activity</p>
-				</div>
-			</section>
+			<ContactActivities contact={contact} />
 		</div>
 	);
 };
