@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth0 } from '@/lib/auth0';
 
 export async function GET(
 	request: NextRequest,
@@ -29,6 +30,21 @@ export async function PUT(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
+		// 1. Check authentication
+		const session = await auth0.getSession();
+		if (!session?.user) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
+		// 2. Get user from database
+		const user = await prisma.user.findUnique({
+			where: { auth0Id: session.user.sub },
+		});
+
+		if (!user) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
 		const { id } = await params;
 		const contactId = parseInt(id);
 		const body = await request.json();
@@ -41,6 +57,23 @@ export async function PUT(
 			updateData.importance = parseInt(updateData.importance);
 		} else {
 			updateData.importance = null; // Remove importance if not set
+		}
+
+		const existingContact = await prisma.contact.findFirst({
+			where: {
+				ownerId: user.id,
+				email: updateData.email,
+			},
+		});
+
+		if (existingContact && existingContact.id !== contactId) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: 'Contact with this email already exists',
+				},
+				{ status: 400 }
+			);
 		}
 
 		const updatedContact = await prisma.contact.update({
@@ -66,6 +99,45 @@ export async function PUT(
 		});
 		return NextResponse.json(
 			{ success: false, error: 'Failed to update contact' },
+			{ status: 500 }
+		);
+	}
+}
+
+export async function DELETE(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+) {
+	try {
+		// 1. Check authentication
+		const session = await auth0.getSession();
+
+		if (!session?.user) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
+		// 2. Get user from database
+		const user = await prisma.user.findUnique({
+			where: { auth0Id: session.user.sub },
+		});
+
+		if (!user) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
+		const { id } = await params;
+
+		const contactId = parseInt(id);
+
+		await prisma.contact.delete({
+			where: { id: contactId },
+		});
+
+		return NextResponse.json({ success: true });
+	} catch (error) {
+		console.error('Error deleting contact:', error);
+		return NextResponse.json(
+			{ error: 'Failed to delete contact' },
 			{ status: 500 }
 		);
 	}

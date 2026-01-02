@@ -11,7 +11,9 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
 	const data = await response.json();
 
 	if (!response.ok) {
-		throw new Error(data.error || `HTTP ${response.status}`);
+		const error = new Error(data.error || `HTTP ${response.status}`);
+		(error as any).duplicate = data.duplicate || false;
+		throw error;
 	}
 
 	return data;
@@ -51,5 +53,9 @@ export const contactAPI = {
 		apiCall(`/api/contacts/${contactData.id}`, {
 			method: 'PUT',
 			body: JSON.stringify(contactData),
+		}),
+	delete: (id: number) =>
+		apiCall(`/api/contacts/${id}`, {
+			method: 'DELETE',
 		}),
 };

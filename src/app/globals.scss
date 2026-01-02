@@ -28,9 +28,15 @@
 		hsla(187, 92%, 69%, 0.25) 50%,
 		hsla(156, 72%, 67%, 0.25) 100%
 	);
+	--gradient-danger: linear-gradient(135deg, #f59f0a, #f8bc54);
 	--gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
 	--gradient-subtle: linear-gradient(135deg, #f0fdff 0%, #f0fdf4 100%);
 	--gradient-accessible: linear-gradient(135deg, #cffafe 0%, #d1fae5 100%);
+	--gradient-danger-accessible: linear-gradient(
+		135deg,
+		hsl(35, 89%, 89%) 0%,
+		hsl(35, 78%, 90%) 100%
+	);
 	--color-primary: hsl(188, 86%, 53%);
 	--color-primary-light: hsl(188, 86%, 70%);
 	--color-primary-hover: hsl(189, 94%, 43%);

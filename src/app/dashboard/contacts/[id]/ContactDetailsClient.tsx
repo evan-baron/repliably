@@ -23,6 +23,8 @@ import type { ContactFromDB } from '@/types/contactTypes';
 
 // Components
 import EditContactButton from '@/app/components/buttons/EditContactButton';
+import DeleteContactButton from '@/app/components/buttons/DeleteContactButton';
+import ContactActivities from './ContactActivities';
 
 export default function ContactDetailsClient({
 	initialContact,
@@ -53,104 +55,118 @@ export default function ContactDetailsClient({
 	};
 
 	return (
-		<section className={styles['header-section']}>
-			<div className={styles['details-wrapper']}>
-				<div className={styles['header-details']}>
-					<h1 className={styles.name}>
-						{contact
-							? `${contact.firstName} ${contact.lastName}`
-							: 'Contact Not Found'}
-					</h1>
-					<EditContactButton contact={contact!} />
-				</div>
+		<>
+			<section className={styles['header-section']}>
+				<div className={styles['details-wrapper']}>
+					<div className={styles['header-details']}>
+						<h1 className={styles.name}>
+							{contact
+								? `${contact.firstName} ${contact.lastName}`
+								: 'Contact Not Found'}
+						</h1>
+						<EditContactButton contact={contact!} />
+						<DeleteContactButton contact={contact!} />
+					</div>
 
-				<div className={styles['contact-details']}>
-					{(contact.company || contact.title || contact.importance) && (
-						<div className={styles['company-info']}>
-							{contact.company && (
+					<div className={styles['contact-details']}>
+						{(contact.company || contact.title || contact.importance) && (
+							<div className={styles['company-info']}>
+								{contact.company && (
+									<div className={styles['info-row']}>
+										<span className={styles.value}>
+											{contact?.company || 'N/A'}
+										</span>
+									</div>
+								)}
+								{contact.title && (
+									<div className={styles['info-row']}>
+										<span className={styles.value}>
+											{contact?.title || 'N/A'}
+										</span>
+									</div>
+								)}
+								{contact.importance && (
+									<div className={styles['info-row']}>
+										<span>
+											Priority:{' '}
+											{contact?.importance
+												? importance[contact.importance]
+												: 'N/A'}
+										</span>
+									</div>
+								)}
+							</div>
+						)}
+						<div className={styles['personal-info']}>
+							<div className={styles['info-row']}>
+								<span className={styles.label}>
+									<MailOutline className={styles.icon} />
+								</span>
+								<span className={styles.value}>{contact?.email || 'N/A'}</span>
+								{contact.validEmail !== null &&
+									(contact.validEmail ? (
+										<Check
+											className={styles.icon}
+											style={{ color: 'hsl(120, 100%, 40%)' }}
+											titleAccess='Email Valid'
+										/>
+									) : (
+										<Close
+											className={styles.icon}
+											style={{ color: 'hsl(0, 100%, 40%)' }}
+											titleAccess='Invalid Email'
+										/>
+									))}
+							</div>
+							{contact.phone && (
 								<div className={styles['info-row']}>
+									<span className={styles.label}>
+										<Phone className={styles.icon} />
+									</span>
 									<span className={styles.value}>
-										{contact?.company || 'N/A'}
+										{contact?.phone || 'N/A'}
 									</span>
 								</div>
 							)}
-							{contact.title && (
+							{contact?.linkedIn && (
 								<div className={styles['info-row']}>
-									<span className={styles.value}>
-										{contact?.title || 'N/A'}
+									<span className={styles.label}>
+										<LinkedIn className={styles.icon} />
 									</span>
-								</div>
-							)}
-							{contact.importance && (
-								<div className={styles['info-row']}>
-									<span>
-										Priority:{' '}
-										{contact?.importance
-											? importance[contact.importance]
-											: 'N/A'}
-									</span>
+									<a
+										href={contact?.linkedIn || ''}
+										className={styles.value}
+										target='_blank'
+										rel='noopener noreferrer'
+									>
+										{contact?.linkedIn || 'N/A'}
+									</a>
 								</div>
 							)}
 						</div>
-					)}
-					<div className={styles['personal-info']}>
+					</div>
+
+					<div className={styles['application-details']}>
+						{contact.associatedRole && (
+							<div className={styles['info-row']}>
+								<span className={styles.label}>
+									Associated Role Applied For:
+								</span>
+								<span className={styles.value} style={{ fontWeight: '600' }}>
+									{contact?.associatedRole || 'N/A'}
+								</span>
+							</div>
+						)}
 						<div className={styles['info-row']}>
-							<span className={styles.label}>
-								<MailOutline className={styles.icon} />
+							<span className={styles.label}>Active Cadence:</span>
+							<span className={styles.value} style={{ fontWeight: '600' }}>
+								{contact?.active ? 'Yes' : 'No'}
 							</span>
-							<span className={styles.value}>{contact?.email || 'N/A'}</span>
-							{contact.validEmail !== null &&
-								(contact.validEmail ? (
-									<Check
-										className={styles.icon}
-										style={{ color: 'hsl(120, 100%, 40%)' }}
-										titleAccess='Email Valid'
-									/>
-								) : (
-									<Close
-										className={styles.icon}
-										style={{ color: 'hsl(0, 100%, 40%)' }}
-										titleAccess='Invalid Email'
-									/>
-								))}
 						</div>
-						{contact.phone && (
-							<div className={styles['info-row']}>
-								<span className={styles.label}>
-									<Phone className={styles.icon} />
-								</span>
-								<span className={styles.value}>{contact?.phone || 'N/A'}</span>
-							</div>
-						)}
-						{contact?.linkedIn && (
-							<div className={styles['info-row']}>
-								<span className={styles.label}>
-									<LinkedIn className={styles.icon} />
-								</span>
-								<a
-									href={contact?.linkedIn || ''}
-									className={styles.value}
-									target='_blank'
-									rel='noopener noreferrer'
-								>
-									{contact?.linkedIn || 'N/A'}
-								</a>
-							</div>
-						)}
 					</div>
 				</div>
-
-				<div className={styles['application-details']}>
-					{contact.associatedRole && (
-						<div className={styles['info-row']}>
-							<span className={styles.label}>Associated Role Applied For:</span>
-							<span className={styles.value}>
-								{contact?.associatedRole || 'N/A'}
-							</span>
-						</div>
-					)}
-				</div>
-			</div>
-		</section>
+			</section>
+			<ContactActivities contact={contact} />
+		</>
 	);
 }

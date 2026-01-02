@@ -44,7 +44,7 @@ const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
 						<p>No recent activity</p>
 					</div>
 				) : (
-					<NewEmailForm contactEmail={contact.email} />
+					<NewEmailForm contactEmail={contact.email} active={contact.active} />
 				)}
 			</div>
 		</section>

@@ -10,6 +10,7 @@ import {
 
 // Tanstack React Query
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { set } from 'react-hook-form';
 
 export const useContactGetUnique = (id: number) => {
 	return useQuery<ContactFromDB>({
@@ -109,6 +110,10 @@ export const useContactUpdate = () => {
 		},
 
 		onError: (error: Error) => {
+			if (error.message === 'Contact with this email already exists') {
+				setDuplicateContact(true);
+				return;
+			}
 			console.error('Failed to update contact:', error);
 			alert(`Failed to update contact: ${error.message}`);
 		},
@@ -121,6 +126,37 @@ export const useContactUpdate = () => {
 					queryKey: ['contact-get-unique', variables.id],
 				});
 			}
+		},
+	});
+};
+
+export const useContactDelete = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<void, Error, number>({
+		mutationFn: contactAPI.delete,
+
+		onSuccess: (_data: void, contactId: number) => {
+			// Remove the deleted contact from the cache
+			queryClient.setQueryData<ContactsResponse>(
+				['contacts-get-all'],
+				(old: any) => {
+					const prev = old?.contacts || [];
+					return {
+						contacts: prev.filter((contact: any) => contact.id !== contactId),
+					};
+				}
+			);
+		},
+
+		onError: (error: Error) => {
+			console.error('Failed to delete contact:', error);
+			alert(`Failed to delete contact: ${error.message}`);
+		},
+
+		onSettled: () => {
+			// Ensure eventual consistency
+			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
 		},
 	});
 };

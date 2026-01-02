@@ -16,6 +16,7 @@ import LoginModal from './modalTypes/auth/login/LoginModal';
 import NewContactModal from './modalTypes/contacts/NewContactModal';
 import SearchContactsModal from './modalTypes/contacts/SearchContactsModal';
 import EditContactModal from './modalTypes/contacts/EditContactModal';
+import DeleteContactModal from './modalTypes/contacts/DeleteContactModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -25,6 +26,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		duplicateContact,
 		selectedContact,
 		setSelectedContact,
+		setDuplicateContact,
 	} = useAppContext();
 
 	const currentModalType = modalType || backupModalType || null;
@@ -37,6 +39,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		setIsModalOpen(false);
 		setModalType(modalType === 'login' ? 'auth' : null);
 		modalType === 'editContact' && setSelectedContact(null);
+		modalType === 'editContact' && setDuplicateContact(false);
 	};
 
 	interface ModalContent {
@@ -75,6 +78,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		editContact: {
 			component: <EditContactModal selectedContact={selectedContact!} />,
 			title: 'Edit Contact',
+			width: '31.5rem',
+		},
+		deleteContact: {
+			component: <DeleteContactModal selectedContact={selectedContact!} />,
+			title: 'Delete Contact',
 			width: '31.5rem',
 		},
 	} as const;

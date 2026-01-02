@@ -20,7 +20,12 @@ const EditContactModal = ({
 }: {
 	selectedContact: ContactFromDB;
 }) => {
-	const { setModalType, setSelectedContact } = useAppContext();
+	const {
+		setModalType,
+		setSelectedContact,
+		duplicateContact,
+		setDuplicateContact,
+	} = useAppContext();
 	const { mutateAsync: updateContact, isPending: updating } =
 		useContactUpdate();
 
@@ -48,7 +53,6 @@ const EditContactModal = ({
 	});
 
 	const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
-		console.log({ id: selectedContact.id, ...data });
 		try {
 			await updateContact({ id: selectedContact.id, ...data });
 			// Handle success
@@ -226,6 +230,7 @@ const EditContactModal = ({
 					<button
 						type='submit'
 						className={`${styles['save-button']} button contact`}
+						disabled={updating || duplicateContact}
 					>
 						{updating ? 'Saving...' : 'Save Changes'}
 					</button>
@@ -234,17 +239,23 @@ const EditContactModal = ({
 						name='cancel'
 						onClick={handleCancel}
 						className={`${styles['cancel-button']} button`}
+						disabled={updating || duplicateContact}
 					>
 						Cancel
 					</button>
 				</div>
 
 				{/* Error Detected */}
-				{/* {isUpdateMode && !Object.values(touchedFields).some(Boolean) && (
-					<div className={styles['error-duplicate']}>
-						<h3>Duplicate Contact Detected</h3>
+				{duplicateContact && (
+					<div className={styles['mini-alert']}>
+						<p className={styles['error-message']}>
+							One of your contacts is already using this email.
+						</p>
+						<button type='button' onClick={() => setDuplicateContact(false)}>
+							Ok
+						</button>
 					</div>
-				)} */}
+				)}
 			</form>
 		</div>
 	);

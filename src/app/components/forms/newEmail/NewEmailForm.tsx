@@ -24,7 +24,13 @@ interface EmailFormData {
 	sendWithoutReviewAfter: string;
 }
 
-const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
+const NewEmailForm = ({
+	contactEmail,
+	active,
+}: {
+	contactEmail?: string;
+	active?: boolean;
+}) => {
 	const { setModalType, selectedContact, setSelectedContact } = useAppContext();
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
 
@@ -56,9 +62,20 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		if (selectedContact?.email) {
 			setValue('to', selectedContact.email);
 		}
-	}, [selectedContact, setValue]);
+
+		if (contactEmail) {
+			setValue('to', contactEmail);
+		}
+	}, [selectedContact, contactEmail, setValue]);
 
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
+		if (active) {
+			console.log(
+				'Contact has an active cadence. Consider pausing it before sending a new email.'
+			);
+			return;
+		}
+
 		try {
 			await sendEmail({
 				to: contactEmail ? contactEmail : data.to,
