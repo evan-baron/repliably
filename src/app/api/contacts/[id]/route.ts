@@ -37,8 +37,10 @@ export async function PUT(
 		const { id: bodyId, ...updateData } = body;
 
 		// Convert importance to integer if it exists
-		if (updateData.importance) {
+		if (updateData.importance !== undefined && updateData.importance !== '') {
 			updateData.importance = parseInt(updateData.importance);
+		} else {
+			updateData.importance = null; // Remove importance if not set
 		}
 
 		const updatedContact = await prisma.contact.update({

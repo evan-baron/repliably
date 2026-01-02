@@ -151,12 +151,6 @@ export default function ContactDetailsClient({
 							</span>
 						</div>
 					)}
-					{/* <div className={styles['info-row']}>
-							<span className={styles.label}>First Contacted:</span>
-							<span className={styles.value}>
-								Todo: Add first email date field to contact
-							</span>
-						</div> */}
 				</div>
 			</div>
 		</section>

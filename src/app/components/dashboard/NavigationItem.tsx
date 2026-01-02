@@ -1,5 +1,4 @@
 // Library imports
-import React from 'react';
 import Link from 'next/link';
 
 // Styles imports

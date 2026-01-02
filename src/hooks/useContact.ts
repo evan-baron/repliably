@@ -54,10 +54,6 @@ export const useContactCreate = () => {
 				// If server only returns contact id or similar, simply invalidate to refetch authoritative data
 				queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
 			}
-
-			alert(
-				`Contact created successfully! ${response.contact.firstName} ${response.contact.lastName}`
-			);
 		},
 
 		onError: (error: Error) => {
