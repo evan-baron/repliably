@@ -15,10 +15,16 @@ import RegisterModal from './modalTypes/auth/register/RegisterModal';
 import LoginModal from './modalTypes/auth/login/LoginModal';
 import NewContactModal from './modalTypes/contacts/NewContactModal';
 import SearchContactsModal from './modalTypes/contacts/SearchContactsModal';
+import EditContactModal from './modalTypes/contacts/EditContactModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
-	const { modalType, setModalType, setIsModalOpen, duplicateContact } =
-		useAppContext();
+	const {
+		modalType,
+		setModalType,
+		setIsModalOpen,
+		duplicateContact,
+		selectedContact,
+	} = useAppContext();
 
 	const currentModalType = modalType || backupModalType || null;
 
@@ -63,6 +69,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		searchContacts: {
 			component: <SearchContactsModal />,
 			title: 'Contacts',
+		},
+		editContact: {
+			component: <EditContactModal selectedContact={selectedContact!} />,
+			title: 'Edit Contact',
+			width: '31.5rem',
 		},
 	} as const;
 

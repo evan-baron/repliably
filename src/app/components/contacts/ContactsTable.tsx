@@ -3,15 +3,11 @@
 // Library imports
 import { useState } from 'react';
 
-// Hooks imports
-
 // Styles imports
 import styles from './contactsTable.module.scss';
 
 // MUI imports
 import { SwapVert } from '@mui/icons-material';
-
-// Components imports
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
@@ -57,6 +53,7 @@ const ContactsTable = ({
 	};
 
 	const handleClick = (contact: ContactFromDB) => {
+		console.log(contact);
 		setSelectedContact(contact);
 		if (onRowClick) onRowClick(contact.id);
 	};

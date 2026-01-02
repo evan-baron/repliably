@@ -4,14 +4,32 @@ import { getContactById } from '@/services/contactsService';
 // Styles imports
 import styles from './contactPage.module.scss';
 
+// MUI imports
+import { Phone, MailOutline, LinkedIn } from '@mui/icons-material';
+
+// Component imports
+import ContactDetailsClient from './ContactDetailsClient';
+
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	const { id } = await params;
 
 	const contact = await getContactById(Number(id));
 
-	console.log('Fetched contact:', contact);
+	if (!contact) {
+		return (
+			<div className={styles['page-wrapper']}>
+				<h1>Contact Not Found</h1>
+			</div>
+		);
+	}
 
-	return <div className={styles['page-wrapper']}>page</div>;
+	console.log(contact);
+
+	return (
+		<div className={styles['page-wrapper']}>
+			<ContactDetailsClient initialContact={contact} />
+		</div>
+	);
 };
 
 export default Page;

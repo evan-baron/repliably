@@ -2,6 +2,7 @@ import { contactAPI } from '@/services/api';
 import { useAppContext } from '@/app/context/AppContext';
 import {
 	ContactData,
+	ContactFromDB,
 	ContactResponse,
 	ContactsResponse,
 	ContactUpdateData,
@@ -9,6 +10,13 @@ import {
 
 // Tanstack React Query
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+export const useContactGetUnique = (id: number) => {
+	return useQuery<ContactFromDB>({
+		queryKey: ['contact-get-unique', id],
+		queryFn: () => contactAPI.readUnique(id),
+	});
+};
 
 export const useContactsGetAll = () => {
 	return useQuery<ContactsResponse>({
@@ -65,14 +73,14 @@ export const useContactCreate = () => {
 };
 
 export const useContactUpdate = () => {
-	const { setDuplicateContact } = useAppContext();
+	const { duplicateContact, setDuplicateContact } = useAppContext();
 	const queryClient = useQueryClient();
 
 	return useMutation<ContactResponse, Error, ContactUpdateData>({
 		mutationFn: contactAPI.update,
 
 		onSuccess: (response: ContactResponse, updateData: ContactUpdateData) => {
-			setDuplicateContact(false);
+			duplicateContact ? setDuplicateContact(false) : null;
 			// Only update cache if server returns the updated contact
 			if (response?.contact) {
 				queryClient.setQueryData<ContactsResponse>(
@@ -86,9 +94,17 @@ export const useContactUpdate = () => {
 						};
 					}
 				);
+				// Invalidate both the contacts list and the unique contact query
+				queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+				queryClient.invalidateQueries({
+					queryKey: ['contact-get-unique', updateData.id],
+				});
 			} else {
 				// If server only returns contact id or similar, simply invalidate to refetch authoritative data
 				queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+				queryClient.invalidateQueries({
+					queryKey: ['contact-get-unique', updateData.id],
+				});
 			}
 
 			alert(
@@ -101,9 +117,14 @@ export const useContactUpdate = () => {
 			alert(`Failed to update contact: ${error.message}`);
 		},
 
-		onSettled: () => {
-			// Ensure eventual consistency
+		onSettled: (_data, _error, variables) => {
+			// Ensure eventual consistency for both queries
 			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+			if (variables?.id) {
+				queryClient.invalidateQueries({
+					queryKey: ['contact-get-unique', variables.id],
+				});
+			}
 		},
 	});
 };

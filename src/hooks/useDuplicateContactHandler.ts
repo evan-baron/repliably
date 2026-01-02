@@ -13,7 +13,7 @@ export const useDuplicateContactHandler = () => {
 	const [submittedData, setSubmittedData] = useState<ContactFormData | null>(
 		null
 	);
-	const [isDuplicateMode, setIsDuplicateMode] = useState(false);
+	const [isUpdateMode, setIsUpdateMode] = useState(false);
 	const [contactId, setContactId] = useState<number | null>(null);
 
 	// Step 2: Move your utility functions here
@@ -55,7 +55,7 @@ export const useDuplicateContactHandler = () => {
 		// Update all state
 		setDuplicateData(normalizedApiContact);
 		setMismatchFields(fieldsWithDifferences);
-		setIsDuplicateMode(true);
+		setIsUpdateMode(true);
 
 		// Return the normalized data so it can be used immediately
 		return normalizedApiContact;
@@ -66,7 +66,7 @@ export const useDuplicateContactHandler = () => {
 		setMismatchFields([]);
 		setDuplicateData(null);
 		setSubmittedData(null);
-		setIsDuplicateMode(false);
+		setIsUpdateMode(false);
 		setContactId(null);
 	};
 
@@ -80,7 +80,7 @@ export const useDuplicateContactHandler = () => {
 		mismatchFields,
 		duplicateData,
 		submittedData,
-		isDuplicateMode,
+		isUpdateMode,
 		contactId,
 		processDuplicate,
 		clearDuplicateState,

@@ -59,7 +59,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 
 	// Reset selectedContact on pathname change
 	useEffect(() => {
-		setSelectedContact(null);
+		const contactDetailRegex = /^\/dashboard\/contacts\/[^/]+$/;
+		if (!contactDetailRegex.test(pathname)) {
+			setSelectedContact(null);
+		}
 	}, [pathname]);
 
 	// Fallback defaults for SSR — assumes desktop/non-touch

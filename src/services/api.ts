@@ -43,6 +43,10 @@ export const contactAPI = {
 		apiCall('/api/contacts', {
 			method: 'GET',
 		}),
+	readUnique: (id: number) =>
+		apiCall(`/api/contacts/${id}`, {
+			method: 'GET',
+		}),
 	update: (contactData: ContactUpdateData) =>
 		apiCall(`/api/contacts/${contactData.id}`, {
 			method: 'PUT',

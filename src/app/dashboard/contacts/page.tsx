@@ -12,7 +12,7 @@ import styles from './contacts.module.scss';
 
 // Components imports
 import SearchBar from '@/app/components/contacts/searchBar/SearchBar';
-import NewContactButton from '@/app/components/buttons/NewContact';
+import NewContactButton from '@/app/components/buttons/NewContactButton';
 import ContactsClient from './ContactsClient';
 
 const Page = async () => {
