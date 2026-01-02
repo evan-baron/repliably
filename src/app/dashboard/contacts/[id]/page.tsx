@@ -5,7 +5,6 @@ import { getContactById } from '@/services/contactsService';
 import styles from './contactPage.module.scss';
 
 // MUI imports
-import { Phone, MailOutline, LinkedIn } from '@mui/icons-material';
 
 // Component imports
 import ContactDetailsClient from './ContactDetailsClient';
@@ -28,6 +27,15 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	return (
 		<div className={styles['page-wrapper']}>
 			<ContactDetailsClient initialContact={contact} />
+			<section className={styles['activities-section']}>
+				<div className={styles.nav}>
+					<h2>Activity</h2>
+					<h2>Send an Email</h2>
+				</div>
+				<div className={styles.content}>
+					<p>No recent activity</p>
+				</div>
+			</section>
 		</div>
 	);
 };

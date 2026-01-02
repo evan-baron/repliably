@@ -44,8 +44,6 @@ export default function ContactDetailsClient({
 	const { data } = useContactGetUnique(initialContact.id);
 	const contact = data || initialContact;
 
-	console.log('contact data:', contact);
-
 	const importance: Record<number, string> = {
 		1: 'Lowest',
 		2: 'Low',
