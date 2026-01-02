@@ -76,116 +76,123 @@ const NewEmailForm = () => {
 	return (
 		<div className={styles['newemailform-wrapper']}>
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<section className={styles['form-settings']}>
-					<h2>Automation Settings:</h2>
-					{/* Follow-up Cadence */}
-					<div className={styles['input-group']}>
-						<div className={styles.input}>
-							<label htmlFor='followUpCadence'>Follow-up Cadence:</label>
-							<select
-								className={styles.select}
-								id='followUpCadence'
-								{...register('followUpCadence', {
-									required: 'Please select a follow-up cadence',
-								})}
-							>
-								<option value=''>Select cadence...</option>
-								<option value='2day'>Every 2 days</option>
-								<option value='3day'>Every 3 days</option>
-								<option value='32day'>Wait 3 then Wait 2 Repeat</option>
-								<option value='weekly'>Weekly on {today}</option>
-								<option value='biweekly'>Bi-weekly on {today}</option>
-							</select>
-						</div>
-						{errors.followUpCadence && (
-							<span>{errors.followUpCadence.message}</span>
-						)}
-					</div>
-					{/* Review Before Sending */}
-					<div className={styles['input-group']}>
-						<div className={styles.input}>
-							<label htmlFor='reviewBeforeSending'>
-								Review Before Sending:
-							</label>
-							<input
-								className={styles.checkbox}
-								type='checkbox'
-								id='reviewBeforeSending'
-								{...register('reviewBeforeSending')}
-							/>
-						</div>
-					</div>
-					{/* Send without Review after */}
-					<div className={styles['input-group']}>
-						<div className={styles.input}>
-							<label htmlFor='sendWithoutReviewAfter'>
-								Send without Review after:
-							</label>
-							<select
-								className={styles.select}
-								id='sendWithoutReviewAfter'
-								{...register('sendWithoutReviewAfter')}
-							>
-								<option value=''>Select time...</option>
-								<option value='1day'>1 Day</option>
-								<option value='2days'>2 Days</option>
-								<option value='never'>Never</option>
-							</select>
-						</div>
-					</div>
-				</section>
+				<div className={styles['form-email-wrapper']}>
+					<section className={styles['form-email']}>
+						<h2>Email:</h2>
 
-				<section className={styles['form-email']}>
-					{/* To Field */}
-					<div className={styles['input-group']}>
-						<div className={styles.input}>
-							<label htmlFor='to'>To:</label>
-							<input
-								type='email'
-								id='to'
-								{...register('to', {
-									required: 'Email address is required',
-									pattern: {
-										value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-										message: 'Invalid email address',
-									},
-								})}
-							/>
-							<button
-								type='button'
-								className={styles['contact-select']}
-								data-tooltip='Select from contacts'
-								onClick={() => setModalType('searchContacts')}
-							>
-								...
-							</button>
+						{/* To Field */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='to'>To:</label>
+								<input
+									type='email'
+									id='to'
+									{...register('to', {
+										required: 'Email address is required',
+										pattern: {
+											value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+											message: 'Invalid email address',
+										},
+									})}
+								/>
+								<button
+									type='button'
+									className={styles['contact-select']}
+									data-tooltip='Select from contacts'
+									onClick={() => setModalType('searchContacts')}
+								>
+									...
+								</button>
+							</div>
+							{errors.to && <span>{errors.to.message}</span>}
 						</div>
-						{errors.to && <span>{errors.to.message}</span>}
-					</div>
 
-					{/* Subject Field */}
-					<div className={styles['input-group']}>
-						<div className={styles.input}>
-							<label htmlFor='subject'>Subject:</label>
-							<input
-								type='text'
-								id='subject'
-								{...register('subject', { required: 'Subject is required' })}
-							/>
+						{/* Subject Field */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='subject'>Subject:</label>
+								<input
+									type='text'
+									id='subject'
+									{...register('subject', { required: 'Subject is required' })}
+								/>
+							</div>
+							{errors.subject && <span>{errors.subject.message}</span>}
 						</div>
-						{errors.subject && <span>{errors.subject.message}</span>}
-					</div>
 
-					{/* Email Body - RTE */}
-					<div className={styles['rte-wrapper']}>
-						<TinyEditor setEditorContent={setEditorContent} />
-					</div>
+						{/* Email Body - RTE */}
+						<div className={styles['rte-wrapper']}>
+							<TinyEditor setEditorContent={setEditorContent} />
+						</div>
+					</section>
+					<section className={styles['form-settings']}>
+						<h2>Automation Settings:</h2>
+						{/* Follow-up Cadence */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='followUpCadence'>Follow-up Cadence:</label>
+								<select
+									className={styles.select}
+									id='followUpCadence'
+									{...register('followUpCadence', {
+										required: 'Please select a follow-up cadence',
+									})}
+								>
+									<option value=''>Select cadence...</option>
+									<option value='2day'>Every 2 days</option>
+									<option value='3day'>Every 3 days</option>
+									<option value='32day'>Wait 3 then Wait 2 Repeat</option>
+									<option value='weekly'>Weekly on {today}</option>
+									<option value='biweekly'>Bi-weekly on {today}</option>
+								</select>
+							</div>
+							{errors.followUpCadence && (
+								<span>{errors.followUpCadence.message}</span>
+							)}
+						</div>
+						{/* Review Before Sending */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='reviewBeforeSending'>
+									Review Before Sending:
+								</label>
+								<input
+									className={styles.checkbox}
+									type='checkbox'
+									id='reviewBeforeSending'
+									{...register('reviewBeforeSending')}
+								/>
+							</div>
+						</div>
+						{/* Send without Review after */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='sendWithoutReviewAfter'>
+									Send without Review after:
+								</label>
+								<select
+									className={styles.select}
+									id='sendWithoutReviewAfter'
+									{...register('sendWithoutReviewAfter')}
+								>
+									<option value=''>Select time...</option>
+									<option value='1day'>1 Day</option>
+									<option value='2days'>2 Days</option>
+									<option value='never'>Never</option>
+								</select>
+							</div>
+						</div>
 
-					{/* Send Buttons */}
-					<button type='submit' disabled={sending}>
-						{sending ? 'Sending...' : 'Send Test Email'}
-					</button>
-				</section>
+						{/* Send Buttons */}
+						<button
+							className={'button send-email'}
+							type='submit'
+							disabled={sending}
+						>
+							{sending ? 'Sending...' : 'Send Email'}
+						</button>
+					</section>
+				</div>
 			</form>
 		</div>
 	);

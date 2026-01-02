@@ -112,7 +112,8 @@ a {
 	font-size: 0.875rem;
 	border: 2px solid transparent;
 
-	&.login {
+	&.login,
+	&.send-email {
 		background: var(--gradient-primary) border-box;
 		color: white;
 		box-shadow: var(--shadow-sm);
@@ -147,12 +148,18 @@ a {
 
 		@media (hover: hover) {
 			&:hover {
-				transform: scale(1.05);
-				box-shadow: var(--shadow-lg);
-
 				&::before {
 					left: 100%;
 				}
+			}
+		}
+	}
+
+	&.login {
+		@media (hover: hover) {
+			&:hover {
+				transform: scale(1.05);
+				box-shadow: var(--shadow-lg);
 			}
 		}
 	}
