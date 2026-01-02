@@ -53,7 +53,6 @@ const ContactsTable = ({
 	};
 
 	const handleClick = (contact: ContactFromDB) => {
-		console.log(contact);
 		setSelectedContact(contact);
 		if (onRowClick) onRowClick(contact.id);
 	};

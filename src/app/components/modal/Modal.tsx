@@ -24,6 +24,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		setIsModalOpen,
 		duplicateContact,
 		selectedContact,
+		setSelectedContact,
 	} = useAppContext();
 
 	const currentModalType = modalType || backupModalType || null;
@@ -35,6 +36,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const handleClose = () => {
 		setIsModalOpen(false);
 		setModalType(modalType === 'login' ? 'auth' : null);
+		modalType === 'editContact' && setSelectedContact(null);
 	};
 
 	interface ModalContent {

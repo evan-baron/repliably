@@ -77,16 +77,17 @@ const NewEmailForm = () => {
 		<div className={styles['newemailform-wrapper']}>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<section className={styles['form-settings']}>
-					<h2>Follow-up Settings</h2>
+					<h2>Automation Settings:</h2>
 					{/* Follow-up Cadence */}
 					<div className={styles['input-group']}>
 						<div className={styles.input}>
 							<label htmlFor='followUpCadence'>Follow-up Cadence:</label>
 							<select
+								className={styles.select}
 								id='followUpCadence'
-								// {...register('followUpCadence', {
-								// 	required: 'Please select a follow-up cadence',
-								// })}
+								{...register('followUpCadence', {
+									required: 'Please select a follow-up cadence',
+								})}
 							>
 								<option value=''>Select cadence...</option>
 								<option value='2day'>Every 2 days</option>
@@ -107,6 +108,7 @@ const NewEmailForm = () => {
 								Review Before Sending:
 							</label>
 							<input
+								className={styles.checkbox}
 								type='checkbox'
 								id='reviewBeforeSending'
 								{...register('reviewBeforeSending')}
@@ -120,6 +122,7 @@ const NewEmailForm = () => {
 								Send without Review after:
 							</label>
 							<select
+								className={styles.select}
 								id='sendWithoutReviewAfter'
 								{...register('sendWithoutReviewAfter')}
 							>

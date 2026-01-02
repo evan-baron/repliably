@@ -20,7 +20,7 @@ const EditContactModal = ({
 }: {
 	selectedContact: ContactFromDB;
 }) => {
-	const { setModalType } = useAppContext();
+	const { setModalType, setSelectedContact } = useAppContext();
 	const { mutateAsync: updateContact, isPending: updating } =
 		useContactUpdate();
 
@@ -62,6 +62,7 @@ const EditContactModal = ({
 	const handleCancel = () => {
 		reset();
 		setModalType(null);
+		setSelectedContact(null);
 	};
 
 	return (
