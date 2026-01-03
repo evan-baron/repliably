@@ -10,7 +10,6 @@ import {
 
 // Tanstack React Query
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { set } from 'react-hook-form';
 
 export const useContactGetUnique = (id: number) => {
 	return useQuery<ContactFromDB>({

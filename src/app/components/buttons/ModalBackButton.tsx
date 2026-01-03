@@ -7,7 +7,7 @@ const ModalBackButton = ({
 	modalRedirect,
 	title,
 }: {
-	modalRedirect: string;
+	modalRedirect: string | null;
 	title: string;
 }) => {
 	const { setModalType } = useAppContext();

@@ -125,7 +125,8 @@ a {
 	border: 2px solid transparent;
 
 	&.login,
-	&.send-email {
+	&.send-email,
+	&.delete {
 		background: var(--gradient-primary) border-box;
 		color: white;
 		box-shadow: var(--shadow-sm);
@@ -177,11 +178,11 @@ a {
 	}
 
 	&.register,
-	&.back {
+	&.back,
+	&.cancel {
 		font-weight: 600;
 		font-size: 1rem;
 		padding: 1rem 2rem;
-		margin-right: 1rem;
 		position: relative;
 		background: linear-gradient(white, white) padding-box,
 			var(--gradient-primary) border-box;
