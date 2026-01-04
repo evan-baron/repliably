@@ -60,7 +60,7 @@ model Contact {
 model Message {
   id            Int       @id @default(autoincrement())
   contactId     Int
-  contact       Contact   @relation(fields: [contactId], references: [id])
+  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
   ownerId       Int?
   owner         User?     @relation(fields: [ownerId], references: [id])
   sequenceId    Int?
@@ -84,7 +84,7 @@ model EmailReply {
   originalMessageId String
   replyMessageId    String
   contactId     Int
-  contact       Contact   @relation(fields: [contactId], references: [id])
+  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
   replySubject  String
   replyContent  String
   replyHistory  String?
@@ -96,7 +96,7 @@ model EmailReply {
 model Sequence {
   id            Int       @id @default(autoincrement())
   contactId     Int
-  contact       Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences")
+  contact       Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
   ownerId       Int
   owner         User      @relation(fields: [ownerId], references: [id])
   sequenceType  String    // e.g. "3-2-1"
