@@ -1,0 +1,17 @@
+.error-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+
+	.errors {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		gap: 0.5rem;
+		list-style: disc;
+		list-style-position: inside;
+		margin-bottom: 1.5rem;
+		font-size: 1.25rem;
+	}
+}

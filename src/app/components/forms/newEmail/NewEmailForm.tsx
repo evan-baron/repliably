@@ -2,7 +2,7 @@
 
 // Library imports
 import { useState, useEffect } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 
 // Hooks imports
 import { useEmailSend } from '@/hooks/useEmail';
@@ -31,7 +31,8 @@ const NewEmailForm = ({
 	contactEmail?: string;
 	active?: boolean;
 }) => {
-	const { setModalType, selectedContact, setSelectedContact } = useAppContext();
+	const { setModalType, selectedContact, setSelectedContact, setErrors } =
+		useAppContext();
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
 
 	const [editorContent, setEditorContent] = useState<string>('');
@@ -55,8 +56,15 @@ const NewEmailForm = ({
 		},
 	});
 
+	const extractFormErrors = (errors: FieldErrors<EmailFormData>): string[] => {
+		return Object.values(errors)
+			.map((error) => error?.message)
+			.filter(Boolean) as string[];
+	};
+
 	const reviewBeforeSendingChecked = watch('reviewBeforeSending');
-	const followingUp = watch('followUpCadence') !== 'none';
+	const followingUp =
+		watch('followUpCadence') !== 'none' && watch('followUpCadence') !== '';
 
 	useEffect(() => {
 		if (selectedContact?.email) {
@@ -96,7 +104,13 @@ const NewEmailForm = ({
 
 	return (
 		<div className={styles['newemailform-wrapper']}>
-			<form onSubmit={handleSubmit(onSubmit)}>
+			<form
+				onSubmit={handleSubmit(onSubmit, (errors) => {
+					const errorMessages = extractFormErrors(errors);
+					setErrors(errorMessages);
+					setModalType('error');
+				})}
+			>
 				<div className={styles['form-email-wrapper']}>
 					<section className={styles['form-email']}>
 						{!contactEmail && <h2>Email:</h2>}
@@ -110,7 +124,7 @@ const NewEmailForm = ({
 										type='email'
 										id='to'
 										{...register('to', {
-											required: 'Email address is required',
+											required: "A 'To:' email address is required",
 											pattern: {
 												value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
 												message: 'Invalid email address',
@@ -126,7 +140,6 @@ const NewEmailForm = ({
 										...
 									</button>
 								</div>
-								{errors.to && <span>{errors.to.message}</span>}
 							</div>
 						)}
 
@@ -137,10 +150,11 @@ const NewEmailForm = ({
 								<input
 									type='text'
 									id='subject'
-									{...register('subject', { required: 'Subject is required' })}
+									{...register('subject', {
+										required: 'A subject line is required',
+									})}
 								/>
 							</div>
-							{errors.subject && <span>{errors.subject.message}</span>}
 						</div>
 
 						{/* Email Body - RTE */}
@@ -154,7 +168,7 @@ const NewEmailForm = ({
 						{/* Follow-up Cadence */}
 						<div className={styles['input-group']}>
 							<div className={styles.input}>
-								<label htmlFor='followUpCadence'>Follow-up Cadence:</label>
+								<label htmlFor='followUpCadence'>*Follow-up Cadence:</label>
 								<select
 									className={styles.select}
 									id='followUpCadence'
@@ -170,9 +184,6 @@ const NewEmailForm = ({
 									<option value='none'>No Follow-up</option>
 								</select>
 							</div>
-							{errors.followUpCadence && (
-								<span>{errors.followUpCadence.message}</span>
-							)}
 						</div>
 
 						{followingUp && (
@@ -202,7 +213,12 @@ const NewEmailForm = ({
 											<select
 												className={styles.select}
 												id='sendWithoutReviewAfter'
-												{...register('sendWithoutReviewAfter')}
+												{...register('sendWithoutReviewAfter', {
+													validate: (value) =>
+														!reviewBeforeSendingChecked || value !== ''
+															? true
+															: 'Please select a review time frame',
+												})}
 											>
 												<option value=''>Select time...</option>
 												<option value='1day'>1 Day</option>

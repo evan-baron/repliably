@@ -116,3 +116,22 @@
 .rte-wrapper {
 	position: relative;
 }
+
+.mini-error-modal {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: auto;
+	max-width: 25rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2rem;
+	padding: 3rem;
+	background: var(--background-secondary);
+	border-radius: var(--border-radius);
+	box-shadow: var(--shadow-floating);
+	border: 0.0625rem solid var(--border-light);
+	z-index: 1000;
+	transform: translate(-50%, -50%);
+}

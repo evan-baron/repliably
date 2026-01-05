@@ -32,6 +32,9 @@ interface AppContextType {
 	setDuplicateContact: (type: boolean) => void;
 	selectedContact: ContactFromDB | null;
 	setSelectedContact: (contact: ContactFromDB | null) => void;
+	errors: string[];
+	setErrors: (errors: string[]) => void;
+	clearErrors: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -51,6 +54,12 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	const [selectedContact, setSelectedContact] = useState<ContactFromDB | null>(
 		null
 	);
+	const [errors, setErrors] = useState<string[]>([]);
+
+	const clearErrors = () => {
+		setErrors([]);
+		setModalType(null);
+	};
 
 	// Auto-sync isModalOpen with modalType
 	useEffect(() => {
@@ -79,6 +88,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		setDuplicateContact: () => {},
 		selectedContact: null,
 		setSelectedContact: () => {},
+		errors: [],
+		setErrors: () => {},
+		clearErrors: () => {},
 	};
 
 	// Client-side checks only after hydration
@@ -137,6 +149,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				setDuplicateContact,
 				selectedContact,
 				setSelectedContact,
+				errors,
+				setErrors,
+				clearErrors,
 		  }
 		: fallback;
 
