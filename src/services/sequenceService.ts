@@ -13,6 +13,11 @@ export async function getSequencesByContactId(contactId: number) {
 
 	const sequences = await prisma.sequence.findMany({
 		where: { ownerId: user.id, contactId: contactId },
+		include: {
+			messages: {
+				orderBy: { date: 'desc' },
+			},
+		},
 		orderBy: { createdAt: 'desc' },
 	});
 
@@ -29,6 +34,11 @@ export async function getSequenceById(sequenceId: number) {
 
 	const sequence = await prisma.sequence.findFirst({
 		where: { ownerId: user.id, id: sequenceId },
+		include: {
+			messages: {
+				orderBy: { date: 'desc' },
+			},
+		},
 	});
 
 	return sequence;

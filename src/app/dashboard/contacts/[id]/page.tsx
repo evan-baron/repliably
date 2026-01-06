@@ -19,8 +19,6 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 	const contact = await getContactById(Number(id));
 	const sequencesData = await getSequencesByContactId(Number(id));
 
-	// console.log('Contact sequences:', sequencesData.sequences);
-
 	if (!contact) {
 		redirect('/dashboard/contacts');
 	}

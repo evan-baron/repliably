@@ -13,6 +13,7 @@ export interface SequenceFromDB {
 	active: boolean;
 	createdAt: Date;
 	updatedAt: Date;
+	messages: any[];
 }
 
 export interface SequencesResponse {

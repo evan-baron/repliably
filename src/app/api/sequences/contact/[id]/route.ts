@@ -19,6 +19,11 @@ export async function GET(
 		const contactId = parseInt(id);
 		const sequences = await prisma.sequence.findMany({
 			where: { ownerId: user.id, contactId: contactId },
+			include: {
+				messages: {
+					orderBy: { date: 'desc' },
+				},
+			},
 		});
 		return NextResponse.json({ sequences });
 	} catch (error: any) {

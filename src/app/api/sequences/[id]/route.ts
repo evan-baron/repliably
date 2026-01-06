@@ -19,6 +19,11 @@ export async function GET(
 		const sequenceId = parseInt(id);
 		const sequence = await prisma.sequence.findFirst({
 			where: { ownerId: user.id, id: sequenceId },
+			include: {
+				messages: {
+					orderBy: { date: 'desc' },
+				},
+			},
 		});
 		return NextResponse.json({ sequence });
 	} catch (error: any) {
