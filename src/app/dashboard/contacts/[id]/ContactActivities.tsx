@@ -19,8 +19,8 @@ import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
 import { ContactFromDB } from '@/types/contactTypes';
 
 const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
-	type SelectedType = 'active' | 'previous' | 'history' | 'email';
-	const [selected, setSelected] = useState<SelectedType>('history');
+	type SelectedType = 'active' | 'previous' | 'email';
+	const [selected, setSelected] = useState<SelectedType>('active');
 
 	interface ActivityContent {
 		[key: string]: {
@@ -29,13 +29,6 @@ const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
 	}
 
 	const activityContent: ActivityContent = {
-		history: {
-			component: (
-				<div className={styles.activity}>
-					<p>No recent activity</p>
-				</div>
-			),
-		},
 		active: {
 			component: (
 				<div className={styles.activity}>
@@ -58,13 +51,6 @@ const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
 	return (
 		<section className={styles['activities-wrapper']}>
 			<div className={styles.nav}>
-				<h2
-					className={selected === 'history' ? styles.selected : ''}
-					onClick={() => setSelected('history')}
-				>
-					History
-				</h2>
-
 				<h2
 					className={selected === 'active' ? styles.selected : ''}
 					onClick={() => setSelected('active')}

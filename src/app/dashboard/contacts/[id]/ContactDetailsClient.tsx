@@ -73,22 +73,30 @@ export default function ContactDetailsClient({
 							<div className={styles['company-info']}>
 								{contact.company && (
 									<div className={styles['info-row']}>
-										<span className={styles.value}>
+										<span>Company:</span>
+										<span
+											className={styles.value}
+											style={{ fontWeight: '600' }}
+										>
 											{contact?.company || 'N/A'}
 										</span>
 									</div>
 								)}
 								{contact.title && (
 									<div className={styles['info-row']}>
-										<span className={styles.value}>
+										<span>Title:</span>
+										<span
+											className={styles.value}
+											style={{ fontWeight: '600' }}
+										>
 											{contact?.title || 'N/A'}
 										</span>
 									</div>
 								)}
 								{contact.importance && (
 									<div className={styles['info-row']}>
-										<span>
-											Priority:{' '}
+										<span>Priority:</span>
+										<span style={{ fontWeight: '600' }}>
 											{contact?.importance
 												? importance[contact.importance]
 												: 'N/A'}
@@ -162,11 +170,6 @@ export default function ContactDetailsClient({
 							<span className={styles.value} style={{ fontWeight: '600' }}>
 								{contact?.active ? 'Yes' : 'No'}
 							</span>
-							{contact?.active && (
-								<div style={{ color: 'red', fontWeight: 'bold' }}>
-									Cancel Sequence Button Goes Here
-								</div>
-							)}
 						</div>
 					</div>
 				</div>
