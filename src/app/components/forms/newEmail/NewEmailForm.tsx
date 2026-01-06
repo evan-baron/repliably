@@ -23,15 +23,10 @@ interface EmailFormData {
 	followUpCadence: string;
 	reviewBeforeSending: boolean;
 	sendWithoutReviewAfter: string;
+	cadenceDuration: string;
 }
 
-const NewEmailForm = ({
-	contactEmail,
-	active,
-}: {
-	contactEmail?: string;
-	active?: boolean;
-}) => {
+const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 	const { setModalType, selectedContact, setSelectedContact, setErrors } =
 		useAppContext();
 	const { resetForm, setResetForm } = useEmailContext();
@@ -50,6 +45,7 @@ const NewEmailForm = ({
 				followUpCadence: '3day',
 				reviewBeforeSending: false,
 				sendWithoutReviewAfter: '',
+				cadenceDuration: '21day',
 			},
 		});
 
@@ -86,6 +82,7 @@ const NewEmailForm = ({
 				cadenceType: data.followUpCadence,
 				reviewBeforeSending: data.reviewBeforeSending,
 				sendWithoutReviewAfter: data.sendWithoutReviewAfter,
+				cadenceDuration: data.cadenceDuration,
 				body:
 					editorContent ||
 					'This is an email from the application automation system.',
@@ -178,7 +175,25 @@ const NewEmailForm = ({
 									<option value='31day'>3... 1... 3... 1... Repeat</option>
 									<option value='weekly'>Weekly on {today}</option>
 									<option value='biweekly'>Bi-weekly on {today}</option>
+									<option value='monthly'>Every 4 weeks on {today}</option>
 									<option value='none'>No Follow-up</option>
+								</select>
+							</div>
+						</div>
+
+						{/* Cadence Duration */}
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='cadenceDuration'>Cadence Duration:</label>
+								<select
+									className={styles.select}
+									id='cadenceDuration'
+									{...register('cadenceDuration')}
+								>
+									<option value='1month'>1 Month</option>
+									<option value='2month'>2 Months</option>
+									<option value='3month'>3 Months</option>
+									<option value='indefinite'>Indefinite</option>
 								</select>
 							</div>
 						</div>

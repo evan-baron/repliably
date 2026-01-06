@@ -36,6 +36,7 @@ export async function storeSentEmail({
 	cadenceType,
 	reviewBeforeSending,
 	sendWithoutReviewAfter,
+	cadenceDuration,
 	messageId,
 	threadId,
 }: StoredEmailData) {
@@ -43,6 +44,22 @@ export async function storeSentEmail({
 
 	let sendDelay = null;
 	let nextStepDueDate = null;
+
+	const cadenceTypeMapping: { [key: string]: number } = {
+		'1day': 1,
+		'3day': 3,
+		'31day': 31,
+		weekly: 7,
+		biweekly: 14,
+		monthly: 28,
+	};
+
+	const cadenceDurationMapping: { [key: string]: number | null } = {
+		'1month': 30,
+		'2month': 60,
+		'3month': 90,
+		indefinite: null,
+	};
 
 	if (
 		sendWithoutReviewAfter === 'never' ||
@@ -57,8 +74,17 @@ export async function storeSentEmail({
 	}
 
 	if (sendDelay) {
-		nextStepDueDate = new Date(Date.now() + sendDelay * 24 * 60 * 60 * 1000);
+		nextStepDueDate = new Date(
+			Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
+		);
 	}
+
+	const endDate = cadenceDurationMapping[cadenceDuration]
+		? new Date(
+				Date.now() +
+					cadenceDurationMapping[cadenceDuration] * 24 * 60 * 60 * 1000
+		  )
+		: null;
 
 	const sequence = await prisma.sequence.create({
 		data: {
@@ -67,7 +93,9 @@ export async function storeSentEmail({
 			sequenceType: cadenceType,
 			autoSend: reviewBeforeSending,
 			autoSendDelay: sendDelay,
+			autoSendDuration: cadenceDurationMapping[cadenceDuration],
 			nextStepDue: nextStepDueDate,
+			endDate,
 		},
 	});
 

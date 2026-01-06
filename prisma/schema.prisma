@@ -94,19 +94,21 @@ model EmailReply {
 }
 
 model Sequence {
-  id            Int       @id @default(autoincrement())
-  contactId     Int
-  contact       Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
-  ownerId       Int
-  owner         User      @relation(fields: [ownerId], references: [id])
-  sequenceType  String    // e.g. "3-2-1"
-  autoSend      Boolean   @default(false)
-  autoSendDelay Int?      // days
-  currentStep   Int       @default(0)
-  nextStepDue   DateTime?
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  contactId        Int
+  contact          Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
+  ownerId          Int
+  owner            User      @relation(fields: [ownerId], references: [id])
+  sequenceType     String    // e.g. "3-2-1"
+  autoSend         Boolean   @default(false)
+  autoSendDelay    Int?      // days
+  autoSendDuration Int?      @default(30)
+  currentStep      Int       @default(0)
+  nextStepDue      DateTime?
+  endDate          DateTime? // createdAt + autoSendDuration days
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   messages      Message[]
 }

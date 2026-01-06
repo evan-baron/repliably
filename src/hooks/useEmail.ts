@@ -12,6 +12,7 @@ interface EmailData {
 	cadenceType: string;
 	reviewBeforeSending: boolean;
 	sendWithoutReviewAfter?: string;
+	cadenceDuration: string;
 	body: string;
 	override?: boolean;
 }

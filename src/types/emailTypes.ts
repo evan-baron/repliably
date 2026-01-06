@@ -6,6 +6,7 @@ export interface StoredEmailData {
 	cadenceType: string;
 	reviewBeforeSending: boolean;
 	sendWithoutReviewAfter?: string;
+	cadenceDuration: string;
 	messageId: string;
 	threadId: string;
 }
@@ -16,6 +17,7 @@ export interface SentEmailData {
 	reviewBeforeSending: boolean;
 	cadenceType: string;
 	sendWithoutReviewAfter?: string;
+	cadenceDuration: string;
 	body: string;
 	override?: boolean;
 }

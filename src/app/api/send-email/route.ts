@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
 			reviewBeforeSending,
 			cadenceType,
 			sendWithoutReviewAfter,
+			cadenceDuration,
 			body,
 			override,
 		} = await req.json();
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
 					cadenceType,
 					reviewBeforeSending,
 					sendWithoutReviewAfter,
+					cadenceDuration,
 					messageId: result.messageId,
 					threadId: result.threadId,
 				});
@@ -110,6 +112,7 @@ export async function POST(req: NextRequest) {
 						reviewBeforeSending,
 						cadenceType,
 						sendWithoutReviewAfter,
+						cadenceDuration,
 						body,
 					},
 					message: 'Contact already part of an active sequence.',

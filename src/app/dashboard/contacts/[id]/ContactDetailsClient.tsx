@@ -162,6 +162,9 @@ export default function ContactDetailsClient({
 							<span className={styles.value} style={{ fontWeight: '600' }}>
 								{contact?.active ? 'Yes' : 'No'}
 							</span>
+							<div style={{ color: 'red', fontWeight: 'bold' }}>
+								Cancel Sequence Button Goes Here
+							</div>
 						</div>
 					</div>
 				</div>
