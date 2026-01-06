@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 // Hooks imports
 import { useQueryClient } from '@tanstack/react-query';
 import { useContactGetUnique } from '@/hooks/useContact';
+import { useSequencesByContactId } from '@/hooks/useSequence';
 
 // Styles imports
 import styles from './contactPage.module.scss';
@@ -51,10 +52,12 @@ export default function ContactDetailsClient({
 				initialSequences
 			);
 		}
-	}, [initialContact, initialSequences, queryClient]);
+	}, []);
 
 	const { data } = useContactGetUnique(initialContact.id);
 	const contact = data || initialContact;
+	const { data: sequencesData } = useSequencesByContactId(initialContact.id);
+	const sequences = sequencesData || initialSequences;
 
 	const importance: Record<number, string> = {
 		1: 'Lowest',
@@ -184,7 +187,7 @@ export default function ContactDetailsClient({
 					</div>
 				</div>
 			</section>
-			<ContactActivities contact={contact} sequences={initialSequences} />
+			<ContactActivities contact={contact} sequences={sequences} />
 		</>
 	);
 }

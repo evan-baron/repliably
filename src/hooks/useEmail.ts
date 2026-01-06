@@ -59,6 +59,9 @@ export const useEmailSend = () => {
 					queryKey: ['contact-get-unique', response.contact.id],
 				});
 				queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+				queryClient.invalidateQueries({
+					queryKey: ['sequences-by-contact-id'],
+				});
 			}
 			setModalType('alert');
 			setAlertMessage('Email sent successfully!');

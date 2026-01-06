@@ -1,0 +1,52 @@
+.active-sequence-table {
+	outline: 1px solid red;
+
+	.header-details {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		margin-bottom: 1rem;
+
+		.value {
+			font-weight: 600;
+		}
+
+		.info-row {
+			height: 2rem;
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			font-size: 1.25rem;
+
+			.label,
+			.value {
+				line-height: 0;
+				display: flex;
+				align-items: center;
+			}
+		}
+
+		.title {
+			display: flex;
+			gap: 0.5rem;
+			min-width: 30%;
+			max-width: 50%;
+			font-size: 1.25rem;
+
+			.value {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				// background: var(--gradient-primary);
+				// -webkit-background-clip: text;
+				// -webkit-text-fill-color: transparent;
+				// background-clip: text;
+			}
+		}
+
+		.sequence-info {
+			display: flex;
+			gap: 1.5rem;
+		}
+	}
+}

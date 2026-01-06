@@ -95,6 +95,7 @@ model EmailReply {
 
 model Sequence {
   id               Int       @id @default(autoincrement())
+  title            String    
   contactId        Int
   contact          Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
   ownerId          Int

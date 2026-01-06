@@ -9,6 +9,7 @@ export interface StoredEmailData {
 	cadenceDuration: string;
 	messageId: string;
 	threadId: string;
+	sequenceId?: number;
 }
 
 export interface SentEmailData {
@@ -20,4 +21,5 @@ export interface SentEmailData {
 	cadenceDuration: string;
 	body: string;
 	override?: boolean;
+	sequenceId?: number;
 }

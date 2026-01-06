@@ -39,9 +39,11 @@ export async function storeSentEmail({
 	cadenceDuration,
 	messageId,
 	threadId,
+	sequenceId,
 }: StoredEmailData) {
 	const contact = await findOrCreateContact(email, ownerId);
 
+	// Declare variables for send delay and next step due date
 	let sendDelay = null;
 	let nextStepDueDate = null;
 
@@ -61,6 +63,12 @@ export async function storeSentEmail({
 		indefinite: null,
 	};
 
+	// Establish next step due date
+	nextStepDueDate = new Date(
+		Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
+	);
+
+	// Check if user selected 'Review Before Sending' and set sendDelay accordingly
 	if (
 		sendWithoutReviewAfter === 'never' ||
 		sendWithoutReviewAfter === '' ||
@@ -73,17 +81,12 @@ export async function storeSentEmail({
 			: null;
 	}
 
-	if (sendDelay) {
-		let daysToAdd = cadenceTypeMapping[cadenceType];
-
-		// Special case for '31day' cadence: set next step due to 3 days later for review
-		// More cron logic needed to handle the actual 31 day send later
-		if (cadenceType === '31day') {
-			daysToAdd = 3;
-		}
-
-		nextStepDueDate = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000);
-	}
+	// Handle sendDelay and nextStepDueDate calculation
+	// if (sendDelay) {
+	// If there's a send delay, set next step due date based on that
+	// Process will look like: If there is a review before sending send delay, if the user reviews and clicks send, override the send delay and send immediately
+	// Else: If the user does not review, email will automatically send after the delay time period has passed
+	// }
 
 	const endDate = cadenceDurationMapping[cadenceDuration]
 		? new Date(
@@ -92,18 +95,34 @@ export async function storeSentEmail({
 		  )
 		: null;
 
-	const sequence = await prisma.sequence.create({
-		data: {
-			contactId: contact.id,
-			ownerId,
-			sequenceType: cadenceType,
-			autoSend: reviewBeforeSending ? false : true,
-			autoSendDelay: sendDelay,
-			sequenceDuration: cadenceDurationMapping[cadenceDuration],
-			nextStepDue: nextStepDueDate,
-			endDate,
-		},
-	});
+	// If sequenceId is provided, use existing sequence. Otherwise, create new one.
+	let sequence;
+
+	if (sequenceId) {
+		// Follow-up email: use existing sequence
+		sequence = await prisma.sequence.findUnique({
+			where: { id: sequenceId },
+		});
+
+		if (!sequence) {
+			throw new Error(`Sequence with id ${sequenceId} not found`);
+		}
+	} else {
+		// First email: create new sequence
+		sequence = await prisma.sequence.create({
+			data: {
+				title: subject,
+				contactId: contact.id,
+				ownerId,
+				sequenceType: cadenceType,
+				autoSend: reviewBeforeSending ? false : true,
+				autoSendDelay: sendDelay,
+				sequenceDuration: cadenceDurationMapping[cadenceDuration],
+				nextStepDue: nextStepDueDate,
+				endDate,
+			},
+		});
+	}
 
 	// Transaction safety: create message in transaction
 	const [createdMessage, updatedContact] = await prisma.$transaction([

@@ -12,12 +12,13 @@ import styles from './contactPage.module.scss';
 
 // Components imports
 import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
+import ActiveSequenceTable from '@/app/components/sequences/active/ActiveSequenceTable';
 
 // Context imports
 
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
-import { SequencesResponse } from '@/types/sequenceTypes';
+import { SequencesResponse, SequenceFromDB } from '@/types/sequenceTypes';
 
 const ContactActivities = ({
 	contact,
@@ -35,20 +36,36 @@ const ContactActivities = ({
 		};
 	}
 
+	const { sequences: sequenceList } = sequences;
+
+	const activeSequence: SequenceFromDB | undefined = sequenceList.find(
+		(seq) => seq.active
+	);
+	const previousSequences: SequenceFromDB[] = sequenceList.filter(
+		(seq) => !seq.active
+	);
+	console.log('activeSequence', activeSequence);
+	console.log('previousSequences', previousSequences);
+
 	const activityContent: ActivityContent = {
 		active: {
-			component: (
+			component: activeSequence ? (
+				<ActiveSequenceTable sequence={activeSequence} />
+			) : (
 				<div className={styles.activity}>
 					<p>No active sequences</p>
 				</div>
 			),
 		},
 		previous: {
-			component: (
-				<div className={styles.activity}>
-					<p>No previous sequences</p>
-				</div>
-			),
+			component:
+				previousSequences.length > 0 ? (
+					<div>Previous Sequences Go Here</div>
+				) : (
+					<div className={styles.activity}>
+						<p>No previous sequences</p>
+					</div>
+				),
 		},
 		email: {
 			component: <NewEmailForm contactEmail={contact.email} />,

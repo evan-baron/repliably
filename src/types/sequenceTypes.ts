@@ -1,5 +1,6 @@
 export interface SequenceFromDB {
 	id: number;
+	title: string;
 	contactId: number;
 	ownerId: number;
 	sequenceType: string;

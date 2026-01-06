@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 			cadenceDuration,
 			body,
 			override,
+			sequenceId,
 		} = await req.json();
 
 		if (
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
 			return await sendAndStoreEmail();
 		}
 
-		// Check if user part of existing sequence
+		// Check if user has an existing sequence, if it matches the sequenceId passed in, or not
 		const existingSequence = await prisma.sequence.findFirst({
 			where: {
 				contact: {
@@ -101,7 +102,13 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
-		if (existingSequence) {
+		if (!existingSequence) {
+			return await sendAndStoreEmail();
+		}
+
+		const matches = sequenceId && existingSequence.id === sequenceId;
+
+		if (!matches) {
 			return NextResponse.json(
 				{
 					sequenceExists: true,
