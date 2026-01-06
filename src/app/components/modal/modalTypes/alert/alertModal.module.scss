@@ -1,0 +1,11 @@
+.alert-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+
+	.message {
+		font-size: 1.25rem;
+		margin-bottom: 1.5rem;
+	}
+}

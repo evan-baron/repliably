@@ -102,7 +102,7 @@ model Sequence {
   sequenceType     String    // e.g. "3-2-1"
   autoSend         Boolean   @default(false)
   autoSendDelay    Int?      // days
-  autoSendDuration Int?      @default(30)
+  sequenceDuration Int?      @default(30)
   currentStep      Int       @default(0)
   nextStepDue      DateTime?
   endDate          DateTime? // createdAt + autoSendDuration days

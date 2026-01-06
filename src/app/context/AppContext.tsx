@@ -35,6 +35,8 @@ interface AppContextType {
 	errors: string[];
 	setErrors: (errors: string[]) => void;
 	clearErrors: () => void;
+	alertMessage: string | null;
+	setAlertMessage: (message: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -55,6 +57,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		null
 	);
 	const [errors, setErrors] = useState<string[]>([]);
+	const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
 	const clearErrors = () => {
 		setErrors([]);
@@ -91,6 +94,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		errors: [],
 		setErrors: () => {},
 		clearErrors: () => {},
+		alertMessage: null,
+		setAlertMessage: () => {},
 	};
 
 	// Client-side checks only after hydration
@@ -152,6 +157,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				errors,
 				setErrors,
 				clearErrors,
+				alertMessage,
+				setAlertMessage,
 		  }
 		: fallback;
 

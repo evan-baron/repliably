@@ -20,6 +20,7 @@ import EditContactModal from './modalTypes/contacts/EditContactModal';
 import DeleteContactModal from './modalTypes/contacts/DeleteContactModal';
 import ErrorModal from './modalTypes/error/ErrorModal';
 import OverrideModal from './modalTypes/error/OverrideModal';
+import AlertModal from './modalTypes/alert/AlertModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -32,6 +33,8 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		setDuplicateContact,
 		errors,
 		clearErrors,
+		alertMessage,
+		setAlertMessage,
 	} = useAppContext();
 	const {
 		showOverrideModal,
@@ -55,13 +58,14 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		modalType === 'editContact' && setDuplicateContact(false);
 		modalType === 'deleteContact' && setSelectedContact(null);
 		modalType === 'error' && clearErrors();
+		modalType === 'alert' && setAlertMessage(null);
 		showOverrideModal && clearEmailContext();
 	};
 
 	interface ModalContent {
 		[key: string]: {
 			component: React.ReactNode;
-			title: string;
+			title?: string;
 			width?: string;
 		};
 	}
@@ -116,6 +120,12 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			title: 'Conflict: Existing Sequence',
 			width: '31.5rem',
 		},
+		alert: {
+			component: (
+				<AlertModal clearAlert={handleClose} message={alertMessage!} />
+			),
+			width: '31.5rem',
+		},
 	} as const;
 
 	return (
@@ -128,9 +138,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 					className={styles.modalContent}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<div className={styles.modalHeader}>
-						<h2>{modalContent[currentModalType].title}</h2>
-					</div>
+					{modalContent[currentModalType].title && (
+						<div className={styles.modalHeader}>
+							<h2>{modalContent[currentModalType].title}</h2>
+						</div>
+					)}
 					<div className={styles.modalBody}>
 						{modalContent[currentModalType].component}
 					</div>
