@@ -55,9 +55,9 @@ export async function storeSentEmail({
 	};
 
 	const cadenceDurationMapping: { [key: string]: number | null } = {
-		'1month': 30,
-		'2month': 60,
-		'3month': 90,
+		'30': 30,
+		'60': 60,
+		'90': 90,
 		indefinite: null,
 	};
 
@@ -74,9 +74,15 @@ export async function storeSentEmail({
 	}
 
 	if (sendDelay) {
-		nextStepDueDate = new Date(
-			Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
-		);
+		let daysToAdd = cadenceTypeMapping[cadenceType];
+
+		// Special case for '31day' cadence: set next step due to 3 days later for review
+		// More cron logic needed to handle the actual 31 day send later
+		if (cadenceType === '31day') {
+			daysToAdd = 3;
+		}
+
+		nextStepDueDate = new Date(Date.now() + daysToAdd * 24 * 60 * 60 * 1000);
 	}
 
 	const endDate = cadenceDurationMapping[cadenceDuration]

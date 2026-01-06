@@ -190,9 +190,9 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 									id='cadenceDuration'
 									{...register('cadenceDuration')}
 								>
-									<option value='1month'>1 Month</option>
-									<option value='2month'>2 Months</option>
-									<option value='3month'>3 Months</option>
+									<option value='30'>30 Days</option>
+									<option value='60'>60 Days</option>
+									<option value='90'>90 Days</option>
 									<option value='indefinite'>Indefinite</option>
 								</select>
 							</div>
