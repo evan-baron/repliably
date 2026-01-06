@@ -9,6 +9,7 @@ export interface PendingEmailData {
 	cadenceType: string;
 	reviewBeforeSending: boolean;
 	sendWithoutReviewAfter?: string;
+	cadenceDuration: string;
 	body: string;
 	override?: boolean;
 }

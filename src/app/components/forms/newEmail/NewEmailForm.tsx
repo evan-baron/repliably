@@ -45,7 +45,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				followUpCadence: '3day',
 				reviewBeforeSending: false,
 				sendWithoutReviewAfter: '',
-				cadenceDuration: '21day',
+				cadenceDuration: '1month',
 			},
 		});
 

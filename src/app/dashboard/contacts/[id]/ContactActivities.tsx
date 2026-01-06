@@ -19,18 +19,66 @@ import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
 import { ContactFromDB } from '@/types/contactTypes';
 
 const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
-	type SelectedType = 'activity' | 'email';
-	const [selected, setSelected] = useState<SelectedType>('activity');
+	type SelectedType = 'active' | 'previous' | 'history' | 'email';
+	const [selected, setSelected] = useState<SelectedType>('history');
+
+	interface ActivityContent {
+		[key: string]: {
+			component: React.ReactNode;
+		};
+	}
+
+	const activityContent: ActivityContent = {
+		history: {
+			component: (
+				<div className={styles.activity}>
+					<p>No recent activity</p>
+				</div>
+			),
+		},
+		active: {
+			component: (
+				<div className={styles.activity}>
+					<p>No active sequences</p>
+				</div>
+			),
+		},
+		previous: {
+			component: (
+				<div className={styles.activity}>
+					<p>No previous sequences</p>
+				</div>
+			),
+		},
+		email: {
+			component: <NewEmailForm contactEmail={contact.email} />,
+		},
+	};
 
 	return (
 		<section className={styles['activities-wrapper']}>
 			<div className={styles.nav}>
 				<h2
-					className={selected === 'activity' ? styles.selected : ''}
-					onClick={() => setSelected('activity')}
+					className={selected === 'history' ? styles.selected : ''}
+					onClick={() => setSelected('history')}
 				>
-					Recent Activity
+					History
 				</h2>
+
+				<h2
+					className={selected === 'active' ? styles.selected : ''}
+					onClick={() => setSelected('active')}
+				>
+					Active Sequence
+				</h2>
+
+				<h2
+					className={selected === 'previous' ? styles.selected : ''}
+					onClick={() => setSelected('previous')}
+				>
+					Previous Sequences
+				</h2>
+
 				<h2
 					className={selected === 'email' ? styles.selected : ''}
 					onClick={() => setSelected('email')}
@@ -39,13 +87,7 @@ const ContactActivities = ({ contact }: { contact: ContactFromDB }) => {
 				</h2>
 			</div>
 			<div className={styles.content}>
-				{selected === 'activity' ? (
-					<div className={styles.activity}>
-						<p>No recent activity</p>
-					</div>
-				) : (
-					<NewEmailForm contactEmail={contact.email} />
-				)}
+				{activityContent[selected].component}
 			</div>
 		</section>
 	);
