@@ -1,0 +1,16 @@
+.deletecontactmodal-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 2.5rem;
+
+	.message {
+		font-size: 1.25rem !important;
+		text-align: left !important;
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		gap: 1.5rem;
+	}
+}

@@ -47,7 +47,6 @@ const DeleteContactModal = ({
 				and all its related data?
 			</p>
 			<div className={styles.buttons}>
-				<ModalBackButton modalRedirect={null} title='Cancel' />
 				<button
 					type='button'
 					className={'button delete'}
@@ -56,6 +55,7 @@ const DeleteContactModal = ({
 				>
 					Delete
 				</button>
+				<ModalBackButton modalRedirect={null} title='Cancel' />
 			</div>
 		</div>
 	);

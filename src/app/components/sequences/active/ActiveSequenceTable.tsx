@@ -10,6 +10,7 @@ import styles from './activeSequenceTable.module.scss';
 import { SequenceFromDB } from '@/types/sequenceTypes';
 
 // Components imports
+import DeactivateSequenceButton from '@/app/components/buttons/DeactivateSequenceButton';
 
 // Context imports
 
@@ -38,7 +39,7 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 							<span className={styles.value}>{endDate}</span>
 						</div>
 					)}
-					<div>Deactivate Sequence Button</div>
+					<DeactivateSequenceButton sequenceId={sequence.id} />
 				</div>
 			</div>
 

@@ -30,6 +30,8 @@ export const useSequenceDeactivate = (sequenceId: number) => {
 			// Invalidate relevant queries to refetch updated data
 			queryClient.invalidateQueries({ queryKey: ['sequences-by-contact-id'] });
 			queryClient.invalidateQueries({ queryKey: ['sequences-by-user-id'] });
+			queryClient.invalidateQueries({ queryKey: ['contact-get-unique'] });
+			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
 		},
 	});
 };

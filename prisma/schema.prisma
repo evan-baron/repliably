@@ -61,13 +61,13 @@ model Message {
   id            Int       @id @default(autoincrement())
   contactId     Int
   contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  ownerId       Int?
-  owner         User?     @relation(fields: [ownerId], references: [id])
-  sequenceId    Int?
+  ownerId       Int
+  owner         User     @relation(fields: [ownerId], references: [id])
+  sequenceId    Int
   sequence      Sequence? @relation(fields: [sequenceId], references: [id])
   templateId    Int?
   template      Template? @relation(fields: [templateId], references: [id], name: "TemplateMessages")
-  subject       String?
+  subject       String
   contents      String    @db.VarChar(1024)
   direction     String    // "outbound" or "inbound"
   date          DateTime  @default(now())

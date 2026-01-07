@@ -54,7 +54,11 @@ export async function PUT(
 			where: { ownerId: user.id, id: sequenceId },
 			data: { active: false },
 		});
-		return NextResponse.json({ updatedSequence });
+		const updatedContact = await prisma.contact.update({
+			where: { id: updatedSequence.contactId },
+			data: { active: false },
+		});
+		return NextResponse.json({ updatedSequence, updatedContact });
 	} catch (error: any) {
 		console.error('Error updating sequence:', error);
 		return NextResponse.json(

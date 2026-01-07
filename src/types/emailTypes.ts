@@ -23,3 +23,14 @@ export interface SentEmailData {
 	override?: boolean;
 	sequenceId?: number;
 }
+
+export interface PendingEmailData {
+	to: string;
+	subject: string;
+	cadenceType: string;
+	reviewBeforeSending: boolean;
+	sendWithoutReviewAfter?: string;
+	cadenceDuration: string;
+	body: string;
+	override?: boolean;
+}

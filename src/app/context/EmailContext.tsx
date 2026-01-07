@@ -3,16 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Types for email sending and override
-export interface PendingEmailData {
-	to: string;
-	subject: string;
-	cadenceType: string;
-	reviewBeforeSending: boolean;
-	sendWithoutReviewAfter?: string;
-	cadenceDuration: string;
-	body: string;
-	override?: boolean;
-}
+import { PendingEmailData } from '@/types/emailTypes';
 
 interface EmailContextType {
 	pendingEmail: PendingEmailData | null;
@@ -24,6 +15,8 @@ interface EmailContextType {
 	clearEmailContext: () => void;
 	resetForm: boolean;
 	setResetForm: (callback: boolean) => void;
+	selectedSequenceId: number | null;
+	setSelectedSequenceId: (sequenceId: number | null) => void;
 }
 
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
@@ -35,6 +28,9 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	const [showOverrideModal, setShowOverrideModal] = useState(false);
 	const [lastError, setLastError] = useState<any>(null);
 	const [resetForm, setResetForm] = useState<boolean>(false);
+	const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
+		null
+	);
 
 	const clearEmailContext = () => {
 		setPendingEmail(null);
@@ -55,6 +51,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				clearEmailContext,
 				resetForm,
 				setResetForm,
+				selectedSequenceId,
+				setSelectedSequenceId,
 			}}
 		>
 			{children}

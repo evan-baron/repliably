@@ -21,6 +21,7 @@ import DeleteContactModal from './modalTypes/contacts/DeleteContactModal';
 import ErrorModal from './modalTypes/error/ErrorModal';
 import OverrideModal from './modalTypes/error/OverrideModal';
 import AlertModal from './modalTypes/alert/AlertModal';
+import DeactivateSequenceModal from './modalTypes/sequence/DeactivateSequenceModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -42,6 +43,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		pendingEmail,
 		setPendingEmail,
 		clearEmailContext,
+		selectedSequenceId,
 	} = useEmailContext();
 
 	const currentModalType =
@@ -124,6 +126,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			component: (
 				<AlertModal clearAlert={handleClose} message={alertMessage!} />
 			),
+			width: '31.5rem',
+		},
+		deactivateSequence: {
+			component: <DeactivateSequenceModal sequenceId={selectedSequenceId!} />,
+			title: 'Deactivate Sequence',
 			width: '31.5rem',
 		},
 	} as const;
