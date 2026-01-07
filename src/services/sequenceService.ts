@@ -17,6 +17,9 @@ export async function getSequencesByContactId(contactId: number) {
 			messages: {
 				orderBy: { date: 'desc' },
 			},
+			emailReplies: {
+				orderBy: { replyDate: 'desc' },
+			},
 		},
 		orderBy: { createdAt: 'desc' },
 	});
@@ -37,6 +40,9 @@ export async function getSequenceById(sequenceId: number) {
 		include: {
 			messages: {
 				orderBy: { date: 'desc' },
+			},
+			emailReplies: {
+				orderBy: { replyDate: 'desc' },
 			},
 		},
 	});

@@ -79,18 +79,22 @@ model Message {
 }
 
 model EmailReply {
-  id            Int       @id @default(autoincrement())
-  ownerId       Int
-  originalMessageId String
-  replyMessageId    String
-  contactId     Int
-  contact       Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  replySubject  String
-  replyContent  String
-  replyHistory  String?
-  replyDate     DateTime
-  processed     Boolean   @default(false)
-  createdAt     DateTime  @default(now())
+  id                Int       @id @default(autoincrement())
+  ownerId           Int
+  originalMessageId String    // Gmail messageId of the original outbound message
+  replyMessageId    String    // Gmail messageId of the reply
+  threadId          String    // Gmail threadId
+  contactId         Int
+  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  sequenceId        Int?
+  sequence          Sequence? @relation(fields: [sequenceId], references: [id])
+  replySubject      String
+  replyContent      String
+  replyHistory      String?
+  replyDate         DateTime
+  isAutomated       Boolean   @default(false) // OOO or auto-reply
+  processed         Boolean   @default(false)
+  createdAt         DateTime  @default(now())
 }
 
 model Sequence {
@@ -111,7 +115,8 @@ model Sequence {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  messages      Message[]
+  messages         Message[]
+  emailReplies     EmailReply[]
 }
 
 model Job {

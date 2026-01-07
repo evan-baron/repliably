@@ -141,7 +141,7 @@ const ContactsTable = ({
 								{contact.phone}
 							</td>
 						)}
-						<th className={styles.lrg}>{contact.email}</th>
+						<td className={styles.lrg}>{contact.email}</td>
 						{columns.linkedIn && (
 							<td className={styles.md}>{contact.linkedIn}</td>
 						)}

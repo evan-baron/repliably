@@ -23,6 +23,9 @@ export async function GET(
 				messages: {
 					orderBy: { date: 'desc' },
 				},
+				emailReplies: {
+					orderBy: { replyDate: 'desc' },
+				},
 			},
 		});
 		return NextResponse.json({ sequence });

@@ -102,10 +102,6 @@ export const useContactUpdate = () => {
 					queryKey: ['contact-get-unique', updateData.id],
 				});
 			}
-
-			alert(
-				`Contact updated successfully! ${response.contact.firstName} ${response.contact.lastName}`
-			);
 		},
 
 		onError: (error: Error) => {

@@ -127,9 +127,19 @@ async function processMessage(gmail: any, messageId: string) {
 			// Parse the email content into structured sections
 			const parsedEmail = parseEmailContent(bodyContent);
 
+			// Check if this is an automated/OOO reply
+			const isAutoReply = isAutomatedReply(headers, subject || '', bodyContent);
+
+			console.log(`Reply from ${senderEmail} - Automated: ${isAutoReply}`);
+
+			// Get sequenceId of the original sent message
+			const sequenceId = sentMessage.sequenceId;
+
 			// Store the reply
 			await prisma.emailReply.create({
 				data: {
+					sequenceId: sequenceId,
+					threadId: threadId,
 					contactId: sentMessage.contactId,
 					ownerId: sentMessage.ownerId || sentMessage.contact.ownerId, // Handle potential null
 					originalMessageId: sentMessage.messageId || '',
@@ -138,6 +148,7 @@ async function processMessage(gmail: any, messageId: string) {
 					replyContent: parsedEmail.reply || parsedEmail.raw,
 					replyHistory: parsedEmail.history || '',
 					replyDate: new Date(parseInt(message.data.internalDate)),
+					isAutomated: isAutoReply,
 				},
 			});
 
@@ -156,11 +167,17 @@ async function processMessage(gmail: any, messageId: string) {
 				data: { hasReply: true },
 			});
 
-			///////////////////////////////////////////////////////////////////////////////////
-			//                                                                               //
-			//                          REMOVE FROM CADENCE LOGIC                            //
-			//                                                                               //
-			///////////////////////////////////////////////////////////////////////////////////
+			// Remove from sequence ONLY if it's a real human reply (not automated)
+			if (sequenceId && !isAutoReply) {
+				await prisma.sequence.update({
+					where: { id: sequenceId },
+					data: {
+						active: false,
+					},
+				});
+			} else if (isAutoReply) {
+				console.log('Automated reply detected - keeping sequence active');
+			}
 		}
 	} catch (error) {
 		console.error('Error processing message:', error);
@@ -171,6 +188,73 @@ async function processMessage(gmail: any, messageId: string) {
 function extractEmailFromHeader(fromHeader: string): string {
 	const emailMatch = fromHeader?.match(/<(.+?)>/);
 	return emailMatch ? emailMatch[1] : fromHeader;
+}
+
+// Check if reply is an automated/out-of-office response
+function isAutomatedReply(
+	headers: any[],
+	subject: string,
+	body: string
+): boolean {
+	// Check headers for automation indicators
+	const autoSubmitted = headers.find(
+		(h: any) => h.name.toLowerCase() === 'auto-submitted'
+	)?.value;
+	const xAutorespond = headers.find(
+		(h: any) => h.name.toLowerCase() === 'x-autorespond'
+	)?.value;
+	const xAutoReply = headers.find(
+		(h: any) => h.name.toLowerCase() === 'x-autoreply'
+	)?.value;
+	const precedence = headers.find(
+		(h: any) => h.name.toLowerCase() === 'precedence'
+	)?.value;
+
+	// Standard auto-reply headers
+	if (autoSubmitted && autoSubmitted !== 'no') return true;
+	if (xAutorespond === 'yes' || xAutoReply === 'yes') return true;
+	if (precedence && (precedence === 'bulk' || precedence === 'auto_reply'))
+		return true;
+
+	// Check subject line patterns (case-insensitive)
+	const subjectLower = subject.toLowerCase();
+	const oofSubjectPatterns = [
+		'out of office',
+		'automatic reply',
+		'auto-reply',
+		'autoreply',
+		'away from office',
+		'vacation',
+		'i am away',
+		"i'm away",
+		'absence automatique',
+		'automatische antwort',
+	];
+
+	if (oofSubjectPatterns.some((pattern) => subjectLower.includes(pattern)))
+		return true;
+
+	// Check body content patterns (case-insensitive)
+	const bodyLower = body.toLowerCase();
+	const oofBodyPatterns = [
+		'out of the office',
+		'currently out of office',
+		'i am currently away',
+		"i'm currently away",
+		'automatic reply',
+		'auto-reply',
+		'i will be away',
+		"i'll be away",
+		'returning on',
+		'back in the office',
+		'limited access to email',
+		'do not have access to my email',
+	];
+
+	if (oofBodyPatterns.some((pattern) => bodyLower.includes(pattern)))
+		return true;
+
+	return false;
 }
 
 // Interface for parsed email content

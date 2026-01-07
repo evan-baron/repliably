@@ -20,6 +20,9 @@ export async function GET(req: NextRequest) {
 				messages: {
 					orderBy: { date: 'desc' },
 				},
+				emailReplies: {
+					orderBy: { replyDate: 'desc' },
+				},
 			},
 		});
 

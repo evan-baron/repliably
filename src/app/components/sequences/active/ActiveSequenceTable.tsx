@@ -11,6 +11,7 @@ import { SequenceFromDB } from '@/types/sequenceTypes';
 
 // Components imports
 import DeactivateSequenceButton from '@/app/components/buttons/DeactivateSequenceButton';
+import MessagesTable from '../MessagesTable';
 
 // Context imports
 
@@ -44,7 +45,7 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 			</div>
 
 			<div className={styles['sequence-details']}>
-				<div className={styles['sequence-tasks']}>Tasks</div>
+				<MessagesTable messages={sequence.messages} />
 			</div>
 		</div>
 	);

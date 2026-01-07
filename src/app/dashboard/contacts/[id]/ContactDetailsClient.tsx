@@ -73,9 +73,8 @@ export default function ContactDetailsClient({
 				<div className={styles['details-wrapper']}>
 					<div className={styles['header-details']}>
 						<h1 className={styles.name}>
-							{contact
-								? `${contact.firstName} ${contact.lastName}`
-								: 'Contact Not Found'}
+							{contact.firstName ? contact.firstName : 'Name Needed'}{' '}
+							{contact.lastName ? contact.lastName : ''}
 						</h1>
 						<EditContactButton contact={contact!} />
 						<DeleteContactButton contact={contact!} />
