@@ -1,7 +1,7 @@
 'use client';
 
 // Library imports
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
@@ -15,22 +15,8 @@ const TinyEditor = ({
 }) => {
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 
-	const [value, setValue] = useState<string>('');
-	const sizeLimit = 4500;
-
-	const handleEditorChange = (content: string, editor: TinyMCEEditor) => {
-		const length = editor.getContent({ format: 'text' }).length;
-		if (length <= sizeLimit) {
-			setValue(content);
-			setEditorContent(content);
-		}
-	};
-
-	const handleBeforeAddUndo = (evt: any, editor: TinyMCEEditor) => {
-		const length = editor.getContent({ format: 'text' }).length;
-		if (length > sizeLimit) {
-			evt.preventDefault();
-		}
+	const handleEditorChange = (content: string) => {
+		setEditorContent(content);
 	};
 
 	return (
@@ -38,12 +24,8 @@ const TinyEditor = ({
 			<Editor
 				id='tiny-editor'
 				apiKey='smh31v60fpm15ps7kl66wjz9tj2hiw8z2mha2fk414vegawf'
-				value={value}
-				onInit={(_evt, editor) => {
-					editorRef.current = editor;
-				}}
+				onInit={(_evt, editor) => (editorRef.current = editor)}
 				onEditorChange={handleEditorChange}
-				onBeforeAddUndo={handleBeforeAddUndo}
 				initialValue='<p></p>'
 				init={{
 					height: 500,
@@ -78,7 +60,6 @@ const TinyEditor = ({
 					// 'p { margin: 0; padding: 0; }' +
 					// 'div { margin: 0; padding: 0; }',
 					statusbar: false,
-					maxlength: 4500,
 				}}
 			/>
 		</div>

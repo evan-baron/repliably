@@ -68,7 +68,7 @@ model Message {
   templateId    Int?
   template      Template? @relation(fields: [templateId], references: [id], name: "TemplateMessages")
   subject       String
-  contents      String    @db.VarChar(5000)
+  contents      String    
   direction     String    // "outbound" or "inbound"
   date          DateTime  @default(now())
   messageId     String?   // Gmail message ID
