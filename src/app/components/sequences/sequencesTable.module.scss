@@ -1,19 +1,19 @@
-.contacts-table {
+.sequences-table {
 	width: 100%;
 	border-collapse: separate;
 	overflow: hidden;
 	border-radius: var(--border-radius);
 
 	.sm {
-		min-width: 6rem;
+		width: 12.5%;
 	}
 
 	.md {
-		max-width: 12rem;
+		width: 20%;
 	}
 
 	.lrg {
-		max-width: 14rem;
+		width: 30%;
 	}
 
 	thead {
@@ -61,6 +61,7 @@
 
 			td {
 				padding: 0.5rem 1rem;
+				max-width: 0; /* Force cells to respect parent column width */
 
 				white-space: nowrap;
 				overflow-x: auto;

@@ -14,6 +14,7 @@ export interface SequenceFromDB {
 	createdAt: Date;
 	updatedAt: Date;
 	messages: any[];
+	emailReplies: any[];
 }
 
 export interface SequencesResponse {

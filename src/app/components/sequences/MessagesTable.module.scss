@@ -9,11 +9,11 @@
 	}
 
 	.md {
-		width: 20%;
+		width: 30%;
 	}
 
 	.lrg {
-		width: 50%;
+		width: 40%;
 	}
 
 	thead {
@@ -27,6 +27,7 @@
 				text-align: left;
 				border-bottom: 2px solid var(--border-light);
 				white-space: nowrap;
+				font-weight: 600;
 
 				.sort {
 					display: flex;
@@ -60,6 +61,7 @@
 
 			td {
 				padding: 0.5rem 1rem;
+				max-width: 0; /* Force cells to respect parent column width */
 
 				white-space: nowrap;
 				overflow-x: auto;

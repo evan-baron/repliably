@@ -55,7 +55,7 @@ export async function PUT(
 		const sequenceId = parseInt(id);
 		const updatedSequence = await prisma.sequence.update({
 			where: { ownerId: user.id, id: sequenceId },
-			data: { active: false },
+			data: { active: false, endDate: new Date() },
 		});
 		const updatedContact = await prisma.contact.update({
 			where: { id: updatedSequence.contactId },

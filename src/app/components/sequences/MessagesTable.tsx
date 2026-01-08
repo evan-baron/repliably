@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 // Styles imports
-import styles from './MessagesTable.module.scss';
+import styles from './messagesTable.module.scss';
 
 // MUI imports
 import { SwapVert } from '@mui/icons-material';

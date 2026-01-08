@@ -12,7 +12,8 @@ import styles from './contactPage.module.scss';
 
 // Components imports
 import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
-import ActiveSequenceTable from '@/app/components/sequences/active/ActiveSequenceTable';
+import ActiveSequence from '@/app/components/sequences/active/ActiveSequence';
+import SequencesTable from '@/app/components/sequences/SequencesTable';
 
 // Context imports
 
@@ -50,7 +51,7 @@ const ContactActivities = ({
 	const activityContent: ActivityContent = {
 		active: {
 			component: activeSequence ? (
-				<ActiveSequenceTable sequence={activeSequence} />
+				<ActiveSequence sequence={activeSequence} />
 			) : (
 				<div className={styles.activity}>
 					<p>No active sequences</p>
@@ -60,7 +61,7 @@ const ContactActivities = ({
 		previous: {
 			component:
 				previousSequences.length > 0 ? (
-					<div>Previous Sequences Go Here</div>
+					<SequencesTable sequences={previousSequences} />
 				) : (
 					<div className={styles.activity}>
 						<p>No previous sequences</p>

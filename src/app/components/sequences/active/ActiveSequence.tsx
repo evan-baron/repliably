@@ -1,10 +1,10 @@
-// Library imports
-import React from 'react';
+// Helper functions imports
+import { sequenceType } from '@/lib/helperFunctions';
 
 // Hooks imports
 
 // Styles imports
-import styles from './activeSequenceTable.module.scss';
+import styles from './activeSequence.module.scss';
 
 // Types imports
 import { SequenceFromDB } from '@/types/sequenceTypes';
@@ -15,7 +15,7 @@ import MessagesTable from '../MessagesTable';
 
 // Context imports
 
-const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
+const ActiveSequence = ({ sequence }: { sequence: SequenceFromDB }) => {
 	const startDate = new Date(sequence.createdAt).toLocaleDateString();
 	const endDate = sequence.endDate
 		? new Date(sequence.endDate).toLocaleDateString()
@@ -24,11 +24,22 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 	return (
 		<div className={styles['active-sequence-table']}>
 			<div className={styles['header-details']}>
-				<div className={styles.title}>
-					<span className={styles.label}>Name:</span>
-					<span className={styles.value}>{sequence.title}</span>
-				</div>
 				<div className={styles['sequence-info']}>
+					<div className={styles.title}>
+						<span className={styles.label}>Name:</span>
+						<span className={styles.value}>{sequence.title}</span>
+					</div>
+					<div className={styles.title}>
+						<span className={styles.label}>Sequence Type:</span>
+						<span className={styles.value}>
+							{sequenceType(
+								sequence.sequenceType,
+								new Date(sequence.createdAt)
+							)}
+						</span>
+					</div>
+				</div>
+				<div className={styles['dates-info']}>
 					<div className={styles['info-row']}>
 						<span className={styles.label}>Start Date:</span>
 						<span className={styles.value}>{startDate}</span>
@@ -51,4 +62,4 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 	);
 };
 
-export default ActiveSequenceTable;
+export default ActiveSequence;

@@ -60,6 +60,6 @@ export async function deactivateSequence(sequenceId: number) {
 
 	await prisma.sequence.update({
 		where: { ownerId: user.id, id: sequenceId },
-		data: { active: false },
+		data: { active: false, endDate: new Date() },
 	});
 }
