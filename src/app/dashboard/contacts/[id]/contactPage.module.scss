@@ -1,7 +1,36 @@
 .page-wrapper {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
+
+	.close-button {
+		position: absolute;
+		top: 0;
+		right: 0;
+		height: 2.5rem;
+		aspect-ratio: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		// border: 2px solid transparent;
+		// border-radius: 50%;
+		opacity: 0.5;
+		color: var(--text-muted);
+
+		.icon {
+			font-size: 2rem;
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				.icon {
+					color: var(--color-primary);
+				}
+			}
+		}
+	}
 
 	.header-section {
 		width: 100%;

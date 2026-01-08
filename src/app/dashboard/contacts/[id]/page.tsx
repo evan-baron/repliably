@@ -1,5 +1,6 @@
 // Library imports
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 // Services imports
 import { getContactById } from '@/services/contactsService';
@@ -9,6 +10,7 @@ import { getSequencesByContactId } from '@/services/sequenceService';
 import styles from './contactPage.module.scss';
 
 // MUI imports
+import { Close } from '@mui/icons-material';
 
 // Component imports
 import ContactDetailsClient from './ContactDetailsClient';
@@ -29,6 +31,13 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 				initialContact={contact}
 				initialSequences={sequencesData}
 			/>
+			<Link
+				href='/dashboard/contacts'
+				className={styles['close-button']}
+				aria-label='Close contact'
+			>
+				<Close className={styles.icon} />
+			</Link>
 		</div>
 	);
 };

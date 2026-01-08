@@ -44,7 +44,7 @@ const SequencesTable = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 							<SwapVert fontSize='small' />
 						</span>
 					</th>
-					<th className={styles.sm}>Success</th>
+					<th className={styles.sm}>Replied</th>
 				</tr>
 			</thead>
 			<tbody>

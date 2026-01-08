@@ -12,11 +12,11 @@ const navigationItems = [
 	{ href: '/dashboard/new-email', label: 'New Email' },
 	{ href: '/dashboard', label: 'Dashboard' },
 	{ href: '/dashboard/replies', label: 'Replies' },
-	{ href: '/dashboard/analytics', label: 'Analytics' },
+	{ href: '/dashboard/analytics', label: 'Analytics (Coming Soon)' },
 	{ href: '/dashboard/contacts', label: 'Contacts' },
 	{ href: '/dashboard/sequences', label: 'Sequences' },
-	{ href: '/dashboard/in-progress', label: 'In Progress' },
-	{ href: '/dashboard/templates', label: 'Templates' },
+	// { href: '/dashboard/in-progress', label: 'In Progress' },
+	{ href: '/dashboard/templates', label: 'Templates (Coming Soon)' },
 	{ href: '/dashboard/settings', label: 'Settings' },
 ];
 
