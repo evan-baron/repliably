@@ -75,6 +75,12 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 	}, [resetForm, setResetForm]);
 
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
+		if (!editorContent || editorContent.trim() === '') {
+			setErrors(['Email cannot be empty.']);
+			setModalType('error');
+			return;
+		}
+
 		try {
 			await sendEmail({
 				to: contactEmail ? contactEmail : data.to,
@@ -83,9 +89,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				reviewBeforeSending: data.reviewBeforeSending,
 				sendWithoutReviewAfter: data.sendWithoutReviewAfter,
 				cadenceDuration: data.cadenceDuration,
-				body:
-					editorContent ||
-					'This is an email from the application automation system.',
+				body: editorContent,
 			});
 
 			// Success handling is done in the hook
