@@ -13,4 +13,5 @@ export interface MessageFromDB {
 	subject: string;
 	templateId: number | null;
 	threadId: string;
+	needsApproval: boolean;
 }

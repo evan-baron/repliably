@@ -76,6 +76,7 @@ model Message {
   inReplyTo     String?   // Reference to original message
   hasReply      Boolean   @default(false)
   replyDate     DateTime?
+  needsApproval Boolean   @default(false)
 }
 
 model EmailReply {
