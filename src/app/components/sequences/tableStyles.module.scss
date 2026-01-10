@@ -1,25 +1,29 @@
-.messages-table {
+.table {
 	width: 100%;
 	border-collapse: separate;
 	overflow: hidden;
 	border-radius: var(--border-radius);
 
 	.sm {
-		width: 15%;
+		width: 12.5%;
 	}
 
 	.md {
-		width: 30%;
+		width: 20%;
 	}
 
 	.lrg {
-		width: 40%;
+		width: 30%;
 	}
 
-	thead {
-		background: var(--gradient-primary-light);
-
+	.tableHeader {
 		tr {
+			background: var(--gradient-primary-light);
+
+			&.nested {
+				background: var(--gradient-greyscale);
+			}
+
 			th {
 				vertical-align: middle;
 				cursor: pointer;
@@ -40,16 +44,13 @@
 					border-right: 1.5px solid var(--border-light);
 				}
 			}
-
-			&.nested-row {
-				background: var(--gradient-greyscale) !important;
-			}
 		}
 	}
 
 	tbody {
 		tr {
 			line-height: 1.25;
+
 			&:nth-child(odd) {
 				background-color: var(--background-tertiary);
 			}
@@ -100,10 +101,27 @@
 				}
 			}
 
-			&.nested-row {
+			&.expanded-row {
+				background: var(--gradient-primary-lighter);
+			}
+
+			&.selected {
+				background: var(--gradient-primary-lighter);
+			}
+
+			&.nested {
+				&.selected {
+					background: var(--gradient-greyscale-lighter);
+				}
+
+				&.expanded-row {
+					background: var(--gradient-greyscale-lighter);
+				}
+
 				@media (hover: hover) {
 					&:hover {
-						background: var(--gradient-greyscale-lighter) !important;
+						background: var(--gradient-greyscale-lighter);
+						cursor: pointer;
 					}
 				}
 			}

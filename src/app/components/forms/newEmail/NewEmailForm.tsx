@@ -186,21 +186,23 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 						</div>
 
 						{/* Cadence Duration */}
-						<div className={styles['input-group']}>
-							<div className={styles.input}>
-								<label htmlFor='cadenceDuration'>Cadence Duration:</label>
-								<select
-									className={styles.select}
-									id='cadenceDuration'
-									{...register('cadenceDuration')}
-								>
-									<option value='30'>30 Days</option>
-									<option value='60'>60 Days</option>
-									<option value='90'>90 Days</option>
-									<option value='indefinite'>Indefinite</option>
-								</select>
+						{followingUp && (
+							<div className={styles['input-group']}>
+								<div className={styles.input}>
+									<label htmlFor='cadenceDuration'>Cadence Duration:</label>
+									<select
+										className={styles.select}
+										id='cadenceDuration'
+										{...register('cadenceDuration')}
+									>
+										<option value='30'>30 Days</option>
+										<option value='60'>60 Days</option>
+										<option value='90'>90 Days</option>
+										<option value='indefinite'>Indefinite</option>
+									</select>
+								</div>
 							</div>
-						</div>
+						)}
 
 						{followingUp && (
 							<>

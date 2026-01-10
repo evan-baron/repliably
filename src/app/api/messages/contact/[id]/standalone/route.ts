@@ -17,18 +17,12 @@ export async function GET(
 		}
 		const { id } = await params;
 		const contactId = parseInt(id);
-		const sequences = await prisma.sequence.findMany({
-			where: { ownerId: user.id, contactId: contactId },
-			include: {
-				messages: {
-					orderBy: { createdAt: 'desc' },
-				},
-				emailReplies: {
-					orderBy: { replyDate: 'desc' },
-				},
-			},
+		const messages = await prisma.message.findMany({
+			where: { ownerId: user.id, contactId: contactId, sequenceId: null },
+
+			orderBy: { createdAt: 'desc' },
 		});
-		return NextResponse.json({ sequences });
+		return NextResponse.json({ messages });
 	} catch (error: any) {
 		console.error('Error fetching sequences for contact:', error);
 		return NextResponse.json(

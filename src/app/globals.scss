@@ -18,10 +18,16 @@
 	);
 	--gradient-primary-light: linear-gradient(
 		135deg,
-		hsla(188, 86%, 53%, 0.5) 0%,
-		hsla(187, 92%, 69%, 0.5) 50%,
-		hsla(156, 72%, 67%, 0.5) 100%
+		hsl(188, 83%, 76%) 0%,
+		hsla(187, 88%, 83%) 50%,
+		hsla(157, 71%, 83%) 100%
 	);
+	// --gradient-primary-light: linear-gradient(
+	// 	135deg,
+	// 	hsla(188, 86%, 53%, 0.5) 0%,
+	// 	hsla(187, 92%, 69%, 0.5) 50%,
+	// 	hsla(156, 72%, 67%, 0.5) 100%
+	// );
 	--gradient-primary-lighter: linear-gradient(
 		135deg,
 		hsla(188, 86%, 53%, 0.25) 0%,
@@ -41,6 +47,18 @@
 		hsl(0, 0%, 91%) 100%
 	);
 	--gradient-danger: linear-gradient(135deg, #f59f0a, #f8bc54);
+	--gradient-accent: linear-gradient(
+		135deg,
+		#f5b74d 0%,
+		#fde68a 50%,
+		#fde68a 100%
+	);
+	--gradient-accent-light: linear-gradient(
+		135deg,
+		#f3d6a3 0%,
+		#f5ecc9 50%,
+		#f5ecc9 100%
+	);
 	--gradient-secondary: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
 	--gradient-subtle: linear-gradient(135deg, #f0fdff 0%, #f0fdf4 100%);
 	--gradient-accessible: linear-gradient(135deg, #cffafe 0%, #d1fae5 100%);

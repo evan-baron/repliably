@@ -21,7 +21,7 @@ export async function GET(
 			where: { ownerId: user.id, id: sequenceId },
 			include: {
 				messages: {
-					orderBy: { date: 'desc' },
+					orderBy: { createdAt: 'desc' },
 				},
 				emailReplies: {
 					orderBy: { replyDate: 'desc' },

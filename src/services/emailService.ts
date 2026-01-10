@@ -54,6 +54,7 @@ export async function storeSentEmail({
 		weekly: 7,
 		biweekly: 14,
 		monthly: 28,
+		none: 0,
 	};
 
 	const cadenceDurationMapping: { [key: string]: number | null } = {
@@ -90,8 +91,31 @@ export async function storeSentEmail({
 		  )
 		: null;
 
-	// If sequenceId is provided, use existing sequence. Otherwise, create new one.
+	// If cadenceType is 'none', no follow-up emails
+	if (cadenceType === 'none') {
+		const [createdMessage, updatedContact] = await prisma.$transaction([
+			prisma.message.create({
+				data: {
+					contactId: contact.id,
+					ownerId,
+					subject,
+					contents,
+					direction: 'outbound',
+					messageId,
+					threadId,
+					createdAt: new Date(),
+					status: 'sent',
+				},
+			}),
+			prisma.contact.update({
+				where: { id: contact.id },
+				data: { lastActivity: new Date() },
+			}),
+		]);
+		return { createdMessage, updatedContact };
+	}
 
+	// If sequenceId is provided, use existing sequence. Otherwise, create new one.
 	if (sequenceId) {
 		// Follow-up email: use existing sequence
 		const sequence = await prisma.sequence.findUnique({
@@ -125,7 +149,7 @@ export async function storeSentEmail({
 						direction: 'outbound',
 						messageId,
 						threadId,
-						date: new Date(),
+						createdAt: new Date(),
 					},
 				}),
 				prisma.contact.update({
@@ -179,7 +203,7 @@ export async function storeSentEmail({
 					direction: 'outbound',
 					messageId,
 					threadId,
-					date: new Date(),
+					createdAt: new Date(),
 				},
 			}),
 			prisma.contact.update({

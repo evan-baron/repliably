@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 // Styles imports
 import styles from './topBar.module.scss';
 
@@ -17,13 +19,15 @@ export default function TopBar({ userName }: TopBarProps) {
 				aria-label='Application header'
 			>
 				<div className={styles.topBarContent}>
-					<h1
-						className={styles.appTitle}
-						id='app-title'
-						aria-label='Application Automation - Main application title'
-					>
-						Application Autom<span>ai</span>tion
-					</h1>
+					<Link href='/'>
+						<h1
+							className={styles.appTitle}
+							id='app-title'
+							aria-label='Application Automation - Main application title'
+						>
+							Application Autom<span>ai</span>tion
+						</h1>
+					</Link>
 					<div
 						className={styles.userSection}
 						role='region'

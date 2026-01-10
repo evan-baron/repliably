@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 // Styles imports
-import styles from './messagesTable.module.scss';
+import styles from './tableStyles.module.scss';
 
 // MUI imports
 import { SwapVert } from '@mui/icons-material';
@@ -38,17 +38,17 @@ const MessagesTable = ({
 	};
 
 	const sortedMessages = [...messages].sort((a, b) => {
-		const dateA = new Date(a.date).getTime();
-		const dateB = new Date(b.date).getTime();
+		const dateA = new Date(a.createdAt).getTime();
+		const dateB = new Date(b.createdAt).getTime();
 		return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
 	});
 
 	const today = new Date(Date.now());
 
 	return (
-		<table className={styles['messages-table']}>
-			<thead>
-				<tr className={nested ? styles['nested-row'] : ''}>
+		<table className={styles.table}>
+			<thead className={styles.tableHeader}>
+				<tr className={nested ? styles.nested : ''}>
 					<th className={styles.md}>
 						<span className={styles.sort}>Email</span>
 					</th>
@@ -66,15 +66,15 @@ const MessagesTable = ({
 			</thead>
 			<tbody>
 				{sortedMessages.map((message) => {
-					const messageDateDay = new Date(message.date);
+					const messageDateDay = new Date(message.createdAt);
 					const status = messageDateDay > today;
 					const parsedContent = parseEmailContent(message.contents);
 
 					return (
 						<tr
 							key={message.id}
-							className={nested ? styles['nested-row'] : ''}
 							onClick={() => handleClick(message.id)}
+							className={nested ? styles.nested : ''}
 						>
 							<td className={styles.md}>{message.subject}</td>
 							<td className={`${styles.lrg} ${styles['content-cell']}`}>

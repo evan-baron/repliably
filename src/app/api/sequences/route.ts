@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 			where: { ownerId: user.id },
 			include: {
 				messages: {
-					orderBy: { date: 'desc' },
+					orderBy: { createdAt: 'desc' },
 				},
 				emailReplies: {
 					orderBy: { replyDate: 'desc' },

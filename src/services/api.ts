@@ -79,3 +79,11 @@ export const sequenceAPI = {
 			method: 'PUT',
 		}),
 };
+
+// Messages API functions
+export const messageAPI = {
+	readStandaloneByContactId: (contactId: number) =>
+		apiCall(`/api/messages/contact/${contactId}/standalone`, {
+			method: 'GET',
+		}),
+};

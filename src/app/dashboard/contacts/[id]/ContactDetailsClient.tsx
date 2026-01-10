@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useContactGetUnique } from '@/hooks/useContact';
 import { useSequencesByContactId } from '@/hooks/useSequence';
+import { useStandaloneMessagesByContactId } from '@/hooks/useMessages';
 
 // Styles imports
 import styles from './contactPage.module.scss';
@@ -22,6 +23,7 @@ import {
 // Types imports
 import type { ContactFromDB } from '@/types/contactTypes';
 import type { SequencesResponse } from '@/types/sequenceTypes';
+import type { StandaloneMessagesResponse } from '@/types/messageTypes';
 
 // Components
 import EditContactButton from '@/app/components/buttons/EditContactButton';
@@ -31,9 +33,11 @@ import ContactActivities from './ContactActivities';
 export default function ContactDetailsClient({
 	initialContact,
 	initialSequences,
+	initialStandaloneMessages,
 }: {
 	initialContact: ContactFromDB;
 	initialSequences: SequencesResponse;
+	initialStandaloneMessages: StandaloneMessagesResponse;
 }) {
 	const queryClient = useQueryClient();
 
@@ -52,12 +56,25 @@ export default function ContactDetailsClient({
 				initialSequences
 			);
 		}
+
+		if (initialStandaloneMessages) {
+			queryClient.setQueryData<StandaloneMessagesResponse>(
+				['standalone-messages-by-contact-id', initialContact.id],
+				initialStandaloneMessages
+			);
+		}
 	}, []);
 
 	const { data } = useContactGetUnique(initialContact.id);
 	const contact = data || initialContact;
 	const { data: sequencesData } = useSequencesByContactId(initialContact.id);
 	const sequences = sequencesData || initialSequences;
+	const { data: standaloneMessagesData } = useStandaloneMessagesByContactId(
+		initialContact.id
+	);
+
+	const standaloneMessages =
+		standaloneMessagesData || initialStandaloneMessages;
 
 	const importance: Record<number, string> = {
 		1: 'Lowest',
@@ -186,7 +203,11 @@ export default function ContactDetailsClient({
 					</div>
 				</div>
 			</section>
-			<ContactActivities contact={contact} sequences={sequences} />
+			<ContactActivities
+				contact={contact}
+				sequences={sequences}
+				standaloneMessages={standaloneMessages}
+			/>
 		</>
 	);
 }

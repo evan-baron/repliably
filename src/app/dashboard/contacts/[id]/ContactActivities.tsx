@@ -13,22 +13,28 @@ import styles from './contactPage.module.scss';
 // Components imports
 import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
 import ActiveSequence from '@/app/components/sequences/active/ActiveSequence';
-import SequencesTable from '@/app/components/sequences/SequencesTable';
+import PreviousSequencesTable from '@/app/components/sequences/PreviousSequencesTable';
 
 // Context imports
 
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
 import { SequencesResponse, SequenceFromDB } from '@/types/sequenceTypes';
+import {
+	StandaloneMessagesResponse,
+	MessageFromDB,
+} from '@/types/messageTypes';
 
 const ContactActivities = ({
 	contact,
 	sequences,
+	standaloneMessages,
 }: {
 	contact: ContactFromDB;
 	sequences: SequencesResponse;
+	standaloneMessages: StandaloneMessagesResponse;
 }) => {
-	type SelectedType = 'active' | 'previous' | 'email';
+	type SelectedType = 'active' | 'previous' | 'email' | 'all';
 	const [selected, setSelected] = useState<SelectedType>('active');
 
 	interface ActivityContent {
@@ -38,6 +44,7 @@ const ContactActivities = ({
 	}
 
 	const { sequences: sequenceList } = sequences;
+	const { messages: messageList } = standaloneMessages;
 
 	const activeSequence: SequenceFromDB | undefined = sequenceList.find(
 		(seq) => seq.active
@@ -45,6 +52,30 @@ const ContactActivities = ({
 	const previousSequences: SequenceFromDB[] = sequenceList.filter(
 		(seq) => !seq.active
 	);
+
+	interface PreviousActivity {
+		type: 'message' | 'sequence';
+		sortDate: Date;
+		details: MessageFromDB | SequenceFromDB;
+	}
+
+	let previousActivities: PreviousActivity[] = [];
+
+	messageList.forEach((message) => {
+		previousActivities.push({
+			type: 'message',
+			sortDate: new Date(message.createdAt),
+			details: message,
+		});
+	});
+
+	previousSequences.forEach((sequence) => {
+		previousActivities.push({
+			type: 'sequence',
+			sortDate: new Date(sequence.endDate!),
+			details: sequence,
+		});
+	});
 
 	const activityContent: ActivityContent = {
 		active: {
@@ -59,7 +90,10 @@ const ContactActivities = ({
 		previous: {
 			component:
 				previousSequences.length > 0 ? (
-					<SequencesTable sequences={previousSequences} />
+					<PreviousSequencesTable
+						sequences={previousSequences}
+						previousActivities={previousActivities}
+					/>
 				) : (
 					<div className={styles.activity}>
 						<p>No previous sequences</p>
@@ -86,6 +120,13 @@ const ContactActivities = ({
 					onClick={() => setSelected('previous')}
 				>
 					Previous Sequences
+				</h2>
+
+				<h2
+					className={selected === 'all' ? styles.selected : ''}
+					onClick={() => setSelected('all')}
+				>
+					All Activities
 				</h2>
 
 				<h2

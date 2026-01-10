@@ -1,17 +1,26 @@
 export interface MessageFromDB {
 	contactId: number;
-	ownerId: number;
-	id: number;
 	contents: string;
-	date: string;
+	createdAt: Date;
 	direction: string;
 	hasReply: boolean;
+	id: number;
 	inReplyTo: string | null;
-	messageId: string;
-	replyDate: string | null;
-	sequenceId: number;
+	lastError: string | null;
+	messageId: string | null;
+	needsApproval: boolean;
+	ownerId: number;
+	replyDate: Date | null;
+	scheduledAt: Date | null;
+	sendAttempts: number;
+	sentAt: Date | null;
+	sequenceId: number | null;
+	status: string;
 	subject: string;
 	templateId: number | null;
-	threadId: string;
-	needsApproval: boolean;
+	threadId: string | null;
+}
+
+export interface StandaloneMessagesResponse {
+	messages: MessageFromDB[] | [];
 }

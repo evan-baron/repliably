@@ -91,6 +91,11 @@ export async function POST(req: NextRequest) {
 			return await sendAndStoreEmail();
 		}
 
+		// Check if standalone email or part of sequence
+		if (cadenceType === 'none') {
+			return await sendAndStoreEmail();
+		}
+
 		// Check if user has an existing sequence, if it matches the sequenceId passed in, or not
 		const existingSequence = await prisma.sequence.findFirst({
 			where: {

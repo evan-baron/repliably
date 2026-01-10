@@ -15,7 +15,7 @@ export async function getSequencesByContactId(contactId: number) {
 		where: { ownerId: user.id, contactId: contactId },
 		include: {
 			messages: {
-				orderBy: { date: 'desc' },
+				orderBy: { createdAt: 'desc' },
 			},
 			emailReplies: {
 				orderBy: { replyDate: 'desc' },
@@ -39,7 +39,7 @@ export async function getSequenceById(sequenceId: number) {
 		where: { ownerId: user.id, id: sequenceId },
 		include: {
 			messages: {
-				orderBy: { date: 'desc' },
+				orderBy: { createdAt: 'desc' },
 			},
 			emailReplies: {
 				orderBy: { replyDate: 'desc' },
