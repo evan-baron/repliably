@@ -103,14 +103,14 @@ const ContactActivities = ({
 					className={selected === 'all' ? styles.selected : ''}
 					onClick={() => setSelected('all')}
 				>
-					All Activities
+					All Activities {/* Email History */}
 				</h2>
 
 				<h2
 					className={selected === 'email' ? styles.selected : ''}
 					onClick={() => setSelected('email')}
 				>
-					Send an Email
+					New Email
 				</h2>
 			</div>
 			<div className={styles.content}>

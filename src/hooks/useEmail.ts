@@ -62,6 +62,9 @@ export const useEmailSend = () => {
 				queryClient.invalidateQueries({
 					queryKey: ['sequences-by-contact-id'],
 				});
+				queryClient.invalidateQueries({
+					queryKey: ['all-messages-by-contact-id'],
+				});
 			}
 			setModalType('alert');
 			setAlertMessage('Email sent successfully!');

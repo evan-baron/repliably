@@ -32,6 +32,9 @@ export const useSequenceDeactivate = (sequenceId: number) => {
 			queryClient.invalidateQueries({ queryKey: ['sequences-by-user-id'] });
 			queryClient.invalidateQueries({ queryKey: ['contact-get-unique'] });
 			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
+			queryClient.invalidateQueries({
+				queryKey: ['all-messages-by-contact-id'],
+			});
 		},
 	});
 };

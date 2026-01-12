@@ -41,10 +41,6 @@ const AllActivitiesTable = ({
 		}
 	};
 
-	// ADD ACTIVE OR INACTIVE SEQUENCE COLUMN
-
-	console.log('All Activities Messages:', messages);
-
 	return (
 		<table className={styles.table}>
 			<thead className={styles.tableHeader}>
