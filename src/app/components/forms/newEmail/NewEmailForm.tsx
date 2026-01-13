@@ -240,7 +240,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 								<div className={styles['input-group']}>
 									<div className={styles.input}>
 										<label htmlFor='reviewBeforeSending'>
-											Review Before Sending:
+											Review Before Sending Follow-up Emails:
 										</label>
 										<input
 											className={styles.checkbox}

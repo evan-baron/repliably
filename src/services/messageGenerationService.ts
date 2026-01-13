@@ -5,7 +5,7 @@ const client = new OpenAI();
 type GenerateOptions = {
 	previousSubject?: string;
 	keepSubject?: boolean; // if true, return previousSubject as subject
-	preserveThreadContext?: boolean;
+	preserveThreadContext?: boolean; // references the referencePreviousEmail col in db
 };
 
 type GeneratedMessage = {
