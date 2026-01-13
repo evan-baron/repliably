@@ -16,6 +16,7 @@ interface EmailData {
 	cadenceDuration: string;
 	body: string;
 	override?: boolean;
+	referencePreviousEmail?: boolean | null;
 }
 
 interface EmailResponse {

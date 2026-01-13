@@ -41,6 +41,7 @@ export async function storeSentEmail({
 	threadId,
 	inReplyTo,
 	sequenceId,
+	referencePreviousEmail,
 }: StoredEmailData) {
 	const contact = await findOrCreateContact(email, ownerId);
 
@@ -148,6 +149,7 @@ export async function storeSentEmail({
 							reviewBeforeSending && sendDelay
 								? new Date(Date.now() + sendDelay * 60 * 1000)
 								: null,
+						referencePreviousEmail: referencePreviousEmail,
 					},
 				}),
 				prisma.contact.update({
@@ -188,6 +190,8 @@ export async function storeSentEmail({
 			},
 		});
 
+		console.log('from email service:', referencePreviousEmail);
+
 		// Transaction safety: create message in transaction
 		const [createdMessage, updatedContact] = await prisma.$transaction([
 			prisma.message.create({
@@ -208,6 +212,7 @@ export async function storeSentEmail({
 						reviewBeforeSending && sendDelay
 							? new Date(Date.now() + sendDelay * 60 * 1000)
 							: null,
+					referencePreviousEmail: referencePreviousEmail,
 				},
 			}),
 			prisma.contact.update({

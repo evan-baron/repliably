@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
 			body,
 			override,
 			sequenceId,
+			referencePreviousEmail,
 		} = await req.json();
 
 		if (
@@ -69,6 +70,8 @@ export async function POST(req: NextRequest) {
 					cadenceDuration,
 					messageId: result.messageId,
 					threadId: result.threadId,
+					referencePreviousEmail: referencePreviousEmail,
+					sequenceId: sequenceId,
 				});
 
 				return NextResponse.json({
@@ -126,6 +129,7 @@ export async function POST(req: NextRequest) {
 						sendWithoutReviewAfter,
 						cadenceDuration,
 						body,
+						referencePreviousEmail,
 					},
 					message: 'Contact already part of an active sequence.',
 				},

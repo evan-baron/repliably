@@ -5,6 +5,7 @@ const client = new OpenAI();
 type GenerateOptions = {
 	previousSubject?: string;
 	keepSubject?: boolean; // if true, return previousSubject as subject
+	preserveThreadContext?: boolean;
 };
 
 type GeneratedMessage = {
@@ -30,14 +31,23 @@ export const generateMessage = async (
 	const temperature = 0.2;
 	const maxTokens = 300;
 
-	const systemInstruction = `You are an assistant that drafts professional, concise follow-up emails. Return only a single JSON object with keys: subject, bodyHtml, bodyPlain. Keep HTML minimal and safe. Do not include any extraneous commentary.`;
+	const preserveThreadContext =
+		typeof options.preserveThreadContext === 'boolean'
+			? options.preserveThreadContext
+			: true;
+
+	const systemInstruction = `You are an assistant that drafts professional, concise follow-up emails. Return only a single JSON object with keys: subject, bodyHtml, bodyPlain. Keep HTML minimal and safe. Do not include any extraneous commentary. Do not use em dashes or anything that might suggest this is Ai-generated.`;
 
 	const keepSubjectNote =
 		options.keepSubject && options.previousSubject
 			? `If appropriate, keep the existing subject exactly as provided: "Re: ${options.previousSubject}".`
 			: 'You may rewrite the subject if it will improve response rate.';
 
-	const userPrompt = `Context: this is a reply-all follow-up to the previous thread. ${keepSubjectNote}\n\nPrevious message contents:\n${previousEmailContents}\n\nProduce the JSON object now.`;
+	const threadContextNote = preserveThreadContext
+		? 'This is a reply-all — preserve thread context. Include a very brief excerpt (1-2 sentences) and keep key topic nouns so recipients recognize the thread.'
+		: 'Do NOT include the original message body. Summarize key facts in one sentence and feel free to rewrite the subject more freely.';
+
+	const userPrompt = `Context: this is a reply-all follow-up to the previous thread. ${keepSubjectNote} ${threadContextNote}\n\nPrevious message contents:\n${previousEmailContents}\n\nProduce the JSON object now.`;
 
 	const promptTemplate = `${systemInstruction}\n\n${userPrompt}`;
 
@@ -87,6 +97,7 @@ export const generateMessage = async (
 				model,
 				temperature,
 				maxTokens,
+				preserveThreadContext,
 				raw: raw.slice ? raw.slice(0, 4000) : raw,
 				attempt,
 			};

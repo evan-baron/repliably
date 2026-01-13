@@ -24,6 +24,7 @@ interface EmailFormData {
 	reviewBeforeSending: boolean;
 	sendWithoutReviewAfter: string;
 	cadenceDuration: string;
+	referencePreviousEmail?: boolean;
 }
 
 const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
@@ -46,6 +47,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				reviewBeforeSending: false,
 				sendWithoutReviewAfter: '',
 				cadenceDuration: '30',
+				referencePreviousEmail: true,
 			},
 		});
 
@@ -70,6 +72,12 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 	}, [selectedContact, contactEmail, setValue]);
 
 	useEffect(() => {
+		if (!followingUp) {
+			setValue('referencePreviousEmail', false);
+		}
+	}, [followingUp, setValue]);
+
+	useEffect(() => {
 		resetForm && reset();
 		setResetForm(false);
 	}, [resetForm, setResetForm]);
@@ -81,6 +89,11 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 			return;
 		}
 
+		const referencePrevious =
+			!data.followUpCadence || data.followUpCadence === 'none'
+				? null
+				: !!data.referencePreviousEmail;
+
 		try {
 			await sendEmail({
 				to: contactEmail ? contactEmail : data.to,
@@ -89,6 +102,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				reviewBeforeSending: data.reviewBeforeSending,
 				sendWithoutReviewAfter: data.sendWithoutReviewAfter,
 				cadenceDuration: data.cadenceDuration,
+				referencePreviousEmail: referencePrevious,
 				body: editorContent,
 			});
 
@@ -206,6 +220,22 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 
 						{followingUp && (
 							<>
+								{/* Reference Previous Emails in Follow-up */}
+								<div className={styles['input-group']}>
+									<div className={styles.input}>
+										<label htmlFor='referencePreviousEmail'>
+											Reference Previous Emails in Follow-up:
+										</label>
+										<input
+											className={styles.checkbox}
+											type='checkbox'
+											id='referencePreviousEmail'
+											{...register('referencePreviousEmail')}
+											defaultChecked={true}
+										/>
+									</div>
+								</div>
+
 								{/* Review Before Sending */}
 								<div className={styles['input-group']}>
 									<div className={styles.input}>
