@@ -152,15 +152,6 @@ async function processMessage(gmail: any, messageId: string) {
 				},
 			});
 
-			// Update contact as replied
-			await prisma.contact.update({
-				where: { id: sentMessage.contactId },
-				data: {
-					replied: true,
-					lastActivity: new Date(),
-				},
-			});
-
 			// Mark original message as having reply
 			await prisma.message.update({
 				where: { id: sentMessage.id },
@@ -172,6 +163,16 @@ async function processMessage(gmail: any, messageId: string) {
 				await prisma.sequence.update({
 					where: { id: sequenceId },
 					data: {
+						active: false,
+					},
+				});
+
+				// Update contact as replied
+				await prisma.contact.update({
+					where: { id: sentMessage.contactId },
+					data: {
+						replied: true,
+						lastActivity: new Date(),
 						active: false,
 					},
 				});
