@@ -8,7 +8,7 @@ export interface MessageFromDB {
 	inReplyTo: string | null;
 	lastError: string | null;
 	messageId: string | null;
-	needsApproval: boolean;
+	needsApproval: boolean | null;
 	approvalDeadline: Date | null;
 	ownerId: number;
 	replyDate: Date | null;
@@ -20,6 +20,8 @@ export interface MessageFromDB {
 	subject: string;
 	templateId: number | null;
 	threadId: string | null;
+	referencePreviousEmail: boolean | null;
+	alterSubjectLine: boolean | null;
 }
 
 export interface MessagesResponse {
@@ -28,4 +30,20 @@ export interface MessagesResponse {
 
 export interface MessagesWithActiveSequence extends MessageFromDB {
 	activeSequence: boolean;
+}
+
+export interface MessageCreationData {
+	contactId: number;
+	ownerId: number;
+	sequenceId?: number | null;
+	subject: string;
+	contents: string;
+	messageId: string | null;
+	threadId: string | null;
+	inReplyTo?: string | null;
+	reviewBeforeSending: boolean;
+	scheduledAt?: Date | null;
+	sendDelay?: number | null;
+	referencePreviousEmail?: boolean | null;
+	alterSubjectLine?: boolean | null;
 }

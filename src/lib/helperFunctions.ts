@@ -1,3 +1,6 @@
+// Types imports
+import { SequenceFromDB } from '@/types/sequenceTypes';
+
 export const sequenceType = (type: string, startDate: Date) => {
 	const sequenceTypes: { [key: string]: string } = {
 		'3day': 'Every 3 days',
@@ -45,4 +48,50 @@ export const parseEmailContent = (htmlString: string): string[] => {
 		.filter((text) => text.length > 0);
 
 	return textArray;
+};
+
+export const parseSequenceData = (sequence: SequenceFromDB) => {
+	const cadenceTypeMapping: { [key: string]: number } = {
+		'1day': 1,
+		'3day': 3,
+		'31day': 31,
+		weekly: 7,
+		biweekly: 14,
+		monthly: 28,
+		none: 0,
+	};
+
+	const { sequenceType, currentStep, endDate } = sequence;
+
+	const nextStepDueDateHelper = (
+		sequenceType: string,
+		currentStep: number,
+		endDate: Date | null
+	) => {
+		if (sequenceType === '31day') {
+			const delay = currentStep % 2 === 0 ? 3 : 1;
+			const proposedDueDate = new Date(
+				Date.now() + delay * 24 * 60 * 60 * 1000
+			);
+			const nextStepDueDate =
+				endDate && proposedDueDate > endDate ? null : proposedDueDate;
+			return { nextStepDueDate };
+		} else {
+			const sequenceDelay = cadenceTypeMapping[sequenceType];
+			const proposedDueDate = new Date(
+				Date.now() + sequenceDelay * 24 * 60 * 60 * 1000
+			);
+			const nextStepDueDate =
+				endDate && proposedDueDate > endDate ? null : proposedDueDate;
+			return { nextStepDueDate };
+		}
+	};
+
+	const { nextStepDueDate } = nextStepDueDateHelper(
+		sequenceType,
+		currentStep,
+		endDate
+	);
+
+	return { endDate, nextStepDueDate };
 };

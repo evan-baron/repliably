@@ -13,8 +13,10 @@ export interface SequenceFromDB {
 	active: boolean;
 	createdAt: Date;
 	updatedAt: Date;
-	messages: any[];
-	emailReplies: any[];
+	messages?: any[];
+	emailReplies?: any[];
+	referencePreviousEmail?: boolean | null;
+	alterSubjectLine?: boolean | null;
 }
 
 export interface SequencesResponse {

@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '@/app/context/AppContext';
 import { useEmailContext } from '@/app/context/EmailContext';
 
-interface EmailData {
+interface NewMessageData {
 	to: string;
 	subject: string;
 	cadenceType: string;
@@ -17,9 +17,10 @@ interface EmailData {
 	body: string;
 	override?: boolean;
 	referencePreviousEmail?: boolean | null;
+	alterSubjectLine?: boolean | null;
 }
 
-interface EmailResponse {
+interface NewMessageResponse {
 	success: boolean;
 	messageId: string;
 	threadId: string;
@@ -33,7 +34,7 @@ export const useEmailSend = () => {
 
 	return useMutation({
 		mutationFn: emailAPI.send,
-		onSuccess: (response: EmailResponse, emailData: EmailData) => {
+		onSuccess: (response: NewMessageResponse, emailData: NewMessageData) => {
 			if (response.contact) {
 				queryClient.setQueryData(
 					['contact-get-unique', response.contact.id],
@@ -70,7 +71,7 @@ export const useEmailSend = () => {
 			setModalType('alert');
 			setAlertMessage('Email sent successfully!');
 		},
-		onError: (error: any, emailData: EmailData) => {
+		onError: (error: any, emailData: NewMessageData) => {
 			if (error.status === 409 && error.responseData?.sequenceExists) {
 				setPendingEmail({ ...error.responseData.emailData, override: true });
 				setModalType('override');

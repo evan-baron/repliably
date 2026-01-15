@@ -73,17 +73,16 @@ model Message {
   createdAt                 DateTime      @default(now())
   messageId                 String?       // Gmail message ID
   threadId                  String?       // Gmail thread ID  
-  inReplyTo                 String?       // Reference to original message
+  inReplyTo                 String?       // Reference to original message messageId
   hasReply                  Boolean       @default(false)
-  replyDate                 DateTime?
-  needsApproval             Boolean       @default(false)
+  replyDate                 DateTime?     // Date when contact replied
+  needsApproval             Boolean?      
   approvalDeadline          DateTime?   
   scheduledAt               DateTime?
   status                    MessageStatus @default(scheduled)
   sendAttempts              Int           @default(0)
   sentAt                    DateTime?     
   lastError                 String?
-  referencePreviousEmail    Boolean?      
 
   @@index([status, scheduledAt])
 }
@@ -108,22 +107,24 @@ model EmailReply {
 }
 
 model Sequence {
-  id               Int       @id @default(autoincrement())
-  title            String    
-  contactId        Int
-  contact          Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
-  ownerId          Int
-  owner            User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  sequenceType     String    // e.g. "3-2-1"
-  autoSend         Boolean   @default(false)
-  autoSendDelay    Int?      // days
-  sequenceDuration Int?      @default(30)
-  currentStep      Int       @default(0)
-  nextStepDue      DateTime?
-  endDate          DateTime? // createdAt + autoSendDuration days
-  active           Boolean   @default(true)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                        Int       @id @default(autoincrement())
+  title                     String    
+  contactId                 Int
+  contact                   Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
+  ownerId                   Int
+  owner                     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sequenceType              String    // e.g. "3-2-1"
+  autoSend                  Boolean   @default(false)
+  autoSendDelay             Int?      // days
+  sequenceDuration          Int?      @default(30)
+  currentStep               Int       @default(0)
+  nextStepDue               DateTime?
+  endDate                   DateTime? // createdAt + autoSendDuration days
+  active                    Boolean   @default(true)
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  referencePreviousEmail    Boolean?     
+  alterSubjectLine          Boolean? 
 
   messages         Message[]
   emailReplies     EmailReply[]

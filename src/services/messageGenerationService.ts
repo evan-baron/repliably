@@ -2,8 +2,12 @@ import OpenAI from 'openai';
 
 const client = new OpenAI();
 
+type PreviousEmailContentsType = {
+	previousSubject: string;
+	previousBody: string;
+};
+
 type GenerateOptions = {
-	previousSubject?: string;
 	keepSubject?: boolean; // if true, return previousSubject as subject
 	preserveThreadContext?: boolean; // references the referencePreviousEmail col in db
 };
@@ -24,7 +28,7 @@ function extractJsonObject(text: string): string | null {
 }
 
 export const generateMessage = async (
-	previousEmailContents: string,
+	previousEmailContents: PreviousEmailContentsType,
 	options: GenerateOptions = {}
 ): Promise<GeneratedMessage> => {
 	const model = 'gpt-5-nano';
@@ -39,15 +43,15 @@ export const generateMessage = async (
 	const systemInstruction = `You are an assistant that drafts professional, concise follow-up emails. Return only a single JSON object with keys: subject, bodyHtml, bodyPlain. Keep HTML minimal and safe. Do not include any extraneous commentary. Do not use em dashes or anything that might suggest this is Ai-generated.`;
 
 	const keepSubjectNote =
-		options.keepSubject && options.previousSubject
-			? `If appropriate, keep the existing subject exactly as provided: "Re: ${options.previousSubject}".`
+		options.keepSubject && previousEmailContents.previousSubject
+			? `If appropriate, keep the existing subject exactly as provided: "Re: ${previousEmailContents.previousSubject}".`
 			: 'You may rewrite the subject if it will improve response rate.';
 
 	const threadContextNote = preserveThreadContext
 		? 'This is a reply-all — preserve thread context. Include a very brief excerpt (1-2 sentences) and keep key topic nouns so recipients recognize the thread.'
 		: 'Do NOT include the original message body. Summarize key facts in one sentence and feel free to rewrite the subject more freely.';
 
-	const userPrompt = `Context: this is a reply-all follow-up to the previous thread. ${keepSubjectNote} ${threadContextNote}\n\nPrevious message contents:\n${previousEmailContents}\n\nProduce the JSON object now.`;
+	const userPrompt = `Context: this is a reply-all follow-up to the previous thread. ${keepSubjectNote} ${threadContextNote}\n\nPrevious message contents:\n${previousEmailContents.previousBody}\n\nProduce the JSON object now.`;
 
 	const promptTemplate = `${systemInstruction}\n\n${userPrompt}`;
 
@@ -83,8 +87,8 @@ export const generateMessage = async (
 			}
 
 			const subject =
-				options.keepSubject && options.previousSubject
-					? options.previousSubject
+				options.keepSubject && previousEmailContents.previousSubject
+					? previousEmailContents.previousSubject
 					: parsed.subject || parsed.subject_line || '';
 			const bodyHtml =
 				parsed.bodyHtml || parsed.body_html || parsed.html || parsed.body || '';

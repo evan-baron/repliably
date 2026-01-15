@@ -25,6 +25,7 @@ interface EmailFormData {
 	sendWithoutReviewAfter: string;
 	cadenceDuration: string;
 	referencePreviousEmail?: boolean;
+	alterSubjectLine?: boolean;
 }
 
 const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
@@ -48,6 +49,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				sendWithoutReviewAfter: '',
 				cadenceDuration: '30',
 				referencePreviousEmail: true,
+				alterSubjectLine: false,
 			},
 		});
 
@@ -94,6 +96,8 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				? null
 				: !!data.referencePreviousEmail;
 
+		const alterSubject = !data.followUpCadence ? null : !!data.alterSubjectLine;
+
 		try {
 			await sendEmail({
 				to: contactEmail ? contactEmail : data.to,
@@ -104,6 +108,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				cadenceDuration: data.cadenceDuration,
 				referencePreviousEmail: referencePrevious,
 				body: editorContent,
+				alterSubjectLine: alterSubject,
 			});
 
 			// Success handling is done in the hook
@@ -232,6 +237,22 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 											id='referencePreviousEmail'
 											{...register('referencePreviousEmail')}
 											defaultChecked={true}
+										/>
+									</div>
+								</div>
+
+								{/* Let AI alter subject line for follow-up emails */}
+								<div className={styles['input-group']}>
+									<div className={styles.input}>
+										<label htmlFor='alterSubjectLine'>
+											Let AI alter subject line for follow-up emails:
+										</label>
+										<input
+											className={styles.checkbox}
+											type='checkbox'
+											id='alterSubjectLine'
+											{...register('alterSubjectLine')}
+											defaultChecked={false}
 										/>
 									</div>
 								</div>

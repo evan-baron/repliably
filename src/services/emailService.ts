@@ -3,7 +3,15 @@ import { prisma } from '@/lib/prisma';
 // Types imports
 import { StoredEmailData } from '@/types/emailTypes';
 
+// Services imports
+import { createMessage } from './messageService';
+
+// Helpers imports
+import { parseSequenceData } from '@/lib/helperFunctions';
+
+// Helper function to find or create a contact
 export async function findOrCreateContact(email: string, ownerId: number) {
+	// Try to find an existing contact with the given email and ownerId
 	let contact = await prisma.contact.findFirst({
 		where: {
 			email: email,
@@ -11,6 +19,7 @@ export async function findOrCreateContact(email: string, ownerId: number) {
 		},
 	});
 
+	// If no contact is found, create a new one
 	if (!contact) {
 		contact = await prisma.contact.create({
 			data: {
@@ -25,9 +34,11 @@ export async function findOrCreateContact(email: string, ownerId: number) {
 		});
 	}
 
+	// Return the found or newly created contact
 	return contact;
 }
 
+// Main function to store sent email in the db and handle/update sequences
 export async function storeSentEmail({
 	email,
 	ownerId,
@@ -42,9 +53,12 @@ export async function storeSentEmail({
 	inReplyTo,
 	sequenceId,
 	referencePreviousEmail,
+	alterSubjectLine,
 }: StoredEmailData) {
+	// First find or create the contact that will be associated with the message
 	const contact = await findOrCreateContact(email, ownerId);
 
+	// Helpers to map cadenceType and cadenceDuration to their respective values
 	const cadenceTypeMapping: { [key: string]: number } = {
 		'1day': 1,
 		'3day': 3,
@@ -62,7 +76,7 @@ export async function storeSentEmail({
 		indefinite: null,
 	};
 
-	// Send delay in days
+	// Helper to determine sendDelay in days
 	const sendDelay =
 		sendWithoutReviewAfter === 'never' ||
 		sendWithoutReviewAfter === '' ||
@@ -72,40 +86,42 @@ export async function storeSentEmail({
 			? parseInt(sendWithoutReviewAfter)
 			: null;
 
+	// Helper to simplify sequenceDuration calculation
 	const sequenceDuration = cadenceDurationMapping[cadenceDuration];
 
+	// Determine endDate for the sequence
 	const endDate = sequenceDuration
 		? new Date(Date.now() + sequenceDuration * 24 * 60 * 60 * 1000)
 		: null;
 
-	// If cadenceType is 'none', no follow-up emails
+	// If cadenceType is 'none', there will be no follow-up emails
 	if (cadenceType === 'none') {
-		const [createdMessage, updatedContact] = await prisma.$transaction([
-			prisma.message.create({
-				data: {
-					contactId: contact.id,
-					ownerId,
-					subject,
-					contents,
-					direction: 'outbound',
-					messageId,
-					threadId,
-					inReplyTo: inReplyTo || null,
-					createdAt: new Date(),
-					status: 'sent',
-				},
-			}),
-			prisma.contact.update({
-				where: { id: contact.id },
-				data: { lastActivity: new Date() },
-			}),
-		]);
+		const newMessageData = {
+			contactId: contact.id,
+			ownerId,
+			subject,
+			contents,
+			messageId,
+			threadId,
+			reviewBeforeSending,
+		};
+
+		const { createdMessage, updatedContact } = await createMessage(
+			newMessageData
+		);
+
 		return { createdMessage, updatedContact };
 	}
 
-	// If sequenceId is provided, use existing sequence. Otherwise, create new one.
+	// If sequenceId is provided, this must be a follow-up email in an existing sequence. Otherwise, it must be the first email in a new sequence.
 	if (sequenceId) {
-		// Follow-up email: use existing sequence
+		// There is a sequenceId provided meaning this is a follow-up email in an existing sequence
+		// Steps to follow:
+		// 1. Fetch the existing sequence
+		// 2. Save the message to the db associated with the existing sequence
+		// 3. Update the sequence's next step due date and current step count
+
+		// Fetch the existing sequence
 		const sequence = await prisma.sequence.findUnique({
 			where: { id: sequenceId },
 		});
@@ -114,60 +130,52 @@ export async function storeSentEmail({
 			throw new Error(`Sequence with id ${sequenceId} not found`);
 		}
 
-		// Calculate next step due date based on sequence type
-		if (sequence.sequenceType === '31day') {
-			const delay = sequence.currentStep % 2 === 0 ? 3 : 1;
-			sequence.nextStepDue = new Date(Date.now() + delay * 24 * 60 * 60 * 1000);
-		} else {
-			const sequenceDelay = cadenceTypeMapping[sequence.sequenceType];
-			const nextStepDueDate = new Date(
-				Date.now() + sequenceDelay * 24 * 60 * 60 * 1000
-			);
+		// Parse sequence data to get the new next step due date
+		const { nextStepDueDate } = parseSequenceData(sequence);
 
-			sequence.endDate && nextStepDueDate > sequence.endDate
-				? (sequence.nextStepDue = null)
-				: (sequence.nextStepDue = nextStepDueDate);
-		}
+		const [createdMessage, updatedSequence] = await prisma.$transaction([
+			// Save the message associated with the existing sequence
+			prisma.message.create({
+				data: {
+					contactId: contact.id,
+					ownerId,
+					sequenceId: sequence.id,
+					subject,
+					contents,
+					direction: 'outbound',
+					messageId,
+					threadId,
+					inReplyTo: inReplyTo || null,
+					createdAt: new Date(),
+					status: reviewBeforeSending ? 'pending' : 'sent',
+					needsApproval: reviewBeforeSending,
+					approvalDeadline:
+						reviewBeforeSending && sendDelay
+							? new Date(Date.now() + sendDelay * 60 * 1000)
+							: null,
+					scheduledAt: nextStepDueDate,
+				},
+			}),
 
-		const [createdMessage, updatedContact, updatedSequence] =
-			await prisma.$transaction([
-				prisma.message.create({
-					data: {
-						contactId: contact.id,
-						ownerId,
-						sequenceId: sequence.id,
-						subject,
-						contents,
-						direction: 'outbound',
-						messageId,
-						threadId,
-						inReplyTo: inReplyTo || null,
-						createdAt: new Date(),
-						status: reviewBeforeSending ? 'pending' : 'sent',
-						needsApproval: reviewBeforeSending,
-						approvalDeadline:
-							reviewBeforeSending && sendDelay
-								? new Date(Date.now() + sendDelay * 60 * 1000)
-								: null,
-						referencePreviousEmail: referencePreviousEmail,
-					},
-				}),
-				prisma.contact.update({
-					where: { id: contact.id },
-					data: { lastActivity: new Date() },
-				}),
-				prisma.sequence.update({
-					where: { id: sequence.id },
-					data: {
-						nextStepDue: sequence.nextStepDue,
-						currentStep: sequence.currentStep + 1,
-					},
-				}),
-			]);
+			// Update the sequence's next step due date and current step count
+			prisma.sequence.update({
+				where: { id: sequence.id },
+				data: {
+					nextStepDue: nextStepDueDate,
+					currentStep: sequence.currentStep + 1,
+				},
+			}),
+		]);
 
-		return { createdMessage, updatedContact, updatedSequence };
+		return { createdMessage, updatedSequence };
 	} else {
-		// For 31day pattern, first step is always 3 days
+		// There isn't a sequenceId provided meaning this is the first email in a new sequence
+		// Steps to follow:
+		// 1. Create the new sequence
+		// 2. Save the message to the db associated with the new sequence
+		// 3. Update the contact to reflect last activity and change their active status to true
+
+		// Helper function to determine the next step due date for new sequence-to-be
 		const nextStepDueDate =
 			cadenceType === '31day'
 				? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
@@ -175,7 +183,7 @@ export async function storeSentEmail({
 						Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
 				  );
 
-		// First email: create new sequence
+		// Create the new sequence
 		const sequence = await prisma.sequence.create({
 			data: {
 				title: subject,
@@ -187,13 +195,14 @@ export async function storeSentEmail({
 				sequenceDuration: cadenceDurationMapping[cadenceDuration],
 				nextStepDue: nextStepDueDate,
 				endDate,
+				referencePreviousEmail: referencePreviousEmail,
+				alterSubjectLine: alterSubjectLine || null,
 			},
 		});
 
-		console.log('from email service:', referencePreviousEmail);
-
 		// Transaction safety: create message in transaction
 		const [createdMessage, updatedContact] = await prisma.$transaction([
+			// Create the message associated with the new sequence
 			prisma.message.create({
 				data: {
 					contactId: contact.id,
@@ -212,9 +221,10 @@ export async function storeSentEmail({
 						reviewBeforeSending && sendDelay
 							? new Date(Date.now() + sendDelay * 60 * 1000)
 							: null,
-					referencePreviousEmail: referencePreviousEmail,
 				},
 			}),
+
+			// Update the contact's last activity and active status
 			prisma.contact.update({
 				where: { id: contact.id },
 				data: { lastActivity: new Date(), active: true },

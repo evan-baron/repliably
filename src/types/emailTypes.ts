@@ -12,6 +12,7 @@ export interface StoredEmailData {
 	inReplyTo?: string;
 	sequenceId?: number;
 	referencePreviousEmail?: boolean | null;
+	alterSubjectLine?: boolean | null;
 }
 
 export interface SentEmailData {
@@ -24,7 +25,6 @@ export interface SentEmailData {
 	body: string;
 	override?: boolean;
 	sequenceId?: number;
-	referencePreviousEmail?: boolean | null;
 }
 
 export interface PendingEmailData {
@@ -37,4 +37,5 @@ export interface PendingEmailData {
 	body: string;
 	override?: boolean;
 	referencePreviousEmail?: boolean | null;
+	alterSubjectLine?: boolean | null;
 }

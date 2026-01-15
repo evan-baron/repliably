@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
 			override,
 			sequenceId,
 			referencePreviousEmail,
+			alterSubjectLine,
 		} = await req.json();
 
 		if (
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
 					threadId: result.threadId,
 					referencePreviousEmail: referencePreviousEmail,
 					sequenceId: sequenceId,
+					alterSubjectLine: alterSubjectLine,
 				});
 
 				return NextResponse.json({
@@ -87,6 +89,8 @@ export async function POST(req: NextRequest) {
 				{ status: 500 }
 			);
 		};
+
+		// Helper: create and store next message in existing sequence
 
 		// Handle override: true logic
 		if (override) {
@@ -112,6 +116,8 @@ export async function POST(req: NextRequest) {
 
 		if (!existingSequence) {
 			return await sendAndStoreEmail();
+
+			// Now create follow-up messages according to cadenceType, cadenceDuration, etc.
 		}
 
 		const matches = sequenceId && existingSequence.id === sequenceId;
@@ -130,6 +136,7 @@ export async function POST(req: NextRequest) {
 						cadenceDuration,
 						body,
 						referencePreviousEmail,
+						alterSubjectLine,
 					},
 					message: 'Contact already part of an active sequence.',
 				},
