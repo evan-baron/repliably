@@ -5,7 +5,7 @@ import Link from 'next/link';
 // Services imports
 import { getContactById } from '@/services/contactsService';
 import { getSequencesByContactId } from '@/services/sequenceService';
-import { getAllMessagesByContactId } from '@/services/messageServices';
+import { getAllMessagesByContactId } from '@/services/messageService';
 
 // Styles imports
 import styles from './contactPage.module.scss';
