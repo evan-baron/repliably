@@ -69,18 +69,14 @@ export const parseSequenceData = (sequence: SequenceFromDB) => {
 		endDate: Date | null
 	) => {
 		if (sequenceType === '31day') {
-			const delay = currentStep % 2 === 0 ? 3 : 1;
-			const proposedDueDate = new Date(
-				Date.now() + delay * 24 * 60 * 60 * 1000
-			);
+			const days = currentStep % 2 === 0 ? 3 : 1;
+			const proposedDueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 			const nextStepDueDate =
 				endDate && proposedDueDate > endDate ? null : proposedDueDate;
 			return { nextStepDueDate };
 		} else {
-			const sequenceDelay = cadenceTypeMapping[sequenceType];
-			const proposedDueDate = new Date(
-				Date.now() + sequenceDelay * 24 * 60 * 60 * 1000
-			);
+			const days = cadenceTypeMapping[sequenceType];
+			const proposedDueDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 			const nextStepDueDate =
 				endDate && proposedDueDate > endDate ? null : proposedDueDate;
 			return { nextStepDueDate };

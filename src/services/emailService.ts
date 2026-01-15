@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma';
 import { StoredEmailData } from '@/types/emailTypes';
 
 // Services imports
-import { createMessage } from './messageService';
 
 // Helpers imports
 import { parseSequenceData } from '@/lib/helperFunctions';
@@ -96,20 +95,25 @@ export async function storeSentEmail({
 
 	// If cadenceType is 'none', there will be no follow-up emails
 	if (cadenceType === 'none') {
-		const newMessageData = {
-			contactId: contact.id,
-			ownerId,
-			subject,
-			contents,
-			messageId,
-			threadId,
-			reviewBeforeSending,
-		};
-
-		const { createdMessage, updatedContact } = await createMessage(
-			newMessageData
-		);
-
+		const [createdMessage, updatedContact] = await prisma.$transaction([
+			prisma.message.create({
+				data: {
+					contactId: contact.id,
+					ownerId,
+					subject,
+					contents,
+					direction: 'outbound',
+					messageId,
+					threadId,
+					createdAt: new Date(),
+					status: 'sent',
+				},
+			}),
+			prisma.contact.update({
+				where: { id: contact.id },
+				data: { lastActivity: new Date() },
+			}),
+		]);
 		return { createdMessage, updatedContact };
 	}
 

@@ -76,7 +76,8 @@ model Message {
   inReplyTo                 String?       // Reference to original message messageId
   hasReply                  Boolean       @default(false)
   replyDate                 DateTime?     // Date when contact replied
-  needsApproval             Boolean?      
+  needsApproval             Boolean?  
+  approved                  Boolean?    
   approvalDeadline          DateTime?   
   scheduledAt               DateTime?
   status                    MessageStatus @default(scheduled)

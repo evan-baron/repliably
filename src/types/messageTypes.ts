@@ -9,6 +9,7 @@ export interface MessageFromDB {
 	lastError: string | null;
 	messageId: string | null;
 	needsApproval: boolean | null;
+	approved: boolean | null;
 	approvalDeadline: Date | null;
 	ownerId: number;
 	replyDate: Date | null;
@@ -20,8 +21,6 @@ export interface MessageFromDB {
 	subject: string;
 	templateId: number | null;
 	threadId: string | null;
-	referencePreviousEmail: boolean | null;
-	alterSubjectLine: boolean | null;
 }
 
 export interface MessagesResponse {
