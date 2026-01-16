@@ -52,6 +52,10 @@
 	will-change: transform;
 	width: 100%;
 
+	&.notification {
+		animation: blinking 1.5s infinite;
+	}
+
 	span {
 		transition: transform 0.2s ease-in-out;
 		will-change: transform;
@@ -63,6 +67,13 @@
 		border-left-color: var(--color-secondary);
 		transform: scaleX(0.98);
 		transform-origin: right center;
+
+		&.notification {
+			background: hsla(0, 92%, 61%, 0.25);
+			border-left-color: hsla(0, 92%, 61%, 0.5);
+			color: var(--accent-important);
+			animation: none;
+		}
 
 		span {
 			transform: scale(1.1);
@@ -86,5 +97,15 @@
 			background: var(--accent-primary);
 			border-radius: 0.1875rem;
 		}
+	}
+}
+
+@keyframes blinking {
+	0%,
+	100% {
+		color: var(--text-secondary);
+	}
+	50% {
+		color: var(--accent-important);
 	}
 }

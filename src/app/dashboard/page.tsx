@@ -36,7 +36,7 @@ const Dashboard = () => {
 				<PreviewTile title='Recent Activity'>
 					<div></div>
 				</PreviewTile>
-				<PreviewTile title='Upcoming'>
+				<PreviewTile title='Pending & Upcoming Activities'>
 					<div></div>
 				</PreviewTile>
 				<PreviewTile title='Active Contacts'>

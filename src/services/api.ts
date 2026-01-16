@@ -90,4 +90,12 @@ export const messageAPI = {
 		apiCall(`/api/messages/contact/${contactId}`, {
 			method: 'GET',
 		}),
+	getAllPending: () =>
+		apiCall('/api/messages/pending', {
+			method: 'GET',
+		}),
+	approveMessage: (messageId: number) =>
+		apiCall(`/api/messages/${messageId}/approve`, {
+			method: 'PUT',
+		}),
 };

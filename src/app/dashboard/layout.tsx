@@ -3,11 +3,16 @@ import React from 'react';
 import { auth0 } from '@/lib/auth0';
 import { redirect } from 'next/navigation';
 
+// Services imports
+import { getAllPendingMessages } from '@/services/messageService';
+import { findOrCreateUser } from '@/services/userService';
+
 // Styles imports
 import styles from './dashboard.module.scss';
 
 // Components imports
 import TopBar from '../components/dashboard/TopBar';
+import SideBarClient from '../components/dashboard/SideBarClient';
 import SideBar from '../components/dashboard/SideBar';
 import Modal from '../components/modal/Modal';
 
@@ -27,8 +32,9 @@ export default async function DashboardLayout({
 		redirect('/');
 	}
 
-	const { findOrCreateUser } = await import('@/services/userService');
 	await findOrCreateUser(user);
+
+	const { messages } = await getAllPendingMessages();
 
 	return (
 		<EmailContextProvider>
@@ -40,7 +46,7 @@ export default async function DashboardLayout({
 				<TopBar userName={user?.given_name || 'User'} />
 
 				<div className={styles.mainContent} role='main'>
-					<SideBar />
+					<SideBarClient initialMessages={messages} />
 
 					<main
 						className={styles.dashboardContent}

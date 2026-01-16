@@ -8,12 +8,14 @@ interface NavigationItemProps {
 	href: string;
 	label: string;
 	isActive?: boolean;
+	notifications?: boolean;
 }
 
 export default function NavigationItem({
 	href,
 	label,
 	isActive = false,
+	notifications = false,
 }: NavigationItemProps) {
 	return (
 		<li role='none'>
@@ -21,7 +23,9 @@ export default function NavigationItem({
 				href={href}
 				className={`${
 					label !== 'New Email' ? styles.navLink : styles.actionButton
-				} ${isActive ? styles.active : ''}`}
+				} ${isActive ? styles.active : ''} ${
+					notifications ? styles.notification : ''
+				}`}
 				aria-current={isActive ? 'page' : undefined}
 				aria-label={`Navigate to ${label} page`}
 			>
