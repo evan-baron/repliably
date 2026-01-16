@@ -110,6 +110,7 @@ export async function storeNewMessage({
 					threadId,
 					createdAt: new Date(),
 					status: 'sent',
+					sentAt: new Date(),
 				},
 			}),
 			prisma.contact.update({
@@ -154,7 +155,7 @@ export async function storeNewMessage({
 
 	// Transaction safety: create message and update contact in transaction
 	const [storedMessage, updatedContact] = await prisma.$transaction([
-		// Create the message associated with the new sequence
+		// Create the message associated with the new sequence (this is technically the first message in the sequence)
 		prisma.message.create({
 			data: {
 				contactId: contact.id,
@@ -172,6 +173,7 @@ export async function storeNewMessage({
 					reviewBeforeSending && sendDelay
 						? new Date(Date.now() + sendDelay * 60 * 1000)
 						: null,
+				sentAt: new Date(),
 			},
 		}),
 
@@ -212,6 +214,7 @@ export async function storeNewMessage({
 				reviewBeforeSending && sendDelay
 					? new Date(Date.now() + sendDelay * 60 * 1000)
 					: null,
+			scheduledAt: nextStepDueDate,
 		},
 	});
 
@@ -247,6 +250,7 @@ export async function updateExistingSequenceMessage(message: MessageFromDB) {
 
 	const sequence = (await prisma.sequence.findUnique({
 		where: { id: sequenceId!, ownerId: message.ownerId },
+		include: { messages: true, emailReplies: true },
 	})) as SequenceFromDB;
 	const {
 		currentStep,

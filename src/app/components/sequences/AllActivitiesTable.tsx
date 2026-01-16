@@ -12,6 +12,7 @@ import { MessagesWithActiveSequence } from '@/types/messageTypes';
 
 // Components
 import MessagesTable from './MessagesTable';
+import { g } from 'vitest/dist/chunks/suite.d.BJWk38HB';
 
 const AllActivitiesTable = ({
 	messages,
@@ -41,6 +42,21 @@ const AllActivitiesTable = ({
 		}
 	};
 
+	const getSendDate = (message: MessagesWithActiveSequence): string => {
+		if (message.status === 'sent' && message.sentAt) {
+			return new Date(message.sentAt).toLocaleDateString();
+		}
+		if (
+			(message.status === 'pending' ||
+				message.status === 'scheduled' ||
+				message.status === 'cancelled') &&
+			message.scheduledAt
+		) {
+			return new Date(message.scheduledAt).toLocaleDateString();
+		}
+		return 'N/A';
+	};
+
 	return (
 		<table className={styles.table}>
 			<thead className={styles.tableHeader}>
@@ -52,7 +68,7 @@ const AllActivitiesTable = ({
 					<th className={styles.lrg}>Name</th>
 					<th className={styles.sm} onClick={() => handleSort()}>
 						<span className={styles.sort}>
-							Completion Date
+							Send Date
 							<SwapVert fontSize='small' />
 						</span>
 					</th>
@@ -61,9 +77,7 @@ const AllActivitiesTable = ({
 			</thead>
 			<tbody>
 				{sortedMessages.map((message, index) => {
-					const sequenceCompletionDate = new Date(
-						message.createdAt
-					).toLocaleDateString();
+					const sendDate = getSendDate(message);
 
 					return (
 						<Fragment key={index}>
@@ -74,15 +88,28 @@ const AllActivitiesTable = ({
 								}}
 							>
 								<td className={styles.sm}>
-									{message.sequenceId ? 'Sequence' : 'Stand-alone Email'}
+									{message.sequenceId ? 'Sequence Email' : 'Stand-alone Email'}
 								</td>
 								<td className={styles.sm}>
 									{message.sequenceId ? (
-										message.activeSequence ? (
-											<span className={styles.active}>Active</span>
-										) : (
-											<span className={styles.inactive}>Inactive</span>
-										)
+										<span
+											className={`${
+												message.status === 'pending'
+													? styles.pending
+													: message.status === 'scheduled'
+													? styles.scheduled
+													: message.status === 'sent'
+													? styles.sent
+													: message.status === 'cancelled'
+													? styles.cancelled
+													: ''
+											}`}
+										>
+											{message.status === 'pending'
+												? 'Pending Approval'
+												: message.status[0].toUpperCase() +
+												  message.status.slice(1)}
+										</span>
 									) : (
 										<span className={styles.na}>N/A</span>
 									)}
@@ -94,9 +121,7 @@ const AllActivitiesTable = ({
 									{message.sequenceId ? message.subject : message.subject}
 								</td>
 
-								<td className={`${styles.sm} ${styles.right}`}>
-									{sequenceCompletionDate}
-								</td>
+								<td className={`${styles.sm} ${styles.right}`}>{sendDate}</td>
 								<td className={`${styles.sm} ${styles.right}`}>
 									{message.sequenceId
 										? message.hasReply

@@ -57,11 +57,23 @@ export async function PUT(
 			where: { ownerId: user.id, id: sequenceId },
 			data: { active: false, endDate: new Date() },
 		});
+		const updatedMessages = await prisma.message.updateMany({
+			where: {
+				sequenceId: sequenceId,
+				ownerId: user.id,
+				status: { in: ['pending', 'scheduled'] },
+			},
+			data: { status: 'cancelled' },
+		});
 		const updatedContact = await prisma.contact.update({
 			where: { id: updatedSequence.contactId },
 			data: { active: false },
 		});
-		return NextResponse.json({ updatedSequence, updatedContact });
+		return NextResponse.json({
+			updatedSequence,
+			updatedMessages,
+			updatedContact,
+		});
 	} catch (error: any) {
 		console.error('Error updating sequence:', error);
 		return NextResponse.json(

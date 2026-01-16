@@ -109,7 +109,7 @@ export async function sendMessage({
 			// Update the message record in the db
 			prisma.message.update({
 				where: { id: dbMessageId },
-				data: { messageId, status: 'sent' },
+				data: { messageId, status: 'sent', sentAt: new Date() },
 			}),
 
 			// Update the sequence in the db
@@ -147,6 +147,7 @@ export async function sendMessage({
 			threadId,
 			needsApproval,
 			autoSendDelay,
+			nextStepDueDate,
 		});
 
 		return {
@@ -180,6 +181,7 @@ export async function generateAndCreateNewMessage({
 	messageId,
 	needsApproval,
 	autoSendDelay,
+	nextStepDueDate,
 }: {
 	subject: string;
 	contents: string;
@@ -192,6 +194,7 @@ export async function generateAndCreateNewMessage({
 	messageId: string;
 	needsApproval: boolean | null;
 	autoSendDelay: number | null;
+	nextStepDueDate: Date | null;
 }) {
 	// Generate and return the follow-up message
 	const { subject: newSubject, bodyHtml } = await generateMessage(
@@ -223,6 +226,7 @@ export async function generateAndCreateNewMessage({
 				needsApproval && autoSendDelay
 					? new Date(Date.now() + autoSendDelay * 60 * 1000)
 					: null,
+			scheduledAt: nextStepDueDate,
 		},
 	});
 

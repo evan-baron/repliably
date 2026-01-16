@@ -128,6 +128,7 @@ export async function storeSentEmail({
 		// Fetch the existing sequence
 		const sequence = await prisma.sequence.findUnique({
 			where: { id: sequenceId },
+			include: { messages: true, emailReplies: true },
 		});
 
 		if (!sequence) {
@@ -220,11 +221,12 @@ export async function storeSentEmail({
 					inReplyTo: inReplyTo || null,
 					createdAt: new Date(),
 					needsApproval: reviewBeforeSending,
-					status: reviewBeforeSending ? 'pending' : 'sent',
+					status: 'sent',
 					approvalDeadline:
 						reviewBeforeSending && sendDelay
 							? new Date(Date.now() + sendDelay * 60 * 1000)
 							: null,
+					sentAt: new Date(),
 				},
 			}),
 

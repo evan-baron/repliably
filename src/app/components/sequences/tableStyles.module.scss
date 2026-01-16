@@ -115,6 +115,34 @@
 					opacity: 0.5;
 					font-style: italic;
 				}
+
+				&.pending {
+					color: var(--accent-important);
+					font-weight: 600;
+				}
+
+				&.cancelled {
+					color: var(--text-muted);
+					opacity: 0.5;
+					font-style: italic;
+				}
+
+				// The following styles are for nested spans
+				.pending {
+					color: var(--accent-important);
+					font-weight: 600;
+				}
+
+				.cancelled {
+					color: var(--text-muted);
+					opacity: 0.5;
+					font-style: italic;
+				}
+
+				.scheduled {
+					color: var(--color-primary);
+					font-weight: 600;
+				}
 			}
 
 			&.expanded-row {

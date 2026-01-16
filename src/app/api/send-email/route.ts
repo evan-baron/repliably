@@ -71,8 +71,8 @@ export async function POST(req: NextRequest) {
 					cadenceDuration,
 					messageId: result.messageId,
 					threadId: result.threadId,
+					sequenceId: sequenceId ?? null,
 					referencePreviousEmail: referencePreviousEmail,
-					sequenceId: sequenceId,
 					alterSubjectLine: alterSubjectLine,
 				});
 
@@ -116,8 +116,6 @@ export async function POST(req: NextRequest) {
 
 		if (!existingSequence) {
 			return await sendAndStoreEmail();
-
-			// Now create follow-up messages according to cadenceType, cadenceDuration, etc.
 		}
 
 		const matches = sequenceId && existingSequence.id === sequenceId;

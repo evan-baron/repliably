@@ -89,5 +89,5 @@ export const parseSequenceData = (sequence: SequenceFromDB) => {
 		endDate
 	);
 
-	return { endDate, nextStepDueDate };
+	return { nextStepDueDate };
 };

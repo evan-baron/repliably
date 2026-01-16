@@ -47,8 +47,6 @@ const MessagesTable = ({
 		return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
 	});
 
-	const today = new Date(Date.now());
-
 	return (
 		<table className={styles.table}>
 			<thead className={styles.tableHeader}>
@@ -70,9 +68,15 @@ const MessagesTable = ({
 			</thead>
 			<tbody>
 				{sortedMessages.map((message) => {
-					const messageDateDay = new Date(message.createdAt);
-					const status = messageDateDay > today;
+					console.log('message from map', message);
+					const messageDateDay = message.sentAt
+						? new Date(message.sentAt)
+						: new Date(message.scheduledAt!);
 					const parsedContent = parseEmailContent(message.contents);
+					const messageStatus =
+						message.status === 'pending'
+							? 'Pending Approval'
+							: message.status[0].toUpperCase() + message.status.slice(1);
 
 					return (
 						<tr
@@ -82,8 +86,18 @@ const MessagesTable = ({
 								selectedMessage === message.id ? styles.selectedMessage : ''
 							}`}
 						>
-							<td className={styles.md}>{message.subject}</td>
-							<td className={`${styles.lrg} ${styles['content-cell']}`}>
+							<td
+								className={`${styles.md} ${
+									message.status === 'cancelled' ? styles.cancelled : ''
+								}`}
+							>
+								{message.subject}
+							</td>
+							<td
+								className={`${styles.lrg} ${styles['content-cell']} ${
+									message.status === 'cancelled' ? styles.cancelled : ''
+								}`}
+							>
 								<div className={styles['parsed-content']}>
 									<span className={styles['message-preview']}>
 										{parsedContent[0]}
@@ -95,9 +109,25 @@ const MessagesTable = ({
 											.map((text, index) => <span key={index}>{text}</span>)}
 								</div>
 							</td>
-							<td className={styles.sm}>{status ? 'Upcoming' : 'Sent'}</td>
-							<td className={styles.sm}>
-								{messageDateDay.toLocaleDateString()}
+							<td
+								className={`${styles.sm} ${
+									message.status === 'pending'
+										? styles.pending
+										: message.status === 'cancelled'
+										? styles.cancelled
+										: ''
+								}`}
+							>
+								{messageStatus}
+							</td>
+							<td
+								className={`${styles.sm} ${
+									message.status === 'cancelled' ? styles.cancelled : ''
+								}`}
+							>
+								{message.status !== 'cancelled'
+									? messageDateDay.toLocaleDateString()
+									: 'N/A'}
 							</td>
 						</tr>
 					);

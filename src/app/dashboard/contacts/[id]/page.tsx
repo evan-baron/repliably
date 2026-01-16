@@ -24,9 +24,13 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 		sequences: [],
 	};
 
+	console.log('sequencesData from page.tsx', sequencesData);
+
 	const { messages } = (await getAllMessagesByContactId(Number(id))) || {
 		messages: [],
 	};
+
+	console.log('messages from page.tsx', messages);
 
 	const { sequences } = sequencesData;
 
