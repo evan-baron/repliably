@@ -12,7 +12,6 @@ import { MessagesWithActiveSequence } from '@/types/messageTypes';
 
 // Components
 import MessagesTable from './MessagesTable';
-import { g } from 'vitest/dist/chunks/suite.d.BJWk38HB';
 
 const AllActivitiesTable = ({
 	messages,
@@ -47,13 +46,14 @@ const AllActivitiesTable = ({
 			return new Date(message.sentAt).toLocaleDateString();
 		}
 		if (
-			(message.status === 'pending' ||
-				message.status === 'scheduled' ||
-				message.status === 'cancelled') &&
+			(message.status === 'pending' || message.status === 'scheduled') &&
 			message.scheduledAt
 		) {
-			return new Date(message.scheduledAt).toLocaleDateString();
+			return `Scheduled for ${new Date(
+				message.scheduledAt
+			).toLocaleDateString()}`;
 		}
+
 		return 'N/A';
 	};
 
@@ -87,7 +87,11 @@ const AllActivitiesTable = ({
 									handleClick(index);
 								}}
 							>
-								<td className={styles.sm}>
+								<td
+									className={`${styles.sm} ${
+										message.status === 'cancelled' ? styles.cancelled : ''
+									}`}
+								>
 									{message.sequenceId ? 'Sequence Email' : 'Stand-alone Email'}
 								</td>
 								<td className={styles.sm}>
@@ -115,21 +119,36 @@ const AllActivitiesTable = ({
 									)}
 								</td>
 								<td
-									className={`${styles.md} ${styles.left}`}
+									className={`${styles.md} ${styles.left} ${
+										message.status === 'cancelled' ? styles.cancelled : ''
+									}`}
 									style={{ fontWeight: '600' }}
 								>
 									{message.sequenceId ? message.subject : message.subject}
 								</td>
 
-								<td className={`${styles.sm} ${styles.right}`}>{sendDate}</td>
-								<td className={`${styles.sm} ${styles.right}`}>
-									{message.sequenceId
+								<td
+									className={`${styles.sm} ${styles.right} ${
+										message.status === 'cancelled'
+											? styles.cancelled
+											: message.status === 'scheduled' ||
+											  message.status === 'pending'
+											? styles.scheduled
+											: ''
+									}`}
+								>
+									{sendDate}
+								</td>
+								<td
+									className={`${styles.sm} ${styles.right} ${
+										message.status !== 'sent' ? styles.na : ''
+									}`}
+								>
+									{message.status === 'sent'
 										? message.hasReply
 											? 'Yes'
 											: 'No'
-										: message.hasReply
-										? 'Yes'
-										: 'No'}
+										: 'N/A'}
 								</td>
 							</tr>
 							{selectedActivity === index ? (

@@ -88,14 +88,22 @@ const MessagesTable = ({
 						>
 							<td
 								className={`${styles.md} ${
-									message.status === 'cancelled' ? styles.cancelled : ''
+									message.status === 'scheduled' || message.status === 'pending'
+										? styles.scheduled
+										: message.status === 'cancelled'
+										? styles.cancelled
+										: ''
 								}`}
 							>
 								{message.subject}
 							</td>
 							<td
 								className={`${styles.lrg} ${styles['content-cell']} ${
-									message.status === 'cancelled' ? styles.cancelled : ''
+									message.status === 'scheduled' || message.status === 'pending'
+										? styles.scheduled
+										: message.status === 'cancelled'
+										? styles.cancelled
+										: ''
 								}`}
 							>
 								<div className={styles['parsed-content']}>
@@ -121,13 +129,19 @@ const MessagesTable = ({
 								{messageStatus}
 							</td>
 							<td
-								className={`${styles.sm} ${
-									message.status === 'cancelled' ? styles.cancelled : ''
+								className={`${styles.sm} ${styles.right} ${
+									message.status === 'scheduled' || message.status === 'pending'
+										? styles.scheduled
+										: message.status === 'cancelled'
+										? styles.cancelled
+										: ''
 								}`}
 							>
-								{message.status !== 'cancelled'
+								{message.status === 'sent'
 									? messageDateDay.toLocaleDateString()
-									: 'N/A'}
+									: message.status !== 'cancelled'
+									? `Scheduled for ${messageDateDay.toLocaleDateString()}`
+									: ' N/A'}
 							</td>
 						</tr>
 					);
