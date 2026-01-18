@@ -3,6 +3,10 @@
 // Library imports
 import { useState } from 'react';
 
+// Hooks imports
+import { useMessageUpdate } from '@/hooks/useMessages';
+import { useMessageApprove } from '@/hooks/useMessages';
+
 // Styles imports
 import styles from './pendingMessagesTable.module.scss';
 
@@ -17,6 +21,7 @@ import { MessageFromDB } from '@/types/messageTypes';
 
 // Components imports
 import TinyEditor from '../../editor/TinyEditor';
+import { set } from 'react-hook-form';
 
 const PendingMessagesTable = ({
 	messages,
@@ -25,17 +30,25 @@ const PendingMessagesTable = ({
 	messages: MessageFromDB[];
 	nested?: boolean;
 }) => {
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [selectedMessage, setSelectedMessage] = useState<number | null>(null);
 	const [editorContent, setEditorContent] = useState<string>('');
 	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const { mutateAsync: updateMessage } = useMessageUpdate();
+	const { mutateAsync: approveMessage } = useMessageApprove();
 
 	const handleSort = () => {
 		setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
 	};
 
 	const handleClick = (messageId: number) => {
-		if (isEditing) return;
+		if (isEditing) {
+			if (selectedMessage === messageId) return;
+
+			setIsEditing(false);
+			setSelectedMessage(messageId);
+			return;
+		}
 
 		const selection =
 			typeof window !== 'undefined' ? window.getSelection?.()?.toString() : '';
@@ -46,6 +59,41 @@ const PendingMessagesTable = ({
 		} else {
 			setSelectedMessage(messageId);
 		}
+	};
+
+	const handleEdit = (
+		e: React.MouseEvent<HTMLButtonElement>,
+		messageId: number
+	) => {
+		e.stopPropagation();
+		if (messageId !== selectedMessage) {
+			setSelectedMessage(messageId);
+		}
+		if (!selectedMessage) {
+			setSelectedMessage(messageId);
+		}
+		setIsEditing(true);
+	};
+
+	const handleApprove = (messageId: number) => {
+		if (isEditing) return;
+		approveMessage(messageId);
+	};
+
+	const handleCancel = () => {
+		setIsEditing(false);
+		setSelectedMessage(null);
+	};
+
+	const handleSaveAndApprove = () => {
+		if (selectedMessage && isEditing) {
+			updateMessage({
+				messageId: selectedMessage,
+				contents: editorContent.trim(),
+			});
+		}
+		setIsEditing(false);
+		setSelectedMessage(null);
 	};
 
 	const sortedMessages = [...messages].sort((a, b) => {
@@ -91,7 +139,7 @@ const PendingMessagesTable = ({
 						>
 							<td className={styles.md}>{message.subject}</td>
 							<td className={`${styles.lrg} ${styles['content-cell']}`}>
-								{isEditing ? (
+								{isEditing && selectedMessage === message.id ? (
 									<div className={styles['rte-wrapper']}>
 										<TinyEditor
 											height={300}
@@ -101,19 +149,11 @@ const PendingMessagesTable = ({
 										<div className={styles.buttons}>
 											<button
 												className={styles.button}
-												onClick={() => {
-													setIsEditing(!isEditing);
-												}}
+												onClick={handleSaveAndApprove}
 											>
 												Save and Approve
 											</button>
-											<button
-												className={styles.button}
-												onClick={() => {
-													setIsEditing(!isEditing);
-													setSelectedMessage(null);
-												}}
-											>
+											<button className={styles.button} onClick={handleCancel}>
 												Cancel
 											</button>
 										</div>
@@ -133,7 +173,11 @@ const PendingMessagesTable = ({
 							</td>
 							<td
 								className={`${styles.sm} ${
-									message.status === 'pending' ? styles.important : ''
+									message.status === 'pending'
+										? styles.important
+										: message.status === 'scheduled'
+										? styles.approved
+										: ''
 								}`}
 							>
 								{messageStatus}
@@ -141,29 +185,43 @@ const PendingMessagesTable = ({
 							<td className={`${styles.sm} ${styles.right} $`}>
 								{messageDateDay.toLocaleDateString()}
 							</td>
-							<td className={styles.buttonBox}>
-								<button
-									className={`${styles.action} ${
-										isEditing ? styles.disabled : ''
-									}`}
-									onClick={() => {
-										setIsEditing(!isEditing);
-									}}
-									disabled={isEditing}
-								>
-									<Edit className={styles.icon} />
-									Edit
-								</button>
-							</td>
-							<td className={styles.buttonBox}>
-								<button
-									className={`${styles.action} ${
-										isEditing ? styles.disabled : ''
-									}`}
-									disabled={isEditing}
-								>
-									Approve
-								</button>
+							<td
+								colSpan={2}
+								className={styles.buttonBox}
+								style={{
+									verticalAlign:
+										isEditing || selectedMessage === message.id
+											? 'top'
+											: 'middle',
+									paddingTop:
+										isEditing || selectedMessage === message.id
+											? '.25rem'
+											: '0',
+								}}
+							>
+								<div className={styles.buttons}>
+									<button
+										className={`${styles.action} ${
+											isEditing ? styles.disabled : ''
+										}`}
+										onClick={(e) => handleEdit(e, message.id)}
+										disabled={isEditing}
+									>
+										<Edit className={styles.icon} />
+										Edit
+									</button>
+									<button
+										className={`${styles.action} ${
+											isEditing || message.status === 'scheduled'
+												? styles.disabled
+												: ''
+										}`}
+										disabled={isEditing || message.status === 'scheduled'}
+										onClick={() => handleApprove(message.id)}
+									>
+										Approve
+									</button>
+								</div>
 							</td>
 						</tr>
 					);

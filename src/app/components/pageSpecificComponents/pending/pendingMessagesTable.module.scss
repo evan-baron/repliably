@@ -66,13 +66,13 @@
 			}
 
 			@media (hover: hover) {
-				&:hover:not(:has(.action:hover)) {
+				&:hover:not(:has(.action:hover, .rte-wrapper)) {
 					background: var(--gradient-primary-lighter);
 					cursor: pointer;
 
-					&.editing {
-						cursor: default;
-					}
+					// &.editing {
+					// 	cursor: default;
+					// }
 				}
 			}
 
@@ -103,8 +103,6 @@
 				&.buttonBox {
 					padding: 0;
 					justify-items: center;
-					padding-top: 0.25rem;
-					vertical-align: top;
 				}
 
 				&.content-cell {
@@ -145,8 +143,12 @@
 					font-weight: 600;
 				}
 
+				&.approved {
+					color: var(--color-success);
+					font-weight: 600;
+				}
+
 				.action {
-					width: 80%;
 					cursor: pointer;
 					display: flex;
 					gap: 0.25rem;
@@ -154,7 +156,7 @@
 					justify-content: center;
 					color: var(--text-secondary);
 					text-decoration: none;
-					padding: 0.125rem 0.5rem;
+					padding: 0.125rem 0.75rem;
 					transition: all 0.2s ease-in-out;
 					font-size: 1rem;
 					position: relative;
@@ -183,8 +185,22 @@
 
 					&.disabled {
 						opacity: 0.5;
-						cursor: default;
-						pointer-events: none;
+						cursor: not-allowed;
+						pointer-events: auto;
+
+						@media (hover: hover) {
+							&:hover {
+								cursor: not-allowed;
+								transform: none;
+								color: var(--text-secondary);
+								background: linear-gradient(
+											var(--background-secondary),
+											var(--background-secondary)
+										)
+										padding-box,
+									var(--gradient-primary) border-box;
+							}
+						}
 					}
 				}
 

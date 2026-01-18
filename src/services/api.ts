@@ -98,4 +98,9 @@ export const messageAPI = {
 		apiCall(`/api/messages/${messageId}/approve`, {
 			method: 'PUT',
 		}),
+	updateMessage: (messageId: number, contents: string) =>
+		apiCall(`/api/messages/${messageId}/update`, {
+			method: 'PUT',
+			body: JSON.stringify({ contents }),
+		}),
 };

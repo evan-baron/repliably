@@ -121,6 +121,8 @@ const MessagesTable = ({
 								className={`${styles.sm} ${
 									message.status === 'pending'
 										? styles.pending
+										: message.status === 'scheduled'
+										? styles.scheduled
 										: message.status === 'cancelled'
 										? styles.cancelled
 										: ''

@@ -51,8 +51,6 @@ const ContactActivities = ({
 		(seq) => !seq.active
 	);
 
-	console.log('active sequence:', activeSequence);
-
 	const activityContent: ActivityContent = {
 		active: {
 			component: activeSequence ? (

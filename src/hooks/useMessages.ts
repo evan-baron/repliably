@@ -46,3 +46,22 @@ export const useMessageApprove = () => {
 		},
 	});
 };
+
+export const useMessageUpdate = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<void, Error, { messageId: number; contents: string }>({
+		mutationFn: ({ messageId, contents }) =>
+			messageAPI.updateMessage(messageId, contents),
+		onSuccess: () => {
+			// Invalidate queries to update the data
+			queryClient.invalidateQueries({ queryKey: ['pending-messages-get-all'] });
+			queryClient.invalidateQueries({
+				queryKey: ['all-messages-by-contact-id'],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ['standalone-messages-by-contact-id'],
+			});
+		},
+	});
+};
