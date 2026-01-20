@@ -2,8 +2,13 @@ import { prisma } from '@/lib/prisma';
 
 // Types imports
 import { StoredEmailData } from '@/types/emailTypes';
+import { MessageFromDB } from '@/types/messageTypes';
+import { SequenceFromDB } from '@/types/sequenceTypes';
+import { ContactFromDB } from '@/types/contactTypes';
 
 // Services imports
+import { generateMessage } from './messageGenerationService';
+import { sendMessage } from './messageService';
 
 // Helpers imports
 import { parseSequenceData } from '@/lib/helperFunctions';
@@ -38,7 +43,7 @@ export async function findOrCreateContact(email: string, ownerId: number) {
 }
 
 // Main function to store sent email in the db and handle/update sequences
-export async function storeSentEmail({
+export async function storeNewMessage({
 	email,
 	ownerId,
 	subject,
@@ -49,8 +54,6 @@ export async function storeSentEmail({
 	cadenceDuration,
 	messageId,
 	threadId,
-	inReplyTo,
-	sequenceId,
 	referencePreviousEmail,
 	alterSubjectLine,
 }: StoredEmailData) {
@@ -107,6 +110,7 @@ export async function storeSentEmail({
 					threadId,
 					createdAt: new Date(),
 					status: 'sent',
+					sentAt: new Date(),
 				},
 			}),
 			prisma.contact.update({
@@ -117,126 +121,311 @@ export async function storeSentEmail({
 		return { createdMessage, updatedContact };
 	}
 
-	// If sequenceId is provided, this must be a follow-up email in an existing sequence. Otherwise, it must be the first email in a new sequence.
-	if (sequenceId) {
-		// There is a sequenceId provided meaning this is a follow-up email in an existing sequence
-		// Steps to follow:
-		// 1. Fetch the existing sequence
-		// 2. Save the message to the db associated with the existing sequence
-		// 3. Update the sequence's next step due date and current step count
+	// Because cadenceType is not 'none', we need to create a new sequence
+	// Steps to follow:
+	// 1. Create the new sequence
+	// 2. Save the message to the db associated with the new sequence
+	// 3. Update the contact to reflect last activity and change their active status to true
+	// 4. Create the next message in the sequence (if applicable)
 
-		// Fetch the existing sequence
-		const sequence = await prisma.sequence.findUnique({
-			where: { id: sequenceId },
-			include: { messages: true, emailReplies: true },
-		});
+	// Helper function to determine the next step due date for new sequence-to-be
+	const nextStepDueDate =
+		cadenceType === '31day'
+			? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+			: new Date(
+					Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
+			  );
 
-		if (!sequence) {
-			throw new Error(`Sequence with id ${sequenceId} not found`);
-		}
+	// Create the new sequence
+	const sequence = await prisma.sequence.create({
+		data: {
+			title: subject,
+			contactId: contact.id,
+			ownerId,
+			sequenceType: cadenceType,
+			autoSend: reviewBeforeSending ? false : true,
+			autoSendDelay: sendDelay,
+			sequenceDuration: cadenceDurationMapping[cadenceDuration],
+			nextStepDue: nextStepDueDate,
+			endDate,
+			referencePreviousEmail: referencePreviousEmail || null,
+			alterSubjectLine: alterSubjectLine || null,
+		},
+	});
 
-		// Parse sequence data to get the new next step due date
-		const { nextStepDueDate } = parseSequenceData(sequence);
-
-		const [createdMessage, updatedSequence] = await prisma.$transaction([
-			// Save the message associated with the existing sequence
-			prisma.message.create({
-				data: {
-					contactId: contact.id,
-					ownerId,
-					sequenceId: sequence.id,
-					subject,
-					contents,
-					direction: 'outbound',
-					messageId,
-					threadId,
-					inReplyTo: inReplyTo || null,
-					createdAt: new Date(),
-					status: reviewBeforeSending ? 'pending' : 'sent',
-					needsApproval: reviewBeforeSending,
-					approvalDeadline:
-						reviewBeforeSending && sendDelay
-							? new Date(Date.now() + sendDelay * 60 * 1000)
-							: null,
-					scheduledAt: nextStepDueDate,
-				},
-			}),
-
-			// Update the sequence's next step due date and current step count
-			prisma.sequence.update({
-				where: { id: sequence.id },
-				data: {
-					nextStepDue: nextStepDueDate,
-					currentStep: sequence.currentStep + 1,
-				},
-			}),
-		]);
-
-		return { createdMessage, updatedSequence };
-	} else {
-		// There isn't a sequenceId provided meaning this is the first email in a new sequence
-		// Steps to follow:
-		// 1. Create the new sequence
-		// 2. Save the message to the db associated with the new sequence
-		// 3. Update the contact to reflect last activity and change their active status to true
-
-		// Helper function to determine the next step due date for new sequence-to-be
-		const nextStepDueDate =
-			cadenceType === '31day'
-				? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-				: new Date(
-						Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
-				  );
-
-		// Create the new sequence
-		const sequence = await prisma.sequence.create({
+	// Transaction safety: create message and update contact in transaction
+	const [storedMessage, updatedContact] = await prisma.$transaction([
+		// Create the message associated with the new sequence (this is technically the first message in the sequence)
+		prisma.message.create({
 			data: {
-				title: subject,
 				contactId: contact.id,
 				ownerId,
-				sequenceType: cadenceType,
-				autoSend: reviewBeforeSending ? false : true,
-				autoSendDelay: sendDelay,
-				sequenceDuration: cadenceDurationMapping[cadenceDuration],
-				nextStepDue: nextStepDueDate,
-				endDate,
-				referencePreviousEmail: referencePreviousEmail,
-				alterSubjectLine: alterSubjectLine || null,
+				sequenceId: sequence.id,
+				subject,
+				contents,
+				direction: 'outbound',
+				messageId,
+				threadId,
+				createdAt: new Date(),
+				needsApproval: reviewBeforeSending,
+				status: 'sent',
+				approvalDeadline:
+					reviewBeforeSending && sendDelay
+						? new Date(Date.now() + sendDelay * 60 * 1000)
+						: null,
+				sentAt: new Date(),
 			},
+		}),
+
+		// Update the contact's last activity and active status
+		prisma.contact.update({
+			where: { id: contact.id },
+			data: { lastActivity: new Date(), active: true },
+		}),
+	]);
+
+	console.log(
+		'Subject, contents, keepSubject, and preserveThreadContext from emailService.ts:',
+		{
+			subject,
+			contents,
+			keepSubject: alterSubjectLine !== true,
+			preserveThreadContext: referencePreviousEmail !== false,
+		}
+	);
+	// Generate and return the follow-up message
+	const { subject: newSubject, bodyHtml } = await generateMessage(
+		{
+			previousSubject: subject,
+			previousBody: contents,
+		},
+		{
+			keepSubject: alterSubjectLine !== true,
+			preserveThreadContext: referencePreviousEmail !== false,
+		}
+	);
+
+	const createdFollowUpMessage = await prisma.message.create({
+		data: {
+			contactId: contact.id,
+			ownerId,
+			sequenceId: sequence.id,
+			inReplyTo: messageId,
+			subject: newSubject,
+			contents: bodyHtml,
+			direction: 'outbound',
+			threadId,
+			createdAt: new Date(),
+			needsApproval: reviewBeforeSending,
+			approved: reviewBeforeSending ? false : null,
+			status: reviewBeforeSending ? 'pending' : 'scheduled',
+			approvalDeadline:
+				reviewBeforeSending && sendDelay
+					? new Date(Date.now() + sendDelay * 60 * 1000)
+					: null,
+			scheduledAt: nextStepDueDate,
+		},
+	});
+
+	return { storedMessage, createdFollowUpMessage, updatedContact };
+}
+
+export async function updateExistingSequenceMessage(message: MessageFromDB) {
+	// Take the existing message, determine its status. If it is ready to be sent, send it, update its status to sent, update the sequence next steps, and create the next message in the sequence, otherwise if it's pending approval but the deadline for approval has passed, update its status to scheduled with the deadline being the approvalDeadline
+	// 1. Parse all message data, sequence data, and contact data and create associated vars
+	// 2. Check if message needs approval
+	// 3. If the message doesn't need approval and it's passed it's scheduledAt date, send the message, update the db. If it needs approval, set scheduledAt to the approvalDeadline, otherwise if the message is approved, set scheduledAt to createdAt + sequence.nextStepDue
+	// 4. Send the email
+	// 5. Update the message status
+	// 6. Update the sequence nextStepDue date
+	// 7. Create the next message in the sequence (if applicable)
+
+	const {
+		inReplyTo,
+		threadId,
+		scheduledAt,
+		needsApproval,
+		approvalDeadline,
+		approved,
+		subject,
+		contents,
+		sequenceId,
+		ownerId,
+	} = message;
+
+	if (!inReplyTo || !threadId) {
+		return console.error('Message is missing inReplyTo or threadId');
+	}
+
+	const sequence = (await prisma.sequence.findUnique({
+		where: { id: sequenceId!, ownerId: message.ownerId },
+		include: { messages: true, emailReplies: true },
+	})) as SequenceFromDB;
+	const {
+		currentStep,
+		autoSendDelay,
+		endDate,
+		referencePreviousEmail,
+		alterSubjectLine,
+	} = sequence;
+	const contact = (await prisma.contact.findUnique({
+		where: { id: message.contactId },
+	})) as ContactFromDB;
+	const { email } = contact;
+	const { nextStepDueDate } = parseSequenceData(sequence);
+	const endOfSequence = endDate && nextStepDueDate && nextStepDueDate > endDate;
+	const passedScheduledAt = new Date() > scheduledAt!;
+	const passedApprovalDeadline =
+		approvalDeadline && new Date() > approvalDeadline;
+
+	// If the message does not need approval and the scheduledAt date has passed, send the message
+	if (!needsApproval && passedScheduledAt) {
+		const {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		} = await sendMessage({
+			dbContactId: contact.id,
+			dbMessageId: message.id,
+			dbSequenceId: sequence.id,
+			email,
+			subject,
+			contents,
+			inReplyTo,
+			threadId,
+			endOfSequence,
+			nextStepDueDate,
+			currentStep,
+			alterSubjectLine: alterSubjectLine !== true,
+			referencePreviousEmail: referencePreviousEmail !== false,
+			contact,
+			ownerId,
+			sequence,
+			needsApproval,
+			autoSendDelay,
 		});
 
-		// Transaction safety: create message in transaction
-		const [createdMessage, updatedContact] = await prisma.$transaction([
-			// Create the message associated with the new sequence
-			prisma.message.create({
-				data: {
-					contactId: contact.id,
-					ownerId,
-					sequenceId: sequence.id,
-					subject,
-					contents,
-					direction: 'outbound',
-					messageId,
-					threadId,
-					inReplyTo: inReplyTo || null,
-					createdAt: new Date(),
-					needsApproval: reviewBeforeSending,
-					status: 'sent',
-					approvalDeadline:
-						reviewBeforeSending && sendDelay
-							? new Date(Date.now() + sendDelay * 60 * 1000)
-							: null,
-					sentAt: new Date(),
-				},
-			}),
-
-			// Update the contact's last activity and active status
-			prisma.contact.update({
-				where: { id: contact.id },
-				data: { lastActivity: new Date(), active: true },
-			}),
-		]);
-
-		return { createdMessage, updatedContact };
+		return {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		};
 	}
+
+	if (approved) {
+		// If the message is approved but the scheduledAt date has not passed, update its status to 'scheduled'
+		if (!passedScheduledAt) {
+			const updatedMessage = await prisma.message.update({
+				where: { id: message.id },
+				data: { status: 'scheduled' },
+			});
+
+			return {
+				messageId: null,
+				updatedMessage,
+				updatedSequence: null,
+				updatedContact: null,
+				createdFollowUpMessage: null,
+			};
+		}
+
+		// If the scheduledAt date has passed, send the message, update its status to 'sent', and update the sequence next steps
+		// Send the email
+		const {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		} = await sendMessage({
+			dbContactId: contact.id,
+			dbMessageId: message.id,
+			dbSequenceId: sequence.id,
+			email,
+			subject,
+			contents,
+			inReplyTo,
+			threadId,
+			endOfSequence,
+			nextStepDueDate,
+			currentStep,
+			alterSubjectLine: alterSubjectLine !== true,
+			referencePreviousEmail: referencePreviousEmail !== false,
+			contact,
+			ownerId,
+			sequence,
+			needsApproval,
+			autoSendDelay,
+		});
+
+		return {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		};
+	}
+
+	// If there's no approval deadline (meaning can be pending forever) and the scheduledAt date has passed, notify the user
+	// if (!approvalDeadline && passedScheduledAt) {
+	// 	// NOTIFY THE USER THAT THE MESSAGE IS PAST ITS SCHEDULE DATE AND NEEDS APPROVAL
+	// 	// IF NOTIFICATION NOT CLEARED, DON'T NOTIFY, OTHERWISE NOTIFY EVERY 48 HOURS AFTER CLEAR
+	// }
+
+	// If the message has not been approved and it's passed the scheduledAt date
+	if (passedScheduledAt && !passedApprovalDeadline) {
+		// If there is an approval deadline
+		const updatedMessage = await prisma.message.update({
+			where: { id: message.id },
+			data: { status: 'scheduled' },
+		});
+
+		// NOTIFY THE USER THAT THE MESSAGE IS STILL NOT APPROVED AND HAS BEEN SCHEDULED FOR AUTO SENDING IN X AMOUNT OF TIME
+
+		return { updatedMessage };
+	}
+
+	if (passedApprovalDeadline) {
+		const {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		} = await sendMessage({
+			dbContactId: contact.id,
+			dbMessageId: message.id,
+			dbSequenceId: sequence.id,
+			email,
+			subject,
+			contents,
+			inReplyTo,
+			threadId,
+			endOfSequence,
+			nextStepDueDate,
+			currentStep,
+			alterSubjectLine: alterSubjectLine !== true,
+			referencePreviousEmail: referencePreviousEmail !== false,
+			contact,
+			ownerId,
+			sequence,
+			needsApproval,
+			autoSendDelay,
+		});
+
+		return {
+			messageId,
+			updatedMessage,
+			updatedSequence,
+			updatedContact,
+			createdFollowUpMessage,
+		};
+	}
+
+	return undefined;
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendGmail } from '@/lib/gmail';
-import { storeSentEmail } from '@/services/emailService';
+import { storeNewMessage } from '@/services/emailService';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 			const result = await sendGmail({ to, subject, html: body });
 
 			if (user && result.messageId && result.threadId) {
-				const { updatedContact } = await storeSentEmail({
+				const { updatedContact } = await storeNewMessage({
 					email: to,
 					ownerId: user.id,
 					subject,
