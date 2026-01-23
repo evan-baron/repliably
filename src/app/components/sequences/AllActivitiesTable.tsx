@@ -79,6 +79,8 @@ const AllActivitiesTable = ({
 				{sortedMessages.map((message, index) => {
 					const sendDate = getSendDate(message);
 
+					console.log('message', message);
+
 					return (
 						<Fragment key={index}>
 							<tr

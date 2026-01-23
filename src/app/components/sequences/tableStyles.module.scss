@@ -230,6 +230,11 @@
 
 					.status {
 						color: var(--accent-important);
+
+						.na {
+							opacity: 0.75;
+							font-style: italic;
+						}
 					}
 
 					.date {
@@ -265,6 +270,13 @@
 				&.sent {
 					.subject {
 						font-weight: 600;
+					}
+
+					.status {
+						.na {
+							opacity: 0.75;
+							font-style: italic;
+						}
 					}
 				}
 
