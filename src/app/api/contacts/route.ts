@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 			phone,
 			linkedIn,
 			importance,
-			associatedRole,
+			reasonForEmail,
 		} = await req.json();
 
 		// 4. Validate required fields
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 				existingContact.phone === (phone || null) &&
 				existingContact.linkedIn === (linkedIn || null) &&
 				existingContact.importance === parseInt(importance) &&
-				existingContact.associatedRole === (associatedRole || null);
+				existingContact.reasonForEmail === (reasonForEmail || null);
 
 			if (isIdentical) {
 				// Pretend we created it - return success with existing contact
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
 						phone: existingContact.phone,
 						linkedIn: existingContact.linkedIn,
 						importance: existingContact.importance,
-						associatedRole: existingContact.associatedRole,
+						reasonForEmail: existingContact.reasonForEmail,
 						createdAt: existingContact.createdAt.toISOString(),
 						updatedAt: existingContact.updatedAt.toISOString(),
 					},
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
 					phone: existingContact.phone,
 					linkedIn: existingContact.linkedIn,
 					importance: existingContact.importance,
-					associatedRole: existingContact.associatedRole,
+					reasonForEmail: existingContact.reasonForEmail,
 				},
 				submittedData: {
 					firstName,
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
 					phone: phone || null,
 					linkedIn: linkedIn || null,
 					importance: parseInt(importance),
-					associatedRole: associatedRole || null,
+					reasonForEmail: reasonForEmail || null,
 				},
 			});
 		}
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
 				phone: phone || null,
 				linkedIn: linkedIn || null,
 				importance: parseInt(importance),
-				associatedRole: associatedRole || null,
+				reasonForEmail: reasonForEmail || null,
 			},
 		});
 

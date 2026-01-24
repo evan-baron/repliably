@@ -23,7 +23,7 @@ CREATE TABLE "Contact" (
     "lastName" TEXT,
     "company" TEXT,
     "phone" TEXT,
-    "associatedRole" TEXT,
+    "reasonForEmail" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT true,
     "lastActivity" TIMESTAMP(3),
     "replied" BOOLEAN NOT NULL DEFAULT false,

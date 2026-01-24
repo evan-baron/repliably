@@ -23,7 +23,7 @@ const ContactsTable = ({
 	contacts: ContactFromDB[];
 	onRowClick?: (contactId: number) => void;
 	columns: {
-		associatedRole: boolean;
+		reasonForEmail: boolean;
 		importance: boolean;
 		lastActivity: boolean;
 		linkedIn: boolean;
@@ -123,8 +123,8 @@ const ContactsTable = ({
 							</span>
 						</th>
 					)}
-					{columns.associatedRole && (
-						<th className={styles.lrg}>Role Applied</th>
+					{columns.reasonForEmail && (
+						<th className={styles.lrg}>Reason For Reaching Out:</th>
 					)}
 				</tr>
 			</thead>
@@ -164,8 +164,8 @@ const ContactsTable = ({
 								{contact.replied ? 'Yes' : 'No'}
 							</td>
 						)}
-						{columns.associatedRole && (
-							<td className={styles.lrg}>{contact.associatedRole}</td>
+						{columns.reasonForEmail && (
+							<td className={styles.lrg}>{contact.reasonForEmail}</td>
 						)}
 					</tr>
 				))}

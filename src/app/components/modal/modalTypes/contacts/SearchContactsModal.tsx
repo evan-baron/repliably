@@ -52,7 +52,7 @@ const SearchContactsModal = () => {
 				contacts={contacts}
 				onRowClick={onRowClick}
 				columns={{
-					associatedRole: false,
+					reasonForEmail: false,
 					importance: false,
 					lastActivity: true,
 					linkedIn: false,

@@ -34,7 +34,7 @@ export const generateMessage = async (
 ): Promise<GeneratedMessage> => {
 	const model = 'gpt-4o-mini';
 	const MAX_TOKENS = 1000;
-	const MAX_BODY_WORDS = 100;
+	const MAX_BODY_WORDS = 200;
 
 	const preserveThreadContext =
 		typeof options.preserveThreadContext === 'boolean'
@@ -54,7 +54,7 @@ export const generateMessage = async (
 
 	const userPrompt = `Context: You are a professional executive assistant acting as the original sender. You are writing a short follow-up email no longer than 3 sentences or ${MAX_BODY_WORDS} words in length. ${keepSubjectNote} ${
 		preserveThreadContext
-			? 'Preserve thread context, if it makes sense to, include a very brief reference to the previous message (1-2 sentences MAX), and keep key topic nouns so recipients recognize the thread.'
+			? 'Preserve thread context, if it makes sense to, include a brief reference to the previous message (1-2 sentences MAX) to remind the recipient why you are reaching out, and keep key topic nouns so recipients recognize the thread.'
 			: 'Do NOT include the full original body; summarize key facts in one sentence and feel free to rewrite the body a little more freely.'
 	} ${contactNameNote} Include one short check-in CTA (e.g., "Are you available for a 15-minute call next week?"). Make sure the CTA is not identical to the previously used CTA. Sign off the exact same as the previous message did. Here is the previous message for context:\n${
 		previousEmailContents.previousBody

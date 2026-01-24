@@ -192,13 +192,11 @@ export default function ContactDetailsClient({
 					</div>
 
 					<div className={styles['application-details']}>
-						{contact.associatedRole && (
+						{contact.reasonForEmail && (
 							<div className={styles['info-row']}>
-								<span className={styles.label}>
-									Associated Role Applied For:
-								</span>
+								<span className={styles.label}>Reason for Reaching Out:</span>
 								<span className={styles.value} style={{ fontWeight: '600' }}>
-									{contact?.associatedRole || 'N/A'}
+									{contact?.reasonForEmail || 'N/A'}
 								</span>
 							</div>
 						)}

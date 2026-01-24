@@ -37,7 +37,7 @@ const NewContactModal = () => {
 			phone: '',
 			linkedIn: '',
 			importance: '',
-			associatedRole: '',
+			reasonForEmail: '',
 		},
 	});
 
@@ -301,21 +301,21 @@ const NewContactModal = () => {
 
 				{/* Additional Fields */}
 				<div className={styles['input-group']}>
-					<label htmlFor='associatedRole'>Associated Role (Applying For)</label>
+					<label htmlFor='reasonForEmail'>Reason for reaching out:</label>
 					<input
 						type='text'
-						id='associatedRole'
-						{...register('associatedRole')}
-						className={`${errors.associatedRole ? styles.error : ''} ${
-							isFieldDifferent('associatedRole', touchedFields.associatedRole)
+						id='reasonForEmail'
+						{...register('reasonForEmail')}
+						className={`${errors.reasonForEmail ? styles.error : ''} ${
+							isFieldDifferent('reasonForEmail', touchedFields.reasonForEmail)
 								? styles['field-updated']
 								: ''
 						}`}
-						placeholder='ex: Junior Engineer'
+						placeholder='ex: Applied for Junior Engineer Role'
 					/>
-					{errors.associatedRole && (
+					{errors.reasonForEmail && (
 						<span className={styles['error-message']}>
-							{errors.associatedRole.message}
+							{errors.reasonForEmail.message}
 						</span>
 					)}
 				</div>

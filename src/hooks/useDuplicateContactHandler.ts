@@ -40,7 +40,7 @@ export const useDuplicateContactHandler = () => {
 			phone: apiContact.phone || '',
 			linkedIn: apiContact.linkedIn || '',
 			importance: String(apiContact.importance || ''),
-			associatedRole: apiContact.associatedRole || '',
+			reasonForEmail: apiContact.reasonForEmail || '',
 		};
 
 		// Find fields that are different

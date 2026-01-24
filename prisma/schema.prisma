@@ -43,7 +43,7 @@ model Contact {
   phone          String?
   linkedIn       String?
   importance     Int?
-  associatedRole String?   // e.g. "Junior Engineer"
+  reasonForEmail String?   // e.g. "Junior Engineer"
   active         Boolean   @default(false )
   lastActivity   DateTime?
   replied        Boolean   @default(false)

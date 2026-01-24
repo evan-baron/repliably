@@ -7,7 +7,7 @@ export interface ContactFormData {
 	phone: string;
 	linkedIn: string;
 	importance: string;
-	associatedRole: string;
+	reasonForEmail: string;
 }
 
 export interface ContactData {
@@ -19,7 +19,7 @@ export interface ContactData {
 	phone?: string;
 	linkedIn?: string;
 	importance?: string;
-	associatedRole?: string;
+	reasonForEmail?: string;
 }
 
 export interface ContactResponse {
@@ -35,7 +35,7 @@ export interface ContactResponse {
 		phone: string;
 		linkedIn: string;
 		importance: number;
-		associatedRole: string;
+		reasonForEmail: string;
 	};
 	contact: {
 		id: number;
@@ -47,7 +47,7 @@ export interface ContactResponse {
 		phone?: string;
 		linkedIn?: string;
 		importance?: number;
-		associatedRole?: string;
+		reasonForEmail?: string;
 		createdAt: string;
 		updatedAt: string;
 	};
@@ -63,7 +63,7 @@ export interface ContactUpdateData {
 	phone?: string;
 	linkedIn?: string;
 	importance?: string;
-	associatedRole?: string;
+	reasonForEmail?: string;
 }
 
 export interface ContactFromDB {
@@ -77,7 +77,7 @@ export interface ContactFromDB {
 	phone: string | null;
 	linkedIn: string | null;
 	importance: number | null;
-	associatedRole: string | null;
+	reasonForEmail: string | null;
 	active: boolean;
 	lastActivity: Date | null;
 	replied: boolean;

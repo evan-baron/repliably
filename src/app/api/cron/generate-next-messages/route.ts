@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { storeSentEmail } from '@/services/emailService';
-import { getApiUser } from '@/services/getUserService';
 import { generateMessage } from '@/services/messageGenerationService';
 import { prisma } from '@/lib/prisma';
 

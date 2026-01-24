@@ -48,7 +48,7 @@ const EditContactModal = ({
 				selectedContact.importance !== null
 					? String(selectedContact.importance)
 					: '',
-			associatedRole: selectedContact.associatedRole || '',
+			reasonForEmail: selectedContact.reasonForEmail || '',
 		},
 	});
 
@@ -210,17 +210,17 @@ const EditContactModal = ({
 
 				{/* Additional Fields */}
 				<div className={styles['input-group']}>
-					<label htmlFor='associatedRole'>Associated Role (Applying For)</label>
+					<label htmlFor='reasonForEmail'>Reason for Reaching Out:</label>
 					<input
 						type='text'
-						id='associatedRole'
-						{...register('associatedRole')}
-						className={errors.associatedRole ? styles.error : ''}
+						id='reasonForEmail'
+						{...register('reasonForEmail')}
+						className={errors.reasonForEmail ? styles.error : ''}
 						placeholder='ex: Junior Engineer'
 					/>
-					{errors.associatedRole && (
+					{errors.reasonForEmail && (
 						<span className={styles['error-message']}>
-							{errors.associatedRole.message}
+							{errors.reasonForEmail.message}
 						</span>
 					)}
 				</div>

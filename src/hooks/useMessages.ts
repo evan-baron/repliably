@@ -11,6 +11,8 @@ export const useAllMessagesByContactId = (contactId: number) => {
 	return useQuery<MessagesResponse>({
 		queryKey: ['all-messages-by-contact-id', contactId],
 		queryFn: () => messageAPI.readAllByContactId(contactId),
+		refetchOnWindowFocus: true,
+		refetchInterval: 1000 * 30, // Refetch every 30 seconds
 	});
 };
 
@@ -18,6 +20,8 @@ export const useStandaloneMessagesByContactId = (contactId: number) => {
 	return useQuery<MessagesResponse>({
 		queryKey: ['standalone-messages-by-contact-id', contactId],
 		queryFn: () => messageAPI.readStandaloneByContactId(contactId),
+		refetchOnWindowFocus: true,
+		refetchInterval: 1000 * 30, // Refetch every 30 seconds
 	});
 };
 
@@ -25,6 +29,8 @@ export const useMessagesGetAllPending = () => {
 	return useQuery<MessagesResponse>({
 		queryKey: ['pending-messages-get-all'],
 		queryFn: () => messageAPI.getAllPending(),
+		refetchOnWindowFocus: true,
+		refetchInterval: 1000 * 30, // Refetch every 30 seconds
 	});
 };
 
