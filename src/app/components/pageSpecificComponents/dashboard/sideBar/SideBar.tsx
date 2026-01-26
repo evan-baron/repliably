@@ -21,7 +21,7 @@ export default function SideBar({
 		{ href: '/dashboard/new-email', label: 'New Email' },
 		{ href: '/dashboard', label: 'Dashboard' },
 		{ href: '/dashboard/contacts', label: 'Contacts' },
-		{ href: '/dashboard/sequences', label: 'Sequences' },
+		{ href: '/dashboard/sequences', label: 'Sequences (Coming Soon)' },
 		{ href: '/dashboard/pending', label: 'Pending' },
 		{ href: '/dashboard/replies', label: 'Replies' },
 		// { href: '/dashboard/in-progress', label: 'In Progress' },
