@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 			`[${new Date().toISOString()}] Cron: generate-next-messages started`
 		);
 
-		const messagesToProcess = await prisma.message.findMany({
+		const candidates = await prisma.message.findMany({
 			where: {
 				needsFollowUp: true,
 				nextMessageGenerated: false,
@@ -25,6 +25,48 @@ export async function GET(request: NextRequest) {
 				sequence: true,
 			},
 			take: 50,
+		});
+
+		if (!candidates.length) {
+			console.log('No messages to process');
+			return NextResponse.json(
+				{ message: 'No messages to process' },
+				{ status: 200 }
+			);
+		}
+
+		const candidateIds = candidates.map((msg) => msg.id);
+		console.log(
+			`Found ${candidates.length} messages to process:`,
+			candidateIds
+		);
+
+		const claimResult = await prisma.message.updateMany({
+			where: {
+				id: { in: candidateIds },
+				status: 'sent',
+				nextMessageGenerated: false,
+			},
+			data: { status: 'processing' },
+		});
+
+		if (!claimResult.count) {
+			console.log('No messages claimed for processing');
+			return NextResponse.json(
+				{ message: 'No messages claimed for processing' },
+				{ status: 200 }
+			);
+		}
+
+		const messagesToProcess = await prisma.message.findMany({
+			where: {
+				id: { in: candidateIds },
+				status: 'processing',
+			},
+			include: {
+				contact: true,
+				sequence: true,
+			},
 		});
 
 		if (!messagesToProcess.length) {

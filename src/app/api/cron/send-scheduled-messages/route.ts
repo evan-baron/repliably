@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 		);
 
 		// Fetching all messages that are scheduled to be sent where scheduledAt is right now or in the past
-		const messagesToSend = await prisma.message.findMany({
+		const candidates = await prisma.message.findMany({
 			where: {
 				scheduledAt: { lte: new Date() },
 				status: 'scheduled',
@@ -32,7 +32,24 @@ export async function GET(request: NextRequest) {
 			take: 50,
 		});
 
-		if (!messagesToSend.length) {
+		// const messagesToSend = await prisma.message.findMany({
+		// 	where: {
+		// 		scheduledAt: { lte: new Date() },
+		// 		status: 'scheduled',
+		// 		sequence: {
+		// 			is: {
+		// 				active: true,
+		// 			},
+		// 		},
+		// 	},
+		// 	include: {
+		// 		contact: true,
+		// 		sequence: true,
+		// 	},
+		// 	take: 50,
+		// });
+
+		if (!candidates.length) {
 			console.log('No messages to send');
 			return NextResponse.json(
 				{ message: 'No messages to send' },
@@ -40,7 +57,36 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		console.log(`Found ${messagesToSend.length} messages to send`);
+		// if (!messagesToSend.length) {
+		// 	console.log('No messages to send');
+		// 	return NextResponse.json(
+		// 		{ message: 'No messages to send' },
+		// 		{ status: 200 }
+		// 	);
+		// }
+
+		const candidateIds = candidates.map((c) => c.id);
+		console.log(`Found ${candidates.length} messages to send`);
+
+		// console.log(`Found ${messagesToSend.length} messages to send`);
+
+		const claimResult = await prisma.message.updateMany({
+			where: { id: { in: candidateIds }, status: 'scheduled' },
+			data: { status: 'processing' }, // assumes 'processing' is a valid status value
+		});
+
+		if (!claimResult.count) {
+			console.log('No messages claimed (another cron may have taken them)');
+			return NextResponse.json(
+				{ message: 'No messages claimed' },
+				{ status: 200 }
+			);
+		}
+
+		const messagesToSend = await prisma.message.findMany({
+			where: { id: { in: candidateIds }, status: 'processing' },
+			include: { contact: true, sequence: true },
+		});
 
 		const results = await Promise.allSettled(
 			messagesToSend.map(async (message) => {
@@ -48,7 +94,15 @@ export async function GET(request: NextRequest) {
 				const sequence = message.sequence;
 
 				if (!sequence) {
-					throw new Error('Sequence not found for message ' + message.id);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: { status: 'scheduled' },
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Sequence not found',
+					};
 				}
 
 				const endOfSequence =
@@ -117,6 +171,11 @@ export async function GET(request: NextRequest) {
 					return { success: true, messageId: message.id };
 				} catch (error) {
 					console.error(`Error sending message ${message.id}:`, error);
+					// restore to scheduled so it can be retried later
+					await prisma.message.update({
+						where: { id: message.id },
+						data: { status: 'scheduled' },
+					});
 					return {
 						success: false,
 						messageId: message.id,

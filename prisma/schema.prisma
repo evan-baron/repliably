@@ -178,6 +178,7 @@ model UserSignature {
 enum MessageStatus {
   scheduled
   pending
+  processing
   sent
   failed
   cancelled
