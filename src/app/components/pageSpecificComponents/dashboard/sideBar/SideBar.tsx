@@ -27,7 +27,7 @@ export default function SideBar({
 		// { href: '/dashboard/in-progress', label: 'In Progress' },
 		{ href: '/dashboard/templates', label: 'Templates (Coming Soon)' },
 		{ href: '/dashboard/analytics', label: 'Analytics (Coming Soon)' },
-		{ href: '/dashboard/settings', label: 'Settings' },
+		{ href: '/dashboard/settings', label: 'Settings (Coming Soon)' },
 	];
 
 	return (

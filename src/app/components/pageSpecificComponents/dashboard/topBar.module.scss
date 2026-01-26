@@ -22,27 +22,47 @@
 		align-items: center;
 		height: 4rem;
 
-		.appTitle {
-			margin: 0;
-			font-size: 1.5rem;
-			font-weight: 700;
-			background: var(--gradient-primary);
-			-webkit-background-clip: text;
-			-webkit-text-fill-color: transparent;
-			background-clip: text;
-			line-height: 1.25;
+		.logo {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
 
-			span {
-				font-style: italic;
-				padding: 0 0.0625rem;
-				background: linear-gradient(
-					90deg,
-					hsl(38, 92%, 50%),
-					hsl(38, 92%, 65%)
-				);
+			.appTitle {
+				display: flex;
+				align-items: center;
+				margin: 0;
+				font-size: 1.5rem;
+				font-weight: 700;
+				background: var(--gradient-primary);
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
 				background-clip: text;
+				line-height: 1.25;
+
+				span {
+					font-style: italic;
+					padding: 0 0.0625rem;
+					background: linear-gradient(
+						90deg,
+						hsl(38, 92%, 50%),
+						hsl(38, 92%, 65%)
+					);
+					-webkit-background-clip: text;
+					-webkit-text-fill-color: transparent;
+					background-clip: text;
+				}
+			}
+
+			.iconContainer {
+				position: relative;
+				display: flex;
+				align-items: center;
+
+				.icon {
+					font-size: 1.625rem;
+					color: var(--text-light-muted);
+					transform: rotate(15deg);
+				}
 			}
 		}
 
