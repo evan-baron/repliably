@@ -13,7 +13,6 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 	const candidates = await prisma.message.findMany({
 		where: {
 			scheduledAt: { lte: new Date() },
-			approvalDeadline: { lte: new Date() },
 			status: 'scheduled',
 			sequence: {
 				is: {
@@ -62,6 +61,27 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 
 	const results = await Promise.allSettled(
 		messagesToSend.map(async (message) => {
+			const now = new Date();
+
+			// If message requires approval and is not approved, skip if there's no deadline (wait indefinitely) or if there's a future approvalDeadline
+			if (message.needsApproval && !message.approved) {
+				const shouldSkip =
+					!message.approvalDeadline ||
+					(message.approvalDeadline && now < message.approvalDeadline);
+
+				if (shouldSkip) {
+					await prisma.message.update({
+						where: { id: message.id },
+						data: { status: 'scheduled' },
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Approval pending',
+					};
+				}
+			}
+
 			const contact = message.contact;
 			const sequence = message.sequence;
 

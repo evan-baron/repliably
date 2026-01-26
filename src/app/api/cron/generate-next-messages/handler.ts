@@ -109,8 +109,22 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 
 				const scheduledAt = sequence.nextStepDue || null;
 
+				if (!scheduledAt) {
+					console.log(
+						`No scheduled time for next message in sequence ${sequence.id} for message ${message.id}`
+					);
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'No scheduled time',
+					};
+				}
+
 				const approvalDeadline = sequence.autoSendDelay
-					? new Date(Date.now() + sequence.autoSendDelay * 24 * 60 * 60 * 1000)
+					? new Date(
+							scheduledAt.getTime() +
+								sequence.autoSendDelay * 24 * 60 * 60 * 1000
+					  )
 					: null;
 
 				// Store the next message

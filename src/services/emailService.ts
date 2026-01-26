@@ -164,12 +164,7 @@ export async function storeSentEmail({
 				messageId,
 				threadId,
 				createdAt: new Date(),
-				needsApproval: autoSend,
 				status: 'sent',
-				approvalDeadline:
-					autoSend && sendDelay
-						? new Date(Date.now() + sendDelay * 60 * 1000)
-						: null,
 				sentAt: new Date(),
 				needsFollowUp: true,
 			},

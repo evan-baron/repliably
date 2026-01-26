@@ -22,7 +22,7 @@ export async function PUT(
 
 		const message = await prisma.message.update({
 			where: { ownerId: user.id, id: messageId },
-			data: { approved: true, status: 'scheduled' },
+			data: { needsApproval: false, approved: true, status: 'scheduled' },
 		});
 
 		return NextResponse.json({ message });
