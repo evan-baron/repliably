@@ -40,6 +40,10 @@ export default function LoginModal() {
 	};
 
 	const handleSocialLogin = (provider: string) => {
+		if (provider === 'apple' || provider === 'microsoft') {
+			return;
+		}
+
 		// Redirect to Auth0 with specific provider
 		window.location.href = `/auth/login?connection=${provider}`;
 	};
@@ -47,7 +51,7 @@ export default function LoginModal() {
 	return (
 		<div className={styles.loginModal}>
 			{/* Email/Password Form */}
-			<form onSubmit={handleSubmit(onSubmit)} className={styles.authForm}>
+			{/* <form onSubmit={handleSubmit(onSubmit)} className={styles.authForm}>
 				<div className={styles.formGroup}>
 					<label htmlFor='email'>Email</label>
 					<input
@@ -97,7 +101,7 @@ export default function LoginModal() {
 
 			<div className={styles.divider}>
 				<span>or</span>
-			</div>
+			</div> */}
 
 			{/* Social Login Buttons */}
 			<div className={styles.socialLoginSection}>
