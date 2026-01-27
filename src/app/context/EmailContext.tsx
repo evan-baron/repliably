@@ -91,6 +91,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				});
 			} catch (error) {
 				console.error('Error triggering follow-up generation:', error);
+			} finally {
+				setEmailSentId(null);
 			}
 		})();
 		setEmailSentId(null);
