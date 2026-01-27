@@ -1,4 +1,5 @@
 'use client';
+
 // Library imports
 import { useEffect } from 'react';
 
@@ -30,6 +31,9 @@ import EditContactButton from '@/app/components/buttons/EditContactButton';
 import DeleteContactButton from '@/app/components/buttons/DeleteContactButton';
 import ContactActivities from './ContactActivities';
 
+// Context
+import { useAppContext } from '@/app/context/AppContext';
+
 export default function ContactDetailsClient({
 	initialContact,
 	initialSequences,
@@ -40,6 +44,15 @@ export default function ContactDetailsClient({
 	initialAllMessages: MessagesWithActiveSequence[];
 }) {
 	const queryClient = useQueryClient();
+
+	const { setSelectedContact, setModalType } = useAppContext();
+
+	useEffect(() => {
+		if (!initialContact.firstName) {
+			setSelectedContact(initialContact);
+			setModalType('newContactFromNewEmail');
+		}
+	}, []);
 
 	// hydrate server data into the cache
 	useEffect(() => {

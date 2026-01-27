@@ -92,6 +92,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			title: 'Edit Contact',
 			width: '31.5rem',
 		},
+		newContactFromNewEmail: {
+			component: <EditContactModal selectedContact={selectedContact!} />,
+			title: 'Action Required:',
+			width: '31.5rem',
+		},
 		deleteContact: {
 			component: <DeleteContactModal selectedContact={selectedContact!} />,
 			title: 'Delete Contact',
@@ -132,7 +137,18 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 				>
 					{modalContent[currentModalType].title && (
 						<div className={styles.modalHeader}>
-							<h2>{modalContent[currentModalType].title}</h2>
+							<h2
+								className={
+									modalContent[currentModalType].title === 'Action Required:'
+										? styles.alert
+										: ''
+								}
+							>
+								{modalContent[currentModalType].title}
+								{modalContent[currentModalType].title === 'Action Required:' ? (
+									<span> Edit Contact</span>
+								) : null}
+							</h2>
 						</div>
 					)}
 					<div className={styles.modalBody}>

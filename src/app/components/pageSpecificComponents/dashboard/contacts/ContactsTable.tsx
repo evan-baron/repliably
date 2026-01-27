@@ -138,23 +138,37 @@ const ContactsTable = ({
 						key={contact.id ?? contact.email}
 						onClick={() => handleClick(contact)}
 					>
-						<td className={styles.sm}>{contact.firstName}</td>
-						<td className={styles.sm}>{contact.lastName}</td>
-						<td className={styles.lrg}>{contact.company}</td>
-						<td className={styles.md}>{contact.title}</td>
+						<td className={styles.sm}>
+							{contact.firstName ? contact.firstName : '-'}
+						</td>
+						<td className={styles.sm}>
+							{contact.lastName ? contact.lastName : '-'}
+						</td>
+						<td className={styles.lrg}>
+							{contact.company ? contact.company : '-'}
+						</td>
+						<td className={styles.md}>{contact.title ? contact.title : '-'}</td>
 						{columns.importance && (
-							<td className={`${styles.sm} ${styles.right}`}>
-								{contact.importance}
+							<td
+								className={`${styles.sm} ${
+									contact.importance ? styles.right : ''
+								}`}
+							>
+								{contact.importance ? contact.importance : '-'}
 							</td>
 						)}
 						{columns.phone && (
-							<td className={`${styles.md} ${styles.right}`}>
-								{contact.phone}
+							<td
+								className={`${styles.md} ${contact.phone ? styles.right : ''}`}
+							>
+								{contact.phone ? contact.phone : '-'}
 							</td>
 						)}
 						<td className={styles.lrg}>{contact.email}</td>
 						{columns.linkedIn && (
-							<td className={styles.md}>{contact.linkedIn}</td>
+							<td className={styles.md}>
+								{contact.linkedIn ? contact.linkedIn : '-'}
+							</td>
 						)}
 						{columns.lastActivity && (
 							<td className={`${styles.md} ${styles.right}`}>
@@ -169,7 +183,9 @@ const ContactsTable = ({
 							</td>
 						)}
 						{columns.reasonForEmail && (
-							<td className={styles.lrg}>{contact.reasonForEmail}</td>
+							<td className={styles.lrg}>
+								{contact.reasonForEmail ? contact.reasonForEmail : '-'}
+							</td>
 						)}
 					</tr>
 				))}

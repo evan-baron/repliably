@@ -38,9 +38,7 @@ export default function SideBarClient({
 	}, [data, initialMessages, queryClient]);
 
 	const messages = data?.messages || [];
-	const pendingMessages = messages.filter(
-		(message) => message.status === 'pending' || !message.approved
-	);
+	const pendingMessages = messages.filter((message) => message.needsApproval);
 	const hasNotifications = pendingMessages.length > 0;
 
 	return <SideBar notifications={hasNotifications} />;

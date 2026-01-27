@@ -26,6 +26,7 @@ interface NewMessageResponse {
 	threadId: string;
 	contact?: any;
 	message?: any;
+	newContact?: boolean;
 }
 
 export const useEmailSend = () => {

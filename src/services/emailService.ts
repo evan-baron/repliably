@@ -14,6 +14,8 @@ import { parseSequenceData } from '@/lib/helperFunctions';
 
 // Helper function to find or create a contact
 export async function findOrCreateContact(email: string, ownerId: number) {
+	let newContact = false;
+
 	// Try to find an existing contact with the given email and ownerId
 	let contact = await prisma.contact.findFirst({
 		where: {
@@ -24,6 +26,7 @@ export async function findOrCreateContact(email: string, ownerId: number) {
 
 	// If no contact is found, create a new one
 	if (!contact) {
+		newContact = true;
 		contact = await prisma.contact.create({
 			data: {
 				email: email,
@@ -38,7 +41,7 @@ export async function findOrCreateContact(email: string, ownerId: number) {
 	}
 
 	// Return the found or newly created contact
-	return contact;
+	return { contact, newContact };
 }
 
 // Main function to store sent email in the db and handle/update sequences
@@ -57,7 +60,7 @@ export async function storeSentEmail({
 	alterSubjectLine,
 }: StoredEmailData) {
 	// First find or create the contact that will be associated with the message
-	const contact = await findOrCreateContact(email, ownerId);
+	const { contact, newContact } = await findOrCreateContact(email, ownerId);
 
 	// Helpers to map cadenceType and cadenceDuration to their respective values
 	const cadenceTypeMapping: { [key: string]: number } = {
@@ -115,7 +118,7 @@ export async function storeSentEmail({
 				data: { lastActivity: new Date() },
 			}),
 		]);
-		return { createdMessage, updatedContact };
+		return { createdMessage, updatedContact, newContact };
 	}
 
 	// Because cadenceType is not 'none', we need to create a new sequence
@@ -181,7 +184,7 @@ export async function storeSentEmail({
 		`Stored sent message ${createdMessage.id} and created sequence ${sequence.id} for contact ${contact.id}`
 	);
 
-	return { createdMessage, updatedContact };
+	return { createdMessage, updatedContact, newContact };
 }
 
 export async function updateExistingSequenceMessage(message: MessageFromDB) {

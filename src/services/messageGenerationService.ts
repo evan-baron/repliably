@@ -50,7 +50,7 @@ export const generateMessage = async (
 
 	const contactNameNote = previousEmailContents.contactName
 		? `Address the contact by name like "Hi ${previousEmailContents.contactName},".`
-		: 'No contact name was provided, so use a generic greeting like "Hi," or "Hello,".';
+		: 'No contact name was provided, so use the generic greeting "Hello,".';
 
 	const userPrompt = `Context: You are a professional executive assistant acting as the original sender. You are writing a short follow-up email no longer than 3 sentences or ${MAX_BODY_WORDS} words in length. ${keepSubjectNote} ${
 		preserveThreadContext

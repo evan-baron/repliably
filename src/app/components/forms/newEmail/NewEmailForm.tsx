@@ -29,9 +29,14 @@ interface EmailFormData {
 }
 
 const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
-	const { setModalType, selectedContact, setSelectedContact, setErrors } =
-		useAppContext();
-	const { resetForm, setResetForm, setEmailSentId } = useEmailContext();
+	const {
+		modalType,
+		setModalType,
+		selectedContact,
+		setSelectedContact,
+		setErrors,
+	} = useAppContext();
+	const { resetForm, setResetForm } = useEmailContext();
 
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
 
@@ -64,14 +69,14 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		watch('followUpCadence') !== 'none' && watch('followUpCadence') !== '';
 
 	useEffect(() => {
-		if (selectedContact?.email) {
+		if (selectedContact?.email && modalType !== 'newContactFromNewEmail') {
 			setValue('to', selectedContact.email);
 		}
 
 		if (contactEmail) {
 			setValue('to', contactEmail);
 		}
-	}, [selectedContact, contactEmail, setValue]);
+	}, [selectedContact, contactEmail, modalType, setValue]);
 
 	useEffect(() => {
 		if (!followingUp) {
@@ -99,7 +104,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		const alterSubject = !data.followUpCadence ? null : !!data.alterSubjectLine;
 
 		try {
-			await sendEmail({
+			const result = await sendEmail({
 				to: contactEmail ? contactEmail : data.to,
 				subject: data.subject || 'Email from Application',
 				cadenceType: data.followUpCadence,
@@ -111,10 +116,15 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				alterSubjectLine: alterSubject,
 			});
 
-			// Success handling is done in the hook
 			setEditorContent('');
 			setSelectedContact(null);
 			reset(); // Reset form fields
+
+			const { newContact } = result;
+			if (newContact) {
+				setSelectedContact(result.contact);
+				setModalType('newContactFromNewEmail');
+			}
 		} catch (error) {
 			// Error handling is done in the hook
 		}

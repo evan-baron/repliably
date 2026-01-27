@@ -144,10 +144,7 @@ const PendingMessagesTable = ({
 							!message.approved)
 							? 'Pending Approval'
 							: 'Scheduled';
-					const messageNeedsApproval =
-						(message.needsApproval && !message.approved) ||
-						message.status === 'pending' ||
-						(message.status === 'scheduled' && !message.approved);
+					const messageNeedsApproval = message.needsApproval;
 
 					return (
 						<tr

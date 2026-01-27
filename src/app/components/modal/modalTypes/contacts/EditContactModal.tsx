@@ -18,8 +18,12 @@ import { useAppContext } from '@/app/context/AppContext';
 const EditContactModal = ({
 	selectedContact,
 }: {
-	selectedContact: ContactFromDB;
+	selectedContact?: ContactFromDB;
 }) => {
+	if (!selectedContact) {
+		return null;
+	}
+
 	const {
 		setModalType,
 		setSelectedContact,

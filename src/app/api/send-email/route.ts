@@ -48,21 +48,22 @@ export async function POST(req: NextRequest) {
 			const result = await sendGmail({ to, subject, html: body });
 
 			if (user && result.messageId && result.threadId) {
-				const { createdMessage, updatedContact } = await storeSentEmail({
-					email: to,
-					ownerId: user.id,
-					subject,
-					contents: body,
-					cadenceType,
-					autoSend,
-					autoSendDelay,
-					cadenceDuration,
-					messageId: result.messageId,
-					threadId: result.threadId,
-					sequenceId: sequenceId ?? null,
-					referencePreviousEmail: referencePreviousEmail,
-					alterSubjectLine: alterSubjectLine,
-				});
+				const { createdMessage, updatedContact, newContact } =
+					await storeSentEmail({
+						email: to,
+						ownerId: user.id,
+						subject,
+						contents: body,
+						cadenceType,
+						autoSend,
+						autoSendDelay,
+						cadenceDuration,
+						messageId: result.messageId,
+						threadId: result.threadId,
+						sequenceId: sequenceId ?? null,
+						referencePreviousEmail: referencePreviousEmail,
+						alterSubjectLine: alterSubjectLine,
+					});
 
 				return NextResponse.json({
 					success: true,
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
 					threadId: result.threadId,
 					contact: updatedContact,
 					message: createdMessage,
+					newContact: newContact,
 				});
 			}
 

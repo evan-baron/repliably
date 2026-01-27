@@ -44,8 +44,6 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	useEffect(() => {
 		if (emailSentId === null) return;
 
-		console.log('emailSentId has changed. New ID:', emailSentId);
-
 		(async () => {
 			try {
 				const result = await fetch(`/api/messages/${emailSentId}/generate`, {
