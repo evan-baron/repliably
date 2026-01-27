@@ -1,5 +1,6 @@
 // Library imports
 import React, { ReactNode } from 'react';
+import Link from 'next/link';
 
 // Hooks imports
 
@@ -12,6 +13,7 @@ interface PreviewTileProps {
 	className?: string;
 	loading?: boolean;
 	error?: boolean;
+	href?: string;
 }
 
 const PreviewTile = ({
@@ -20,10 +22,13 @@ const PreviewTile = ({
 	className,
 	loading,
 	error,
+	href,
 }: PreviewTileProps) => {
 	return (
 		<div className={styles.tileWrapper}>
-			<h2 className={styles.tileTitle}>{title}</h2>
+			<Link href={href || '/dashboard'} className={styles.tileHeader}>
+				<h2 className={styles.tileTitle}>{title}</h2>
+			</Link>
 			{children}
 		</div>
 	);

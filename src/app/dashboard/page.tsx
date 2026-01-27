@@ -33,24 +33,24 @@ const Dashboard = () => {
 				className={styles.previewTiles}
 				aria-labelledby='preview-tiles-title'
 			>
-				<PreviewTile title='Recent Activity'>
+				<PreviewTile title='Active Contacts' href='/dashboard/contacts'>
 					<div></div>
 				</PreviewTile>
-				<PreviewTile title='Pending & Upcoming Activities'>
-					<div></div>
-				</PreviewTile>
-				<PreviewTile title='Active Contacts'>
+				<PreviewTile
+					title='Pending & Scheduled Emails'
+					href='/dashboard/pending'
+				>
 					<div></div>
 				</PreviewTile>
 			</section>
 
 			<section
-				className={styles.quickActions}
-				aria-labelledby='quick-actions-title'
+				className={styles.recentActivity}
+				aria-labelledby='recent-activity-title'
 				role='region'
 			>
-				<h2 className={styles.sectionTitle} id='quick-actions-title'>
-					Quick Actions
+				<h2 className={styles.sectionTitle} id='recent-activity-title'>
+					Recent Activity
 				</h2>
 			</section>
 		</div>
