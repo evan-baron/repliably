@@ -290,7 +290,14 @@
 
 				&.cancelled {
 					font-style: italic;
-					opacity: 0.75;
+
+					.type,
+					.subject,
+					.status,
+					.date,
+					.replied {
+						opacity: 0.75;
+					}
 				}
 
 				&.nested {
