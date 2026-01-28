@@ -61,8 +61,8 @@ export default function ContactDetailsClient({
 
 	// hydrate server data into the cache
 	useEffect(() => {
-		setLoading(true);
-		setLoadingMessage('Loading');
+		// setLoading(true);
+		// setLoadingMessage('Loading');
 
 		if (initialContact) {
 			queryClient.setQueryData<ContactFromDB>(
@@ -87,28 +87,28 @@ export default function ContactDetailsClient({
 	}, []);
 
 	// watch queries and clear loading when they finish
-	useEffect(() => {
-		const isLoading =
-			contactQuery.isLoading ||
-			contactQuery.isFetching ||
-			sequencesQuery.isLoading ||
-			sequencesQuery.isFetching ||
-			allMessagesQuery.isLoading ||
-			allMessagesQuery.isFetching;
+	// useEffect(() => {
+	// 	const isLoading =
+	// 		contactQuery.isLoading ||
+	// 		contactQuery.isFetching ||
+	// 		sequencesQuery.isLoading ||
+	// 		sequencesQuery.isFetching ||
+	// 		allMessagesQuery.isLoading ||
+	// 		allMessagesQuery.isFetching;
 
-		setLoading(isLoading);
-		setLoadingMessage(isLoading ? 'Loading' : null);
-	}, [
-		contactQuery.isLoading,
-		contactQuery.isFetching,
-		sequencesQuery.isLoading,
-		sequencesQuery.isFetching,
-		allMessagesQuery.isLoading,
-		allMessagesQuery.isFetching,
-		setLoading,
-		setLoadingMessage,
-		queryClient,
-	]);
+	// 	setLoading(isLoading);
+	// 	setLoadingMessage(isLoading ? 'Loading' : null);
+	// }, [
+	// 	contactQuery.isLoading,
+	// 	contactQuery.isFetching,
+	// 	sequencesQuery.isLoading,
+	// 	sequencesQuery.isFetching,
+	// 	allMessagesQuery.isLoading,
+	// 	allMessagesQuery.isFetching,
+	// 	setLoading,
+	// 	setLoadingMessage,
+	// 	queryClient,
+	// ]);
 
 	const { data } = contactQuery;
 	const contact = data || initialContact;

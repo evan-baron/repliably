@@ -15,7 +15,7 @@
 	.container {
 		width: 15rem;
 		height: 10rem;
-
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -24,6 +24,31 @@
 		background-color: var(--background-secondary);
 		border-radius: 0.5rem;
 		box-shadow: var(--shadow-lg);
+
+		/* Inset shadow for depth */
+		&::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			border-radius: var(--border-radius);
+			// box-shadow: var(--shadow-inset);
+			pointer-events: none;
+		}
+
+		/* Gradient top border */
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 0.5rem;
+			background: var(--gradient-primary);
+			border-radius: var(--border-radius) var(--border-radius) 0 0;
+		}
 
 		h2 {
 			position: relative;
