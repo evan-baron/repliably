@@ -111,6 +111,14 @@ const PendingMessagesTable = ({
 		return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
 	});
 
+	if (!messages.length) {
+		return (
+			<div className={styles.activity}>
+				<p>No pending emails</p>
+			</div>
+		);
+	}
+
 	return (
 		<table className={styles.table}>
 			<thead className={styles.tableHeader}>

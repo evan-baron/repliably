@@ -18,13 +18,13 @@ const Page = async () => {
 		<div className={styles['page-wrapper']}>
 			<section className={styles['header-section']}>
 				<h1 className={styles.welcomeTitle} id='pending-messages-title'>
-					Pending Messages
+					Pending Emails
 				</h1>
 				<p
 					className={styles.welcomeSubtitle}
 					aria-describedby='pending-messages-title'
 				>
-					Approve or edit pending messages.
+					Approve or edit pending emails.
 				</p>
 			</section>
 
