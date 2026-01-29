@@ -51,7 +51,7 @@ const PreviousSequencesTable = ({
 					<th className={styles.lrg}>
 						<span className={styles.sort}>Name</span>
 					</th>
-					<th className={styles.md}>
+					<th className={styles.sm}>
 						<span className={styles.sort}>Sequence Type</span>
 					</th>
 					<th className={styles.sm}>Duration (Days)</th>
@@ -85,7 +85,7 @@ const PreviousSequencesTable = ({
 								<td className={styles.lrg} style={{ fontWeight: '600' }}>
 									{sequence.title}
 								</td>
-								<td className={`${styles.md} ${styles.right}`}>
+								<td className={`${styles.sm} ${styles.right}`}>
 									{sequenceType(
 										sequence.sequenceType,
 										new Date(sequence.createdAt)
