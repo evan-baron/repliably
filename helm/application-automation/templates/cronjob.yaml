@@ -1,0 +1,43 @@
+{{- if .Values.cronJob.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "application-automation.fullname" . }}-cron
+  labels:
+    {{- include "application-automation.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronJob.schedule | quote }}
+  successfulJobsHistoryLimit: {{ .Values.cronJob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronJob.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "application-automation.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cron
+              image: "{{ .Values.cronJob.image.repository }}:{{ .Values.cronJob.image.tag }}"
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  curl -X GET \
+                    -H "Authorization: Bearer $(CRON_SECRET)" \
+                    "http://{{ include "application-automation.fullname" . }}:{{ .Values.service.port }}/api/cron"
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "application-automation.secretName" . }}
+                      key: cron-secret
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+                requests:
+                  cpu: 50m
+                  memory: 32Mi
+{{- end }}

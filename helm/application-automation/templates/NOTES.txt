@@ -1,0 +1,46 @@
+Application Automation has been deployed!
+
+1. Get the application URL:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ (index $host.paths 0).path }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "application-automation.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  Watch the status with: kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "application-automation.fullname" . }}
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "application-automation.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "application-automation.fullname" . }} 8080:{{ .Values.service.port }}
+  echo "Visit http://127.0.0.1:8080"
+{{- end }}
+
+2. Before deploying, ensure you have created the required secrets:
+
+   kubectl create secret generic application-automation-secrets \
+     --from-literal=auth0-domain='your-auth0-domain' \
+     --from-literal=auth0-client-id='your-client-id' \
+     --from-literal=auth0-client-secret='your-client-secret' \
+     --from-literal=auth0-secret='your-auth0-secret' \
+     --from-literal=google-client-id='your-google-client-id' \
+     --from-literal=google-client-secret='your-google-client-secret' \
+     --from-literal=google-redirect-uri='your-redirect-uri' \
+     --from-literal=google-refresh-token='your-refresh-token' \
+     --from-literal=email-address='your-email' \
+     --from-literal=google-cloud-project-id='your-project-id' \
+     --from-literal=google-client-email='your-service-account-email' \
+     --from-literal=google-private-key='your-private-key' \
+     --from-literal=cron-secret='your-cron-secret' \
+     --from-literal=api-secret='your-api-secret' \
+     --from-literal=openai-api-key='your-openai-key'
+
+   kubectl create secret generic {{ include "application-automation.databaseSecretName" . }} \
+     --from-literal={{ .Values.database.existingSecretKey }}='your-database-password'
+
+3. Database migrations will run automatically before deployment if enabled.
+
+4. To enable the CronJob for scheduled tasks, set cronJob.enabled=true in values.yaml

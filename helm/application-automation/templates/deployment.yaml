@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "application-automation.fullname" . }}
+  labels:
+    {{- include "application-automation.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "application-automation.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "application-automation.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "application-automation.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          {{- if .Values.probes.liveness.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+            successThreshold: {{ .Values.probes.liveness.successThreshold }}
+          {{- end }}
+          {{- if .Values.probes.readiness.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+            successThreshold: {{ .Values.probes.readiness.successThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "application-automation.fullname" . }}
+          env:
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.databaseSecretName" . }}
+                  key: {{ .Values.database.existingSecretKey }}
+            - name: DATABASE_URL
+              value: {{ include "application-automation.databaseUrl" . }}
+            - name: AUTH0_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: auth0-domain
+            - name: AUTH0_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: auth0-client-id
+            - name: AUTH0_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: auth0-client-secret
+            - name: AUTH0_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: auth0-secret
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-client-id
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-client-secret
+            - name: GOOGLE_REDIRECT_URI
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-redirect-uri
+            - name: GOOGLE_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-refresh-token
+            - name: EMAIL_ADDRESS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: email-address
+            - name: GOOGLE_CLOUD_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-cloud-project-id
+            - name: GOOGLE_CLIENT_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-client-email
+            - name: GOOGLE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: google-private-key
+            - name: CRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: cron-secret
+            - name: API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: api-secret
+                  optional: true
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "application-automation.secretName" . }}
+                  key: openai-api-key
+                  optional: true
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
