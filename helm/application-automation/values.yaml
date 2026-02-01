@@ -1,0 +1,126 @@
+replicaCount: 2
+
+image:
+  repository: application-automation
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  fsGroup: 1001
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: app-tls
+  #    hosts:
+  #      - app.example.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Database configuration
+database:
+  host: ""
+  port: 5432
+  name: "application_automation"
+  user: ""
+  existingSecret: ""
+  existingSecretKey: "database-password"
+
+# Application configuration
+config:
+  appBaseUrl: "http://localhost:3000"
+  nodeEnv: "production"
+
+# Secrets configuration
+secrets:
+  create: false
+  existingSecret: "application-automation-secrets"
+
+# Prisma migration job
+migration:
+  enabled: true
+  hookWeight: "-5"
+
+# Liveness and readiness probes
+probes:
+  liveness:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+    path: /api/health
+  readiness:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+    successThreshold: 1
+    path: /api/health
+
+# CronJob for scheduled tasks
+cronJob:
+  enabled: false
+  schedule: "*/5 * * * *"
+  image:
+    repository: curlimages/curl
+    tag: "latest"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3

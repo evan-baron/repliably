@@ -1,0 +1,12 @@
+apiVersion: v2
+name: application-automation
+description: A Helm chart for Application Automation - Job application follow-up automation platform
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - nextjs
+  - automation
+  - email
+maintainers:
+  - name: DevOps Team
