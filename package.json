@@ -6,7 +6,12 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint"
+		"lint": "eslint",
+		"db:migrate:dev": "prisma migrate dev",
+		"db:migrate:deploy": "prisma migrate deploy",
+		"db:migrate:status": "prisma migrate status",
+		"db:generate": "prisma generate",
+		"postinstall": "prisma generate"
 	},
 	"dependencies": {
 		"@auth0/nextjs-auth0": "^4.13.2",

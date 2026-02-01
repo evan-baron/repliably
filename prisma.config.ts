@@ -9,6 +9,7 @@ export default defineConfig({
 		path: 'prisma/migrations',
 	},
 	datasource: {
-		url: env('DATABASE_URL'),
+		// Use admin URL for migrations, fallback for backward compatibility
+		url: env('DATABASE_ADMIN_URL') || env('DATABASE_URL'),
 	},
 });
