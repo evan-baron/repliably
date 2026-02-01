@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 export async function PUT(
 	request: NextRequest,
@@ -24,6 +25,21 @@ export async function PUT(
 			where: { ownerId: user.id, id: messageId },
 			data: { needsApproval: false, approved: true, status: 'scheduled' },
 		});
+
+		// Audit the message approval
+		await auditUserAction(
+			request,
+			user.id,
+			AUDIT_ACTIONS.MESSAGE_APPROVE,
+			'message',
+			messageId,
+			{
+				contactId: message.contactId,
+				sequenceId: message.sequenceId,
+				subject: message.subject,
+			},
+			'success'
+		);
 
 		return NextResponse.json({ message });
 	} catch (error: any) {

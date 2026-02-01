@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { prisma } from '@/lib/prisma';
+import { verifyPubSubToken } from '@/lib/pubsub-auth';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
+import { auditWebhook, AUDIT_ACTIONS } from '@/lib/audit';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -8,6 +11,42 @@ const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 
 export async function POST(req: NextRequest) {
+	const clientIp = getClientIp(req);
+
+	// Check rate limit (100 requests per minute per IP)
+	const rateLimit = checkRateLimit(clientIp, 'webhook');
+	if (!rateLimit.allowed) {
+		await auditWebhook(
+			req,
+			AUDIT_ACTIONS.WEBHOOK_RATE_LIMITED,
+			{ ip: clientIp },
+			'failure',
+			'Rate limit exceeded'
+		);
+		return NextResponse.json(
+			{ error: 'Too many requests' },
+			{ status: 429, headers: rateLimit.headers }
+		);
+	}
+
+	// Verify Pub/Sub OIDC token
+	const authHeader = req.headers.get('authorization');
+	const authResult = await verifyPubSubToken(authHeader);
+
+	if (!authResult.valid) {
+		await auditWebhook(
+			req,
+			AUDIT_ACTIONS.WEBHOOK_REJECTED,
+			{ ip: clientIp, reason: authResult.error },
+			'failure',
+			authResult.error
+		);
+		return NextResponse.json(
+			{ error: 'Unauthorized' },
+			{ status: 401, headers: rateLimit.headers }
+		);
+	}
+
 	try {
 		const body = await req.json();
 		console.log('Gmail webhook received:', body);
@@ -19,13 +58,31 @@ export async function POST(req: NextRequest) {
 
 		console.log('Decoded message:', message);
 
+		// Log successful webhook receipt
+		await auditWebhook(
+			req,
+			AUDIT_ACTIONS.WEBHOOK_RECEIVED,
+			{ historyId: message.historyId, ip: clientIp },
+			'success'
+		);
+
 		// Check for new emails
 		await checkForNewEmails(message.historyId);
 
-		return NextResponse.json({ success: true });
+		return NextResponse.json({ success: true }, { headers: rateLimit.headers });
 	} catch (error: any) {
 		console.error('Webhook error:', error);
-		return NextResponse.json({ error: error.message }, { status: 500 });
+		await auditWebhook(
+			req,
+			AUDIT_ACTIONS.WEBHOOK_RECEIVED,
+			{ ip: clientIp },
+			'failure',
+			error.message
+		);
+		return NextResponse.json(
+			{ error: error.message },
+			{ status: 500, headers: rateLimit.headers }
+		);
 	}
 }
 

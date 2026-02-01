@@ -4,6 +4,8 @@ import { storeSentEmail } from '@/services/emailService';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 import { deactivateSequence } from '@/services/sequenceService';
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -12,6 +14,25 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json(
 				{ error: error.error },
 				{ status: error.status }
+			);
+		}
+
+		// Check rate limit (100 requests per hour per user)
+		const rateLimit = checkRateLimit(String(user.id), 'sendEmail');
+		if (!rateLimit.allowed) {
+			await auditUserAction(
+				req,
+				user.id,
+				AUDIT_ACTIONS.RATE_LIMITED,
+				'email',
+				null,
+				{ endpoint: 'send-email' },
+				'failure',
+				'Rate limit exceeded'
+			);
+			return NextResponse.json(
+				{ error: 'Too many requests. Please try again later.' },
+				{ status: 429, headers: rateLimit.headers }
 			);
 		}
 
@@ -39,7 +60,7 @@ export async function POST(req: NextRequest) {
 		) {
 			return NextResponse.json(
 				{ error: 'Missing parameters' },
-				{ status: 400 }
+				{ status: 400, headers: rateLimit.headers }
 			);
 		}
 
@@ -65,19 +86,50 @@ export async function POST(req: NextRequest) {
 						alterSubjectLine: alterSubjectLine,
 					});
 
-				return NextResponse.json({
-					success: true,
-					messageId: result.messageId,
-					threadId: result.threadId,
-					contact: updatedContact,
-					message: createdMessage,
-					newContact: newContact,
-				});
+				// Audit successful email send
+				await auditUserAction(
+					req,
+					user.id,
+					AUDIT_ACTIONS.EMAIL_SEND,
+					'email',
+					result.messageId,
+					{
+						to,
+						subject,
+						contactId: updatedContact?.id,
+						sequenceId: sequenceId ?? null,
+					},
+					'success'
+				);
+
+				return NextResponse.json(
+					{
+						success: true,
+						messageId: result.messageId,
+						threadId: result.threadId,
+						contact: updatedContact,
+						message: createdMessage,
+						newContact: newContact,
+					},
+					{ headers: rateLimit.headers }
+				);
 			}
+
+			// Audit failed email send
+			await auditUserAction(
+				req,
+				user.id,
+				AUDIT_ACTIONS.EMAIL_SEND_FAILED,
+				'email',
+				null,
+				{ to, subject },
+				'failure',
+				'Failed to send email or create message'
+			);
 
 			return NextResponse.json(
 				{ error: 'Failed to send email or create message.' },
-				{ status: 500 }
+				{ status: 500, headers: rateLimit.headers }
 			);
 		};
 
@@ -128,7 +180,7 @@ export async function POST(req: NextRequest) {
 					},
 					message: 'Contact already part of an active sequence.',
 				},
-				{ status: 409 }
+				{ status: 409, headers: rateLimit.headers }
 			);
 		}
 

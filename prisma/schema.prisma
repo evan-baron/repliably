@@ -29,6 +29,29 @@ model User {
   messages      Message[]
   templates     Template[]
   signatures    UserSignature[]
+  auditLogs     AuditLog[]
+}
+
+model AuditLog {
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime  @default(now())
+  userId      Int?
+  user        User?     @relation(fields: [userId], references: [id])
+  actorType   String    // "user", "system", "webhook", "cron"
+  actorIp     String?
+  action      String    // "message.approve", "email.send", etc.
+  resource    String    // "message", "contact", etc.
+  resourceId  String?
+  details     Json?
+  status      String    @default("success")
+  errorMsg    String?
+  userAgent   String?
+  requestId   String?
+
+  @@index([userId, timestamp])
+  @@index([action, timestamp])
+  @@index([resource, resourceId])
+  @@index([timestamp])
 }
 
 model Contact {

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 export async function GET(req: NextRequest) {
 	try {
@@ -40,6 +42,25 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		// 2. Check rate limit (60 requests per minute per user)
+		const rateLimit = checkRateLimit(String(user.id), 'api');
+		if (!rateLimit.allowed) {
+			await auditUserAction(
+				req,
+				user.id,
+				AUDIT_ACTIONS.RATE_LIMITED,
+				'contact',
+				null,
+				{ endpoint: 'contacts' },
+				'failure',
+				'Rate limit exceeded'
+			);
+			return NextResponse.json(
+				{ error: 'Too many requests. Please try again later.' },
+				{ status: 429, headers: rateLimit.headers }
+			);
+		}
+
 		// 3. Parse request body
 		const {
 			firstName,
@@ -57,7 +78,7 @@ export async function POST(req: NextRequest) {
 		if (!firstName || !lastName || !email) {
 			return NextResponse.json(
 				{ error: 'Missing required fields: firstName, lastName, email' },
-				{ status: 400 }
+				{ status: 400, headers: rateLimit.headers }
 			);
 		}
 
@@ -83,9 +104,34 @@ export async function POST(req: NextRequest) {
 
 			if (isIdentical) {
 				// Pretend we created it - return success with existing contact
-				return NextResponse.json({
-					success: true,
-					contact: {
+				return NextResponse.json(
+					{
+						success: true,
+						contact: {
+							id: existingContact.id,
+							firstName: existingContact.firstName,
+							lastName: existingContact.lastName,
+							company: existingContact.company,
+							title: existingContact.title,
+							email: existingContact.email,
+							phone: existingContact.phone,
+							linkedIn: existingContact.linkedIn,
+							importance: existingContact.importance,
+							reasonForEmail: existingContact.reasonForEmail,
+							createdAt: existingContact.createdAt.toISOString(),
+							updatedAt: existingContact.updatedAt.toISOString(),
+						},
+					},
+					{ headers: rateLimit.headers }
+				);
+			}
+
+			// Return duplicate data for comparison instead of error
+			return NextResponse.json(
+				{
+					success: false,
+					duplicate: true,
+					existingContact: {
 						id: existingContact.id,
 						firstName: existingContact.firstName,
 						lastName: existingContact.lastName,
@@ -96,40 +142,21 @@ export async function POST(req: NextRequest) {
 						linkedIn: existingContact.linkedIn,
 						importance: existingContact.importance,
 						reasonForEmail: existingContact.reasonForEmail,
-						createdAt: existingContact.createdAt.toISOString(),
-						updatedAt: existingContact.updatedAt.toISOString(),
 					},
-				});
-			}
-
-			// Return duplicate data for comparison instead of error
-			return NextResponse.json({
-				success: false,
-				duplicate: true,
-				existingContact: {
-					id: existingContact.id,
-					firstName: existingContact.firstName,
-					lastName: existingContact.lastName,
-					company: existingContact.company,
-					title: existingContact.title,
-					email: existingContact.email,
-					phone: existingContact.phone,
-					linkedIn: existingContact.linkedIn,
-					importance: existingContact.importance,
-					reasonForEmail: existingContact.reasonForEmail,
+					submittedData: {
+						firstName,
+						lastName,
+						company: company || null,
+						title: title || null,
+						email,
+						phone: phone || null,
+						linkedIn: linkedIn || null,
+						importance: parseInt(importance),
+						reasonForEmail: reasonForEmail || null,
+					},
 				},
-				submittedData: {
-					firstName,
-					lastName,
-					company: company || null,
-					title: title || null,
-					email,
-					phone: phone || null,
-					linkedIn: linkedIn || null,
-					importance: parseInt(importance),
-					reasonForEmail: reasonForEmail || null,
-				},
-			});
+				{ headers: rateLimit.headers }
+			);
 		}
 
 		// 6. Create contact in database
@@ -148,11 +175,25 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
-		// 7. Return success response
-		return NextResponse.json({
-			success: true,
-			contact,
-		});
+		// 7. Audit the contact creation
+		await auditUserAction(
+			req,
+			user.id,
+			AUDIT_ACTIONS.CONTACT_CREATE,
+			'contact',
+			contact.id,
+			{ email, firstName, lastName, company },
+			'success'
+		);
+
+		// 8. Return success response
+		return NextResponse.json(
+			{
+				success: true,
+				contact,
+			},
+			{ headers: rateLimit.headers }
+		);
 	} catch (error: any) {
 		console.error('Contact creation error:', error);
 		return NextResponse.json(

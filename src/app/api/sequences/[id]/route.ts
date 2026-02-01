@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 export async function GET(
 	request: NextRequest,
@@ -51,6 +53,26 @@ export async function PUT(
 				{ status: error.status }
 			);
 		}
+
+		// 2. Check rate limit (60 requests per minute per user)
+		const rateLimit = checkRateLimit(String(user.id), 'api');
+		if (!rateLimit.allowed) {
+			await auditUserAction(
+				request,
+				user.id,
+				AUDIT_ACTIONS.RATE_LIMITED,
+				'sequence',
+				null,
+				{ endpoint: 'sequences/[id]' },
+				'failure',
+				'Rate limit exceeded'
+			);
+			return NextResponse.json(
+				{ error: 'Too many requests. Please try again later.' },
+				{ status: 429, headers: rateLimit.headers }
+			);
+		}
+
 		const { id } = await params;
 		const sequenceId = parseInt(id);
 		const updatedSequence = await prisma.sequence.update({
@@ -69,11 +91,29 @@ export async function PUT(
 			where: { id: updatedSequence.contactId },
 			data: { active: false },
 		});
-		return NextResponse.json({
-			updatedSequence,
-			updatedMessages,
-			updatedContact,
-		});
+
+		// Audit the sequence deactivation
+		await auditUserAction(
+			request,
+			user.id,
+			AUDIT_ACTIONS.SEQUENCE_DEACTIVATE,
+			'sequence',
+			sequenceId,
+			{
+				contactId: updatedSequence.contactId,
+				cancelledMessages: updatedMessages.count,
+			},
+			'success'
+		);
+
+		return NextResponse.json(
+			{
+				updatedSequence,
+				updatedMessages,
+				updatedContact,
+			},
+			{ headers: rateLimit.headers }
+		);
 	} catch (error: any) {
 		console.error('Error updating sequence:', error);
 		return NextResponse.json(

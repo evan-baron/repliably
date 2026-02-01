@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { checkRateLimit } from '@/lib/rate-limiter';
+import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
 
 export async function GET(
 	request: NextRequest,
@@ -39,6 +41,25 @@ export async function PUT(
 			);
 		}
 
+		// 2. Check rate limit (60 requests per minute per user)
+		const rateLimit = checkRateLimit(String(user.id), 'api');
+		if (!rateLimit.allowed) {
+			await auditUserAction(
+				request,
+				user.id,
+				AUDIT_ACTIONS.RATE_LIMITED,
+				'contact',
+				null,
+				{ endpoint: 'contacts/[id]' },
+				'failure',
+				'Rate limit exceeded'
+			);
+			return NextResponse.json(
+				{ error: 'Too many requests. Please try again later.' },
+				{ status: 429, headers: rateLimit.headers }
+			);
+		}
+
 		const { id } = await params;
 		const contactId = parseInt(id);
 		const body = await request.json();
@@ -66,7 +87,7 @@ export async function PUT(
 					success: false,
 					error: 'Contact with this email already exists',
 				},
-				{ status: 400 }
+				{ status: 400, headers: rateLimit.headers }
 			);
 		}
 
@@ -75,10 +96,24 @@ export async function PUT(
 			data: updateData,
 		});
 
-		return NextResponse.json({
-			success: true,
-			contact: updatedContact,
-		});
+		// Audit the contact update
+		await auditUserAction(
+			request,
+			user.id,
+			AUDIT_ACTIONS.CONTACT_UPDATE,
+			'contact',
+			contactId,
+			{ updatedFields: Object.keys(updateData) },
+			'success'
+		);
+
+		return NextResponse.json(
+			{
+				success: true,
+				contact: updatedContact,
+			},
+			{ headers: rateLimit.headers }
+		);
 	} catch (error) {
 		console.error('Error updating contact:', error);
 		let message = 'Unknown error';
@@ -112,15 +147,49 @@ export async function DELETE(
 			);
 		}
 
-		const { id } = await params;
+		// 2. Check rate limit (60 requests per minute per user)
+		const rateLimit = checkRateLimit(String(user.id), 'api');
+		if (!rateLimit.allowed) {
+			await auditUserAction(
+				request,
+				user.id,
+				AUDIT_ACTIONS.RATE_LIMITED,
+				'contact',
+				null,
+				{ endpoint: 'contacts/[id]' },
+				'failure',
+				'Rate limit exceeded'
+			);
+			return NextResponse.json(
+				{ error: 'Too many requests. Please try again later.' },
+				{ status: 429, headers: rateLimit.headers }
+			);
+		}
 
+		const { id } = await params;
 		const contactId = parseInt(id);
+
+		// Get contact info before deletion for audit
+		const contact = await prisma.contact.findFirst({
+			where: { id: contactId, ownerId: user.id },
+		});
 
 		await prisma.contact.delete({
 			where: { id: contactId, ownerId: user.id },
 		});
 
-		return NextResponse.json({ success: true });
+		// Audit the contact deletion
+		await auditUserAction(
+			request,
+			user.id,
+			AUDIT_ACTIONS.CONTACT_DELETE,
+			'contact',
+			contactId,
+			{ email: contact?.email },
+			'success'
+		);
+
+		return NextResponse.json({ success: true }, { headers: rateLimit.headers });
 	} catch (error) {
 		console.error('Error deleting contact:', error);
 		return NextResponse.json(
