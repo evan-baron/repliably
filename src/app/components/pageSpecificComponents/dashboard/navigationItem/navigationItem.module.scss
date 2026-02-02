@@ -56,7 +56,10 @@
 		animation: blinking 1.5s infinite;
 	}
 
-	span {
+	.linkInner {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 		transition: transform 0.2s ease-in-out;
 		will-change: transform;
 	}
@@ -75,7 +78,7 @@
 			animation: none;
 		}
 
-		span {
+		.linkInner {
 			transform: scale(1.1);
 		}
 	}

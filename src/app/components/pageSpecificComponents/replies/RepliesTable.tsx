@@ -20,8 +20,6 @@ import { RepliesFromDB } from '@/types/repliesTypes';
 import { parseReplyContent } from '@/lib/helperFunctions';
 
 const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
-	console.log('All replies:', replies);
-
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [selectedReply, setSelectedReply] = useState<number | null>(null);
 	const { mutateAsync: updateReply } = useReplyUpdate();
