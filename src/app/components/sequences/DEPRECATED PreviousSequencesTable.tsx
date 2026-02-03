@@ -5,7 +5,7 @@ import { useState, Fragment } from 'react';
 import styles from './tableStyles.module.scss';
 
 // Helpers imports
-import { sequenceType } from '@/lib/helperFunctions';
+import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Icon imports
 import { SwapVert } from '@mui/icons-material';

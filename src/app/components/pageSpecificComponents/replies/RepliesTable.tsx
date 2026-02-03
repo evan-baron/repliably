@@ -17,7 +17,7 @@ import { SwapVert } from '@mui/icons-material';
 import { RepliesFromDB } from '@/types/repliesTypes';
 
 // Helper functions imports
-import { parseReplyContent } from '@/lib/helperFunctions';
+import { parseReplyContent } from '@/lib/helpers/emailHelpers';
 
 const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -94,9 +94,10 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 					const parsedContent = parseReplyContent(reply.replyContent);
 					const message = [`${reply.replySubject}`, ...parsedContent];
 
-					const contactName = reply.contact?.firstName
-						? reply.contact.firstName + ' ' + reply.contact?.lastName
-						: 'Unknown';
+					const contactName =
+						reply.contact?.firstName ?
+							reply.contact.firstName + ' ' + reply.contact?.lastName
+						:	'Unknown';
 
 					return (
 						<tr

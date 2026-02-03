@@ -62,6 +62,7 @@ export default function ContactsClient({
 						reasonForEmail: true,
 						importance: true,
 						lastActivity: true,
+						verified: true,
 						linkedIn: true,
 						phone: true,
 						replied: true,

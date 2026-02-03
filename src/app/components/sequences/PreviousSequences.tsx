@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 
 // Helpers imports
-import { sequenceType } from '@/lib/helperFunctions';
+import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Types imports
 import { SequenceFromDB } from '@/types/sequenceTypes';
@@ -33,9 +33,10 @@ const PreviousSequences = ({
 		{ label: 'Replied', size: 'sm', sortable: true },
 	];
 
-	const contactColumnHeaders = contact
-		? [{ label: 'Contact', size: 'sm', sortable: true }, ...columnHeaders]
-		: [];
+	const contactColumnHeaders =
+		contact ?
+			[{ label: 'Contact', size: 'sm', sortable: true }, ...columnHeaders]
+		:	[];
 
 	const nestedMessagesHeaders = [
 		{ label: 'Subject', size: 'md' },
@@ -50,20 +51,20 @@ const PreviousSequences = ({
 			sequences.map((sequence) => {
 				const rowData = sequence.messages.map((message) => {
 					const messageStatus =
-						message.status === 'pending' ||
-						(message.status === 'scheduled' &&
-							message.needsApproval &&
-							!message.approved)
-							? 'Pending Approval'
-							: message.status[0].toUpperCase() + message.status.slice(1);
+						(
+							message.status === 'pending' ||
+							(message.status === 'scheduled' &&
+								message.needsApproval &&
+								!message.approved)
+						) ?
+							'Pending Approval'
+						:	message.status[0].toUpperCase() + message.status.slice(1);
 					const sendDate =
-						message.status === 'cancelled'
-							? 'N/A'
-							: message.sentAt
-							? new Date(message.sentAt).toLocaleDateString()
-							: `Scheduled for ${new Date(
-									message.scheduledAt!
-							  ).toLocaleDateString()}`;
+						message.status === 'cancelled' ? 'N/A'
+						: message.sentAt ? new Date(message.sentAt).toLocaleDateString()
+						: `Scheduled for ${new Date(
+								message.scheduledAt!
+							).toLocaleDateString()}`;
 
 					return {
 						rowId: message.id,
@@ -112,9 +113,8 @@ const PreviousSequences = ({
 				const cellData = [
 					{
 						value: sequence.title,
-						size: contact
-							? contactColumnHeaders[1].size
-							: columnHeaders[0].size,
+						size:
+							contact ? contactColumnHeaders[1].size : columnHeaders[0].size,
 						cellStyling: 'bold' as CellStyling,
 					},
 					{
@@ -122,44 +122,40 @@ const PreviousSequences = ({
 							sequence.sequenceType,
 							new Date(sequence.createdAt)
 						),
-						size: contact
-							? contactColumnHeaders[2].size
-							: columnHeaders[1].size,
+						size:
+							contact ? contactColumnHeaders[2].size : columnHeaders[1].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
 						value: sequenceDuration,
-						size: contact
-							? contactColumnHeaders[3].size
-							: columnHeaders[2].size,
+						size:
+							contact ? contactColumnHeaders[3].size : columnHeaders[2].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
 						value: messagesSent,
-						size: contact
-							? contactColumnHeaders[4].size
-							: columnHeaders[3].size,
+						size:
+							contact ? contactColumnHeaders[4].size : columnHeaders[3].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
 						value: sequence.endDate ? sequence.endDate : '',
-						size: contact
-							? contactColumnHeaders[5].size
-							: columnHeaders[4].size,
+						size:
+							contact ? contactColumnHeaders[5].size : columnHeaders[4].size,
 						cellOrientation: 'right' as CellOrientation,
 						isDate: true,
 					},
 					{
 						value: sequence.emailReplies.length > 0 ? 'Yes' : 'No',
-						size: contact
-							? contactColumnHeaders[6].size
-							: columnHeaders[5].size,
+						size:
+							contact ? contactColumnHeaders[6].size : columnHeaders[5].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 				];
 
-				const contactCellData = contact
-					? [
+				const contactCellData =
+					contact ?
+						[
 							{
 								value:
 									sequence.contact.firstName + ' ' + sequence.contact.lastName,
@@ -169,8 +165,8 @@ const PreviousSequences = ({
 								href: `/dashboard/contacts/${sequence.contact.id}`,
 							},
 							...cellData,
-					  ]
-					: [];
+						]
+					:	[];
 
 				return {
 					rowId: sequence.id,
@@ -179,12 +175,14 @@ const PreviousSequences = ({
 				};
 			})
 			.sort((a, b) => {
-				const valA = a.cellData[4]?.value
-					? new Date(a.cellData[4].value as string).getTime()
-					: 0;
-				const valB = b.cellData[4]?.value
-					? new Date(b.cellData[4].value as string).getTime()
-					: 0;
+				const valA =
+					a.cellData[4]?.value ?
+						new Date(a.cellData[4].value as string).getTime()
+					:	0;
+				const valB =
+					b.cellData[4]?.value ?
+						new Date(b.cellData[4].value as string).getTime()
+					:	0;
 				return valB - valA;
 			}),
 	};

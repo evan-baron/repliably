@@ -29,6 +29,7 @@ const ContactsTable = ({
 		reasonForEmail: boolean;
 		importance: boolean;
 		lastActivity: boolean;
+		verified: boolean;
 		linkedIn: boolean;
 		phone: boolean;
 		replied: boolean;
@@ -120,6 +121,7 @@ const ContactsTable = ({
 					{columns.phone && <th className={styles.md}>Phone</th>}
 					<th className={styles.lrg}>Email</th>
 					{columns.linkedIn && <th className={styles.md}>LinkedIn</th>}
+					{columns.verified && <th className={styles.sm}>Email Verified</th>}
 					{columns.lastActivity && (
 						<th
 							className={styles.md}
@@ -148,6 +150,7 @@ const ContactsTable = ({
 						<tr
 							key={contact.id ?? contact.email}
 							onClick={() => handleClick(contact)}
+							className={contact.validEmail === false ? styles.invalid : ''}
 						>
 							{columns.active && (
 								<td className={styles.sm}>{contact.active ? 'Yes' : 'No'}</td>
@@ -188,11 +191,30 @@ const ContactsTable = ({
 									{contact.linkedIn ? contact.linkedIn : '-'}
 								</td>
 							)}
+							{columns.verified && (
+								<td
+									className={`
+								${styles.sm} 
+								${styles.right}
+								${
+									contact.validEmail === null ? ''
+									: !contact.validEmail ? styles.invalid
+									: ''
+								}
+								`}
+								>
+									{contact.validEmail === null ?
+										'-'
+									: contact.validEmail ?
+										'Yes'
+									:	'No'}
+								</td>
+							)}
 							{columns.lastActivity && (
 								<td className={`${styles.md} ${styles.right}`}>
-									{contact.lastActivity
-										? new Date(contact.lastActivity).toLocaleDateString()
-										: ''}
+									{contact.lastActivity ?
+										new Date(contact.lastActivity).toLocaleDateString()
+									:	''}
 								</td>
 							)}
 							{columns.replied && (

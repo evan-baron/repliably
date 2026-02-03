@@ -8,7 +8,7 @@ import Link from 'next/link';
 import styles from './masterTable.module.scss';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helperFunctions';
+import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 
 // Components imports
 import TableHeader from './TableHeader';
@@ -108,157 +108,149 @@ const MasterTable = ({
 				{sortedRowData.map((row) => {
 					const nestedRowData = row.nestedData?.value ?? null;
 
-					return nestedRowData ? (
-						<Fragment key={row.rowId}>
-							<tr
-								className={`
+					return nestedRowData ?
+							<Fragment key={row.rowId}>
+								<tr
+									className={`
 									${selectedRow === row.rowId ? styles.selected : ''} 
 									${styles.bodyRow} ${row.rowStyling ? styles[row.rowStyling] : ''}
 								`}
-								onClick={() => handleClick(row.rowId)}
-							>
-								{row.cellData.map((cell: any, cellIndex: number) => {
-									const parsedContent =
-										cell.contentCell && parseEmailContent(cell.value);
+									onClick={() => handleClick(row.rowId)}
+								>
+									{row.cellData.map((cell: any, cellIndex: number) => {
+										const parsedContent =
+											cell.contentCell && parseEmailContent(cell.value);
 
-									return cell.contentCell ? (
-										<td
-											key={`nestedCellMaster-${cellIndex}`}
-											className={`
+										return cell.contentCell ?
+												<td
+													key={`nestedCellMaster-${cellIndex}`}
+													className={`
 												${styles[cell.size]} 
 												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 												${styles['content-cell']}
 											`}
-										>
-											<div className={styles['parsed-content']}>
-												<span className={styles['message-preview']}>
-													{parsedContent[0]}
-												</span>
-												{parsedContent.length > 1 &&
-													parsedContent
-														.slice(1)
-														.map((text: string, index: number) => (
-															<span key={index}>{text}</span>
-														))}
-											</div>
-										</td>
-									) : (
-										<td
-											key={`nestedCellMaster-${cellIndex}`}
-											className={`
+												>
+													<div className={styles['parsed-content']}>
+														<span className={styles['message-preview']}>
+															{parsedContent[0]}
+														</span>
+														{parsedContent.length > 1 &&
+															parsedContent
+																.slice(1)
+																.map((text: string, index: number) => (
+																	<span key={index}>{text}</span>
+																))}
+													</div>
+												</td>
+											:	<td
+													key={`nestedCellMaster-${cellIndex}`}
+													className={`
 												${styles[cell.size]} 
 												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
 												${cell.value === 'N/A' ? styles.transparent : ''}
 											`}
-										>
-											{cell.isDate ? (
-												new Date(cell.value as string).toLocaleDateString()
-											) : cell.isLink ? (
-												<Link
-													href={cell.href}
-													onClick={(e) => {
-														e.stopPropagation();
-													}}
 												>
-													{cell.value}
-												</Link>
-											) : (
-												cell.value
-											)}
-										</td>
-									);
-								})}
-							</tr>
-							{selectedRow === row.rowId && (
-								<tr
-									className={`${styles['expanded-row']} ${
-										selectedRow === row.rowId ? styles.selected : ''
-									} ${styles.bodyRow}`}
-								>
-									<td colSpan={tableSize}>
-										<NestedTable
-											inModal={inModal}
-											tableData={nestedRowData}
-											tableType={tableType}
-										/>
-									</td>
+													{cell.isDate ?
+														new Date(cell.value as string).toLocaleDateString()
+													: cell.isLink ?
+														<Link
+															href={cell.href}
+															onClick={(e) => {
+																e.stopPropagation();
+															}}
+														>
+															{cell.value}
+														</Link>
+													:	cell.value}
+												</td>;
+									})}
 								</tr>
-							)}
-						</Fragment>
-					) : (
-						<tr
-							key={row.rowId}
-							className={`${styles.bodyRow} ${
-								row.rowStyling ? styles[row.rowStyling] : ''
-							}`}
-							onClick={() => handleClick(row.rowId)}
-						>
-							{row.cellData.map((cell: any, index: number) => {
-								const parsedContent =
-									cell.contentCell && parseEmailContent(cell.value);
+								{selectedRow === row.rowId && (
+									<tr
+										className={`${styles['expanded-row']} ${
+											selectedRow === row.rowId ? styles.selected : ''
+										} ${styles.bodyRow}`}
+									>
+										<td colSpan={tableSize}>
+											<NestedTable
+												inModal={inModal}
+												tableData={nestedRowData}
+												tableType={tableType}
+											/>
+										</td>
+									</tr>
+								)}
+							</Fragment>
+						:	<tr
+								key={row.rowId}
+								className={`${styles.bodyRow} ${
+									row.rowStyling ? styles[row.rowStyling] : ''
+								}`}
+								onClick={() => handleClick(row.rowId)}
+							>
+								{row.cellData.map((cell: any, index: number) => {
+									const parsedContent =
+										cell.contentCell && parseEmailContent(cell.value);
 
-								return cell.contentCell ? (
-									<td
-										key={index}
-										className={`
+									return cell.contentCell ?
+											<td
+												key={index}
+												className={`
 											${styles[cell.size]} 
 											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 											${styles['content-cell']}
 										`}
-									>
-										<div className={styles['parsed-content']}>
-											<span
-												className={`
+											>
+												<div className={styles['parsed-content']}>
+													<span
+														className={`
 													${styles['message-preview']} 
 													${
-														cell.subjectContentCell &&
-														row.rowStyling !== 'cancelled'
-															? styles.subject
-															: ''
+														(
+															cell.subjectContentCell &&
+															row.rowStyling !== 'cancelled'
+														) ?
+															styles.subject
+														:	''
 													}
 												`}
-											>
-												{parsedContent[0]}
-											</span>
-											{selectedRow === row.rowId &&
-												parsedContent.length > 1 &&
-												parsedContent
-													.slice(1)
-													.map((text: string, index: number) => (
-														<span key={index}>{text}</span>
-													))}
-										</div>
-									</td>
-								) : (
-									<td
-										key={index}
-										className={`
+													>
+														{parsedContent[0]}
+													</span>
+													{selectedRow === row.rowId &&
+														parsedContent.length > 1 &&
+														parsedContent
+															.slice(1)
+															.map((text: string, index: number) => (
+																<span key={index}>{text}</span>
+															))}
+												</div>
+											</td>
+										:	<td
+												key={index}
+												className={`
 											${styles[cell.size]} 
 											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 											${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
 											${cell.value === 'N/A' ? styles.transparent : ''}
 										`}
-									>
-										{cell.isDate ? (
-											new Date(cell.value as string).toLocaleDateString()
-										) : cell.isLink ? (
-											<Link
-												href={cell.href}
-												onClick={(e) => {
-													e.stopPropagation();
-												}}
 											>
-												{cell.value}
-											</Link>
-										) : (
-											cell.value
-										)}
-									</td>
-								);
-							})}
-						</tr>
-					);
+												{cell.isDate ?
+													new Date(cell.value as string).toLocaleDateString()
+												: cell.isLink ?
+													<Link
+														href={cell.href}
+														onClick={(e) => {
+															e.stopPropagation();
+														}}
+													>
+														{cell.value}
+													</Link>
+												:	cell.value}
+											</td>;
+								})}
+							</tr>;
 				})}
 			</tbody>
 		</table>

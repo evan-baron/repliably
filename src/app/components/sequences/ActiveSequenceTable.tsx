@@ -17,17 +17,18 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 		columnHeaders,
 		rowData: sequence.messages.map((message) => {
 			const messageStatus =
-				message.status === 'pending' ||
-				(message.status === 'scheduled' &&
-					message.needsApproval &&
-					!message.approved)
-					? 'Pending Approval'
-					: message.status[0].toUpperCase() + message.status.slice(1);
-			const sendDate = message.sentAt
-				? message.sentAt
-				: `Scheduled for ${new Date(
-						message.scheduledAt!
-				  ).toLocaleDateString()}`;
+				(
+					message.status === 'pending' ||
+					(message.status === 'scheduled' &&
+						message.needsApproval &&
+						!message.approved)
+				) ?
+					'Pending Approval'
+				:	message.status[0].toUpperCase() + message.status.slice(1);
+			const sendDate =
+				message.sentAt ?
+					message.sentAt
+				:	`Scheduled for ${new Date(message.scheduledAt!).toLocaleDateString()}`;
 
 			return {
 				rowId: message.id,
@@ -46,11 +47,9 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 						value: messageStatus,
 						size: columnHeaders[2].size,
 						cellStyling:
-							message.status === 'pending'
-								? 'pending'
-								: message.status === 'scheduled'
-								? 'scheduled'
-								: null,
+							message.status === 'pending' ? 'pending'
+							: message.status === 'scheduled' ? 'scheduled'
+							: null,
 					},
 					{
 						value: sendDate,
@@ -60,16 +59,20 @@ const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
 					},
 				],
 				rowStyling:
-					message.status === 'scheduled'
-						? 'scheduled'
-						: message.status === 'pending'
-						? 'pending'
-						: null,
+					message.status === 'scheduled' ? 'scheduled'
+					: message.status === 'pending' ? 'pending'
+					: null,
 			};
 		}),
 	};
 
-	return <MasterTable tableData={tableData} tableType='activeSequence' />;
+	return (
+		<MasterTable
+			tableData={tableData}
+			tableType='activeSequence'
+			tableSize={columnHeaders.length}
+		/>
+	);
 };
 
 export default ActiveSequenceTable;

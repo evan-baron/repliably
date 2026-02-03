@@ -14,7 +14,7 @@ import styles from './pendingMessagesTable.module.scss';
 import { Edit, SwapVert } from '@mui/icons-material';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helperFunctions';
+import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 
 // Types imports
 import { MessageWithContact } from '@/types/messageTypes';
@@ -93,12 +93,14 @@ const PendingMessagesTable = ({
 		if (selectedMessage && isEditing) {
 			updateMessage({
 				messageId: selectedMessage,
-				contents: editorContent
-					? editorContent.trim()
-					: messages.find((m) => m.id === selectedMessage)?.contents || '',
-				subject: subjectContent
-					? subjectContent.trim()
-					: messages.find((m) => m.id === selectedMessage)?.subject || '',
+				contents:
+					editorContent ?
+						editorContent.trim()
+					:	messages.find((m) => m.id === selectedMessage)?.contents || '',
+				subject:
+					subjectContent ?
+						subjectContent.trim()
+					:	messages.find((m) => m.id === selectedMessage)?.subject || '',
 			});
 			approveMessage(selectedMessage);
 		}
@@ -142,22 +144,24 @@ const PendingMessagesTable = ({
 				{sortedMessages.map((message) => {
 					const messageDateDay =
 						message.scheduledAt && new Date(message.scheduledAt);
-					const passedScheduledAt = messageDateDay
-						? new Date() >= messageDateDay
-						: false;
+					const passedScheduledAt =
+						messageDateDay ? new Date() >= messageDateDay : false;
 					const parsedContent = parseEmailContent(message.contents);
 					const emailContent = [`${message.subject}`, ...parsedContent];
 					const messageStatus =
-						message.status === 'pending' ||
-						(message.status === 'scheduled' &&
-							message.needsApproval &&
-							!message.approved)
-							? 'Pending Approval'
-							: 'Scheduled';
+						(
+							message.status === 'pending' ||
+							(message.status === 'scheduled' &&
+								message.needsApproval &&
+								!message.approved)
+						) ?
+							'Pending Approval'
+						:	'Scheduled';
 					const messageNeedsApproval = message.needsApproval;
-					const contactName = message.contact?.firstName
-						? message.contact.firstName + ' ' + message.contact?.lastName
-						: 'Unknown';
+					const contactName =
+						message.contact?.firstName ?
+							message.contact.firstName + ' ' + message.contact?.lastName
+						:	'Unknown';
 
 					return (
 						<tr
@@ -169,7 +173,7 @@ const PendingMessagesTable = ({
 						>
 							<td className={styles.md}>{contactName}</td>
 							<td className={`${styles.lrg} ${styles['content-cell']}`}>
-								{isEditing && selectedMessage === message.id ? (
+								{isEditing && selectedMessage === message.id ?
 									<div className={styles['rte-wrapper']}>
 										{/* Subject Field */}
 										<div className={styles['input-group']}>
@@ -195,17 +199,16 @@ const PendingMessagesTable = ({
 												className={styles.button}
 												onClick={handleSaveAndApprove}
 											>
-												{messageNeedsApproval
-													? 'Save and Approve'
-													: 'Save Changes'}
+												{messageNeedsApproval ?
+													'Save and Approve'
+												:	'Save Changes'}
 											</button>
 											<button className={styles.button} onClick={handleCancel}>
 												Cancel
 											</button>
 										</div>
 									</div>
-								) : (
-									<div className={styles['parsed-content']}>
+								:	<div className={styles['parsed-content']}>
 										<span className={styles['message-preview']}>
 											{emailContent[0]}
 										</span>
@@ -215,18 +218,19 @@ const PendingMessagesTable = ({
 												.slice(1)
 												.map((text, index) => <span key={index}>{text}</span>)}
 									</div>
-								)}
+								}
 							</td>
 							<td
 								className={`${styles.sm} ${
-									message.status === 'pending' ||
-									(message.status === 'scheduled' &&
-										message.needsApproval &&
-										!message.approved)
-										? styles.important
-										: message.status === 'scheduled'
-										? styles.approved
-										: ''
+									(
+										message.status === 'pending' ||
+										(message.status === 'scheduled' &&
+											message.needsApproval &&
+											!message.approved)
+									) ?
+										styles.important
+									: message.status === 'scheduled' ? styles.approved
+									: ''
 								}`}
 							>
 								{messageStatus}
@@ -243,13 +247,13 @@ const PendingMessagesTable = ({
 								className={styles.buttonBox}
 								style={{
 									verticalAlign:
-										isEditing || selectedMessage === message.id
-											? 'top'
-											: 'middle',
+										isEditing || selectedMessage === message.id ?
+											'top'
+										:	'middle',
 									paddingTop:
-										isEditing || selectedMessage === message.id
-											? '.25rem'
-											: '0',
+										isEditing || selectedMessage === message.id ?
+											'.25rem'
+										:	'0',
 								}}
 							>
 								<div className={styles.buttons}>

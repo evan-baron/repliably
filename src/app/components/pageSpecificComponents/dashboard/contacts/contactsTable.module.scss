@@ -59,6 +59,20 @@
 				background-color: var(--background-tertiary-med);
 			}
 
+			&.invalid {
+				position: relative;
+
+				animation: notification 1.5s ease-in-out infinite;
+
+				@media (hover: hover) {
+					&:hover {
+						background: var(--gradient-accent-light);
+						cursor: pointer;
+						animation: none;
+					}
+				}
+			}
+
 			@media (hover: hover) {
 				&:hover {
 					background: var(--gradient-primary-lighter);
@@ -83,6 +97,11 @@
 				&.right {
 					text-align: right;
 				}
+
+				&.invalid {
+					color: var(--accent-important);
+					font-weight: 600;
+				}
 			}
 		}
 	}
@@ -101,5 +120,17 @@
 	p {
 		font-size: 1rem;
 		color: var(--text-secondary);
+	}
+}
+
+@keyframes notification {
+	0% {
+		background-color: var(--background-tertiary);
+	}
+	50% {
+		background: #f5ecc9;
+	}
+	100% {
+		background-color: var(--background-tertiary);
 	}
 }

@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 
 // Helpers imports
-import { sequenceType } from '@/lib/helperFunctions';
+import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Types imports
 import { SequenceFromDB } from '@/types/sequenceTypes';
@@ -40,20 +40,20 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 			sequences.map((sequence) => {
 				const rowData = sequence.messages.map((message) => {
 					const messageStatus =
-						message.status === 'pending' ||
-						(message.status === 'scheduled' &&
-							message.needsApproval &&
-							!message.approved)
-							? 'Pending Approval'
-							: message.status[0].toUpperCase() + message.status.slice(1);
+						(
+							message.status === 'pending' ||
+							(message.status === 'scheduled' &&
+								message.needsApproval &&
+								!message.approved)
+						) ?
+							'Pending Approval'
+						:	message.status[0].toUpperCase() + message.status.slice(1);
 					const sendDate =
-						message.status === 'cancelled'
-							? 'N/A'
-							: message.sentAt
-							? new Date(message.sentAt).toLocaleDateString()
-							: `Scheduled for ${new Date(
-									message.scheduledAt!
-							  ).toLocaleDateString()}`;
+						message.status === 'cancelled' ? 'N/A'
+						: message.sentAt ? new Date(message.sentAt).toLocaleDateString()
+						: `Scheduled for ${new Date(
+								message.scheduledAt!
+							).toLocaleDateString()}`;
 
 					return {
 						rowId: message.id,
@@ -156,12 +156,14 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 				};
 			})
 			.sort((a, b) => {
-				const valA = a.cellData[4]?.value
-					? new Date(a.cellData[4].value as string).getTime()
-					: 0;
-				const valB = b.cellData[4]?.value
-					? new Date(b.cellData[4].value as string).getTime()
-					: 0;
+				const valA =
+					a.cellData[4]?.value ?
+						new Date(a.cellData[4].value as string).getTime()
+					:	0;
+				const valB =
+					b.cellData[4]?.value ?
+						new Date(b.cellData[4].value as string).getTime()
+					:	0;
 				return valB - valA;
 			}),
 	};

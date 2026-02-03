@@ -10,7 +10,7 @@ import styles from './tableStyles.module.scss';
 import { SwapVert } from '@mui/icons-material';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helperFunctions';
+import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 
 // Types imports
 import { MessageFromDB } from '@/types/messageTypes';
@@ -70,17 +70,20 @@ const MessagesTable = ({
 			</thead>
 			<tbody>
 				{sortedMessages.map((message) => {
-					const messageDateDay = message.sentAt
-						? new Date(message.sentAt)
-						: new Date(message.scheduledAt!);
+					const messageDateDay =
+						message.sentAt ?
+							new Date(message.sentAt)
+						:	new Date(message.scheduledAt!);
 					const parsedContent = parseEmailContent(message.contents);
 					const messageStatus =
-						message.status === 'pending' ||
-						(message.status === 'scheduled' &&
-							message.needsApproval &&
-							!message.approved)
-							? 'Pending Approval'
-							: message.status[0].toUpperCase() + message.status.slice(1);
+						(
+							message.status === 'pending' ||
+							(message.status === 'scheduled' &&
+								message.needsApproval &&
+								!message.approved)
+						) ?
+							'Pending Approval'
+						:	message.status[0].toUpperCase() + message.status.slice(1);
 
 					return (
 						<tr
@@ -89,11 +92,13 @@ const MessagesTable = ({
 							className={`${nested ? styles.nested : ''} ${
 								selectedMessage === message.id ? styles.selectedMessage : ''
 							} ${
-								message.status === 'scheduled' &&
-								message.needsApproval &&
-								!message.approved
-									? styles.pending
-									: styles[message.status]
+								(
+									message.status === 'scheduled' &&
+									message.needsApproval &&
+									!message.approved
+								) ?
+									styles.pending
+								:	styles[message.status]
 							} ${tab ? styles[tab] : ''}`}
 						>
 							<td className={`${styles.md} ${styles.subject}`}>
@@ -120,11 +125,11 @@ const MessagesTable = ({
 							</td>
 
 							<td className={`${styles.sm} ${styles.right} ${styles.date}`}>
-								{message.status === 'sent'
-									? messageDateDay.toLocaleDateString()
-									: message.status !== 'cancelled'
-									? `Scheduled for ${messageDateDay.toLocaleDateString()}`
-									: ' N/A'}
+								{message.status === 'sent' ?
+									messageDateDay.toLocaleDateString()
+								: message.status !== 'cancelled' ?
+									`Scheduled for ${messageDateDay.toLocaleDateString()}`
+								:	' N/A'}
 							</td>
 						</tr>
 					);

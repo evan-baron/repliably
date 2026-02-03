@@ -1,6 +1,6 @@
 import { sendGmail } from '@/lib/gmail';
 import { prisma } from '@/lib/prisma';
-import { parseSequenceData } from '@/lib/helperFunctions';
+import { parseSequenceData } from '@/lib/helpers/sequenceHelpers';
 
 export async function runSendScheduledMessages({ limit }: { limit: number }) {
 	const limitValue = limit || 50;
@@ -147,9 +147,8 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 						data: {
 							updatedAt: new Date(),
 							nextStepDue: endOfSequence ? null : nextStepDueDate,
-							currentStep: endOfSequence
-								? sequence.currentStep
-								: newCurrentStep,
+							currentStep:
+								endOfSequence ? sequence.currentStep : newCurrentStep,
 							active: endOfSequence ? false : true,
 						},
 					}),

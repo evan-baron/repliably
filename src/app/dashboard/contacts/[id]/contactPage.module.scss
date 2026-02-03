@@ -45,6 +45,22 @@
 			align-items: center;
 			font-size: 1.25rem;
 
+			&.invalid {
+				font-weight: 600;
+
+				animation: notification 1.5s ease-in-out infinite;
+
+				@keyframes notification {
+					0%,
+					100% {
+						color: var(--text-secondary);
+					}
+					50% {
+						color: var(--accent-important);
+					}
+				}
+			}
+
 			.label,
 			.value {
 				line-height: 0;
@@ -52,11 +68,16 @@
 				align-items: center;
 			}
 
-			.icon {
+			.icon,
+			.verifiedIcon {
 				font-size: 1.5rem;
 				aspect-ratio: 1;
 				margin: 0;
 				padding: 0;
+			}
+
+			.verifiedIcon {
+				font-size: 1.75rem;
 			}
 		}
 

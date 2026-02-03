@@ -1,5 +1,5 @@
 // Helper functions imports
-import { sequenceType } from '@/lib/helperFunctions';
+import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Styles imports
 import styles from './activeSequence.module.scss';
@@ -13,12 +13,12 @@ import ActiveSequenceTable from './ActiveSequenceTable';
 
 const ActiveSequence = ({ sequence }: { sequence: SequenceFromDB }) => {
 	const startDate = new Date(sequence.createdAt).toLocaleDateString();
-	const endDate = sequence.endDate
-		? new Date(sequence.endDate).toLocaleDateString()
-		: null;
-	const nextStepDue = sequence.nextStepDue
-		? new Date(sequence.nextStepDue).toLocaleDateString()
-		: 'N/A';
+	const endDate =
+		sequence.endDate ? new Date(sequence.endDate).toLocaleDateString() : null;
+	const nextStepDue =
+		sequence.nextStepDue ?
+			new Date(sequence.nextStepDue).toLocaleDateString()
+		:	'N/A';
 
 	return (
 		<div className={styles['active-sequence-table']}>

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import styles from './masterTable.module.scss';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helperFunctions';
+import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 
 // Components imports
 import TableHeader from './TableHeader';
@@ -115,45 +115,45 @@ const NestedTable = ({
 								const parsedContent =
 									cell.contentCell && parseEmailContent(cell.value);
 
-								return cell.contentCell ? (
-									<td
-										key={`nestedCellNested-${cellIndex}`}
-										className={`${styles[cell.size]} ${
-											cell.cellStyling ? styles[cell.cellStyling] : ''
-										} ${styles['content-cell']}`}
-									>
-										<div className={styles['parsed-content']}>
-											<span
-												className={`${styles['message-preview']} ${
-													cell.subjectContentCell &&
-													row.rowStyling !== 'cancelled'
-														? styles.subject
-														: ''
-												}`}
-											>
-												{parsedContent[0]}
-											</span>
-											{selectedRow === row.rowId &&
-												parsedContent.length > 1 &&
-												parsedContent
-													.slice(1)
-													.map((text: string, index: number) => (
-														<span key={index}>{text}</span>
-													))}
-										</div>
-									</td>
-								) : (
-									<td
-										key={`nestedCellNested-${cellIndex}`}
-										className={`${styles[cell.size]} ${
-											cell.cellStyling ? styles[cell.cellStyling] : ''
-										} ${
-											cell.cellOrientation ? styles[cell.cellOrientation] : ''
-										}`}
-									>
-										{cell.value}
-									</td>
-								);
+								return cell.contentCell ?
+										<td
+											key={`nestedCellNested-${cellIndex}`}
+											className={`${styles[cell.size]} ${
+												cell.cellStyling ? styles[cell.cellStyling] : ''
+											} ${styles['content-cell']}`}
+										>
+											<div className={styles['parsed-content']}>
+												<span
+													className={`${styles['message-preview']} ${
+														(
+															cell.subjectContentCell &&
+															row.rowStyling !== 'cancelled'
+														) ?
+															styles.subject
+														:	''
+													}`}
+												>
+													{parsedContent[0]}
+												</span>
+												{selectedRow === row.rowId &&
+													parsedContent.length > 1 &&
+													parsedContent
+														.slice(1)
+														.map((text: string, index: number) => (
+															<span key={index}>{text}</span>
+														))}
+											</div>
+										</td>
+									:	<td
+											key={`nestedCellNested-${cellIndex}`}
+											className={`${styles[cell.size]} ${
+												cell.cellStyling ? styles[cell.cellStyling] : ''
+											} ${
+												cell.cellOrientation ? styles[cell.cellOrientation] : ''
+											}`}
+										>
+											{cell.value}
+										</td>;
 							})}
 						</tr>
 					);

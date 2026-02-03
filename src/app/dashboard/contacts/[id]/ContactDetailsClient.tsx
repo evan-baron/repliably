@@ -153,34 +153,34 @@ export default function ContactDetailsClient({
 									<div className={styles['info-row']}>
 										<span>Priority:</span>
 										<span style={{ fontWeight: '600' }}>
-											{contact?.importance
-												? importance[contact.importance]
-												: 'N/A'}
+											{contact?.importance ?
+												importance[contact.importance]
+											:	'N/A'}
 										</span>
 									</div>
 								)}
 							</div>
 						)}
 						<div className={styles['personal-info']}>
-							<div className={styles['info-row']}>
+							<div
+								className={`${styles['info-row']} ${contact?.validEmail === false ? styles.invalid : ''}`}
+							>
 								<span className={styles.label}>
 									<MailOutline className={styles.icon} />
 								</span>
 								<span className={styles.value}>{contact?.email || 'N/A'}</span>
 								{contact.validEmail !== null &&
-									(contact.validEmail ? (
+									(contact.validEmail ?
 										<Check
-											className={styles.icon}
-											style={{ color: 'hsl(120, 100%, 40%)' }}
+											className={styles.verifiedIcon}
+											style={{ color: '#6ee7b7' }}
 											titleAccess='Email Valid'
 										/>
-									) : (
-										<Close
-											className={styles.icon}
-											style={{ color: 'hsl(0, 100%, 40%)' }}
+									:	<Close
+											className={styles.verifiedIcon}
+											style={{ color: '#f59e0b' }}
 											titleAccess='Invalid Email'
-										/>
-									))}
+										/>)}
 							</div>
 							{contact.phone && (
 								<div className={styles['info-row']}>

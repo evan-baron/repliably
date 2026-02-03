@@ -14,7 +14,7 @@ import { MessagesWithActiveSequence } from '@/types/messageTypes';
 import AllActivities from './AllActivities';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helperFunctions';
+import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 
 const AllActivitiesTable = ({
 	messages,
@@ -31,9 +31,9 @@ const AllActivitiesTable = ({
 	const sortedMessages = messages.sort((a, b) => {
 		const dateA = new Date(a.createdAt);
 		const dateB = new Date(b.createdAt);
-		return sortOrder === 'asc'
-			? dateA.getTime() - dateB.getTime()
-			: dateB.getTime() - dateA.getTime();
+		return sortOrder === 'asc' ?
+				dateA.getTime() - dateB.getTime()
+			:	dateB.getTime() - dateA.getTime();
 	});
 
 	const handleClick = (index: number) => {
@@ -90,44 +90,49 @@ const AllActivitiesTable = ({
 									className={`${
 										selectedActivity === index ? styles.selected : ''
 									} ${
-										message.status === 'scheduled' &&
-										message.needsApproval &&
-										!message.approved
-											? styles.pending
-											: styles[message.status]
+										(
+											message.status === 'scheduled' &&
+											message.needsApproval &&
+											!message.approved
+										) ?
+											styles.pending
+										:	styles[message.status]
 									} ${styles.all}`}
 									onClick={() => {
 										handleClick(index);
 									}}
 								>
 									<td className={`${styles.sm} ${styles.type}`}>
-										{message.sequenceId
-											? 'Sequence Email'
-											: 'Stand-alone Email'}
+										{message.sequenceId ?
+											'Sequence Email'
+										:	'Stand-alone Email'}
 									</td>
 
 									<td className={`${styles.sm} ${styles.status}`}>
-										{message.sequenceId ? (
+										{message.sequenceId ?
 											<span
 												className={
-													message.status === 'scheduled' &&
-													message.needsApproval &&
-													!message.approved
-														? styles.pending
-														: styles[message.status]
+													(
+														message.status === 'scheduled' &&
+														message.needsApproval &&
+														!message.approved
+													) ?
+														styles.pending
+													:	styles[message.status]
 												}
 											>
-												{message.status === 'pending' ||
-												(message.status === 'scheduled' &&
-													message.needsApproval &&
-													!message.approved)
-													? 'Pending Approval'
-													: message.status[0].toUpperCase() +
-													  message.status.slice(1)}
+												{(
+													message.status === 'pending' ||
+													(message.status === 'scheduled' &&
+														message.needsApproval &&
+														!message.approved)
+												) ?
+													'Pending Approval'
+												:	message.status[0].toUpperCase() +
+													message.status.slice(1)
+												}
 											</span>
-										) : (
-											<span className={styles.na}>N/A</span>
-										)}
+										:	<span className={styles.na}>N/A</span>}
 									</td>
 
 									<td
@@ -137,11 +142,11 @@ const AllActivitiesTable = ({
 											<div className={styles.subject}>
 												{message.sequenceId ? message.subject : message.subject}
 											</div>
-											{selectedActivity === index
-												? parsedContent.map((text, index) => (
-														<span key={index}>{text}</span>
-												  ))
-												: null}
+											{selectedActivity === index ?
+												parsedContent.map((text, index) => (
+													<span key={index}>{text}</span>
+												))
+											:	null}
 										</div>
 									</td>
 
@@ -154,15 +159,11 @@ const AllActivitiesTable = ({
 											styles.replied
 										} ${message.status !== 'sent' ? styles.na : ''}`}
 									>
-										{message.status === 'sent' ? (
-											message.hasReply ? (
+										{message.status === 'sent' ?
+											message.hasReply ?
 												'Yes'
-											) : (
-												'No'
-											)
-										) : (
-											<span className={styles.na}>N/A</span>
-										)}
+											:	'No'
+										:	<span className={styles.na}>N/A</span>}
 									</td>
 								</tr>
 								{/* {selectedActivity === index ? (
