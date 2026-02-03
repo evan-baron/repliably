@@ -86,30 +86,6 @@ export default function ContactDetailsClient({
 		}
 	}, []);
 
-	// watch queries and clear loading when they finish
-	// useEffect(() => {
-	// 	const isLoading =
-	// 		contactQuery.isLoading ||
-	// 		contactQuery.isFetching ||
-	// 		sequencesQuery.isLoading ||
-	// 		sequencesQuery.isFetching ||
-	// 		allMessagesQuery.isLoading ||
-	// 		allMessagesQuery.isFetching;
-
-	// 	setLoading(isLoading);
-	// 	setLoadingMessage(isLoading ? 'Loading' : null);
-	// }, [
-	// 	contactQuery.isLoading,
-	// 	contactQuery.isFetching,
-	// 	sequencesQuery.isLoading,
-	// 	sequencesQuery.isFetching,
-	// 	allMessagesQuery.isLoading,
-	// 	allMessagesQuery.isFetching,
-	// 	setLoading,
-	// 	setLoadingMessage,
-	// 	queryClient,
-	// ]);
-
 	const { data } = contactQuery;
 	const contact = data || initialContact;
 	const { data: sequencesData } = sequencesQuery;

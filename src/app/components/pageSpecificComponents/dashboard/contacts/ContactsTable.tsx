@@ -25,6 +25,7 @@ const ContactsTable = ({
 	contacts: ContactFromDB[];
 	onRowClick?: (contactId: number) => void;
 	columns: {
+		active: boolean;
 		reasonForEmail: boolean;
 		importance: boolean;
 		lastActivity: boolean;
@@ -35,6 +36,7 @@ const ContactsTable = ({
 }) => {
 	const { setSelectedContact } = useAppContext();
 	type SortableContactColumn =
+		| 'active'
 		| 'firstName'
 		| 'lastName'
 		| 'company'
@@ -81,6 +83,14 @@ const ContactsTable = ({
 		>
 			<thead>
 				<tr>
+					{columns.active && (
+						<th className={styles.sm} onClick={() => handleSort('active')}>
+							<span className={styles.sort}>
+								Active
+								<SwapVert fontSize='small' />
+							</span>
+						</th>
+					)}
 					<th className={styles.sm} onClick={() => handleSort('firstName')}>
 						<span className={styles.sort}>
 							First
@@ -139,6 +149,9 @@ const ContactsTable = ({
 							key={contact.id ?? contact.email}
 							onClick={() => handleClick(contact)}
 						>
+							{columns.active && (
+								<td className={styles.sm}>{contact.active ? 'Yes' : 'No'}</td>
+							)}
 							<td className={styles.sm}>
 								{contact.firstName ? contact.firstName : '-'}
 							</td>

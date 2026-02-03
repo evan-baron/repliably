@@ -80,6 +80,10 @@ export const sequenceAPI = {
 		apiCall(`/api/sequences/${sequenceId}`, {
 			method: 'PUT',
 		}),
+	deactivateAll: () =>
+		apiCall('/api/sequences/deactivate-all', {
+			method: 'PUT',
+		}),
 };
 
 // Messages API functions

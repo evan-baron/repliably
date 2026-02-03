@@ -72,8 +72,11 @@
 		transform-origin: right center;
 
 		&.notification {
-			background: hsla(0, 92%, 61%, 0.25);
-			border-left-color: hsla(0, 92%, 61%, 0.5);
+			background: var(--gradient-danger-accessible) padding-box,
+				var(--gradient-danger) border-box;
+			border-left-color: var(--accent-important);
+			// background: hsla(0, 92%, 61%, 0.25);
+			// border-left-color: hsla(0, 92%, 61%, 0.5);
 			color: var(--accent-important);
 			animation: none;
 		}

@@ -13,8 +13,6 @@ import styles from './contactPage.module.scss';
 // Components imports
 import NewEmailForm from '@/app/components/forms/newEmail/NewEmailForm';
 import ActiveSequence from '@/app/components/sequences/ActiveSequence';
-import PreviousSequencesTable from '@/app/components/sequences/DEPRECATED PreviousSequencesTable';
-import AllActivitiesTable from '@/app/components/sequences/DEPRECATED AllActivitiesTable';
 import PreviousSequences from '@/app/components/sequences/PreviousSequences';
 import AllActivities from '@/app/components/sequences/AllActivities';
 

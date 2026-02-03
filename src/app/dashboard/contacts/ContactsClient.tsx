@@ -58,6 +58,7 @@ export default function ContactsClient({
 					contacts={contacts}
 					onRowClick={(contactId) => handleRowClick(contactId)}
 					columns={{
+						active: true,
 						reasonForEmail: true,
 						importance: true,
 						lastActivity: true,

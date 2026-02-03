@@ -2,6 +2,7 @@
 
 // Library imports
 import { useState, Fragment } from 'react';
+import Link from 'next/link';
 
 // Styles imports
 import styles from './masterTable.module.scss';
@@ -20,6 +21,7 @@ const MasterTable = ({
 	inModal,
 	tableData,
 	tableType,
+	tableSize,
 }: {
 	inModal?: boolean;
 	tableData: MasterTableData;
@@ -30,6 +32,7 @@ const MasterTable = ({
 		| 'allActivities'
 		| 'replies'
 		| 'pendingEmails';
+	tableSize: number;
 }) => {
 	const [sortType, setSortType] = useState<string | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -146,11 +149,23 @@ const MasterTable = ({
 												${styles[cell.size]} 
 												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
+												${cell.value === 'N/A' ? styles.transparent : ''}
 											`}
 										>
-											{cell.isDate
-												? new Date(cell.value as string).toLocaleDateString()
-												: cell.value}
+											{cell.isDate ? (
+												new Date(cell.value as string).toLocaleDateString()
+											) : cell.isLink ? (
+												<Link
+													href={cell.href}
+													onClick={(e) => {
+														e.stopPropagation();
+													}}
+												>
+													{cell.value}
+												</Link>
+											) : (
+												cell.value
+											)}
 										</td>
 									);
 								})}
@@ -161,7 +176,7 @@ const MasterTable = ({
 										selectedRow === row.rowId ? styles.selected : ''
 									} ${styles.bodyRow}`}
 								>
-									<td colSpan={6}>
+									<td colSpan={tableSize}>
 										<NestedTable
 											inModal={inModal}
 											tableData={nestedRowData}
@@ -222,11 +237,23 @@ const MasterTable = ({
 											${styles[cell.size]} 
 											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
 											${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
+											${cell.value === 'N/A' ? styles.transparent : ''}
 										`}
 									>
-										{cell.isDate
-											? new Date(cell.value as string).toLocaleDateString()
-											: cell.value}
+										{cell.isDate ? (
+											new Date(cell.value as string).toLocaleDateString()
+										) : cell.isLink ? (
+											<Link
+												href={cell.href}
+												onClick={(e) => {
+													e.stopPropagation();
+												}}
+											>
+												{cell.value}
+											</Link>
+										) : (
+											cell.value
+										)}
 									</td>
 								);
 							})}

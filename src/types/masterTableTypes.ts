@@ -30,6 +30,7 @@ type CellData = {
 	subjectContentCell?: boolean;
 	isDate?: boolean;
 	isLink?: boolean;
+	href?: string;
 };
 
 type NestedData = {

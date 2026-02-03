@@ -15,27 +15,17 @@ import {
 // Components
 import MasterTable from '../masterTable/MasterTable';
 
-const PreviousSequences = ({
-	sequences,
-	contact,
-}: // previousActivities,
-{
-	sequences: SequenceFromDB[];
-	contact?: boolean;
-	// previousActivities: PreviousActivity[];
-}) => {
+const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 	const columnHeaders = [
-		{ label: 'Sequence Name', size: 'lrg' },
+		{ label: 'Contact', size: 'sm', sortable: true },
+		{ label: 'Sequence Name', size: 'md' },
 		{ label: 'Sequence Type', size: 'sm' },
 		{ label: 'Duration (Days)', size: 'sm' },
 		{ label: 'Messages Sent', size: 'sm' },
-		{ label: 'Completion Date', size: 'sm', sortable: true },
+		{ label: 'Start Date', size: 'sm', sortable: true },
+		{ label: 'End Date', size: 'sm', sortable: true },
 		{ label: 'Replied', size: 'sm', sortable: true },
 	];
-
-	const contactColumnHeaders = contact
-		? [{ label: 'Contact', size: 'sm', sortable: true }, ...columnHeaders]
-		: [];
 
 	const nestedMessagesHeaders = [
 		{ label: 'Subject', size: 'md' },
@@ -96,7 +86,7 @@ const PreviousSequences = ({
 	}, [sequences, nestedMessagesHeaders]);
 
 	const tableData: MasterTableData = {
-		columnHeaders: contact ? contactColumnHeaders : columnHeaders,
+		columnHeaders: columnHeaders,
 		rowData: sequences
 			.map((sequence) => {
 				const sequenceCompletionDate = new Date(sequence.endDate!);
@@ -111,10 +101,15 @@ const PreviousSequences = ({
 
 				const cellData = [
 					{
+						value: sequence.contact.firstName + ' ' + sequence.contact.lastName,
+						size: columnHeaders[0].size,
+						cellStyling: 'link' as CellStyling,
+						isLink: true,
+						href: `/dashboard/contacts/${sequence.contact.id}`,
+					},
+					{
 						value: sequence.title,
-						size: contact
-							? contactColumnHeaders[1].size
-							: columnHeaders[0].size,
+						size: columnHeaders[1].size,
 						cellStyling: 'bold' as CellStyling,
 					},
 					{
@@ -122,59 +117,41 @@ const PreviousSequences = ({
 							sequence.sequenceType,
 							new Date(sequence.createdAt)
 						),
-						size: contact
-							? contactColumnHeaders[2].size
-							: columnHeaders[1].size,
+						size: columnHeaders[2].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
 						value: sequenceDuration,
-						size: contact
-							? contactColumnHeaders[3].size
-							: columnHeaders[2].size,
+						size: columnHeaders[3].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
 						value: messagesSent,
-						size: contact
-							? contactColumnHeaders[4].size
-							: columnHeaders[3].size,
+						size: columnHeaders[4].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 					{
-						value: sequence.endDate ? sequence.endDate : '',
-						size: contact
-							? contactColumnHeaders[5].size
-							: columnHeaders[4].size,
+						value: sequence.createdAt ? sequence.createdAt : '',
+						size: columnHeaders[5].size,
+						cellOrientation: 'right' as CellOrientation,
+						isDate: true,
+					},
+					{
+						value: sequence.endDate ? sequence.endDate : 'N/A',
+						size: columnHeaders[6].size,
 						cellOrientation: 'right' as CellOrientation,
 						isDate: true,
 					},
 					{
 						value: sequence.emailReplies.length > 0 ? 'Yes' : 'No',
-						size: contact
-							? contactColumnHeaders[6].size
-							: columnHeaders[5].size,
+						size: columnHeaders[7].size,
 						cellOrientation: 'right' as CellOrientation,
 					},
 				];
 
-				const contactCellData = contact
-					? [
-							{
-								value:
-									sequence.contact.firstName + ' ' + sequence.contact.lastName,
-								size: contactColumnHeaders[0].size,
-								cellStyling: 'link' as CellStyling,
-								isLink: true,
-								href: `/dashboard/contacts/${sequence.contact.id}`,
-							},
-							...cellData,
-					  ]
-					: [];
-
 				return {
 					rowId: sequence.id,
-					cellData: contact ? contactCellData : cellData,
+					cellData: cellData,
 					nestedData: { value: nestedTablesById.get(sequence.id) ?? null },
 				};
 			})
@@ -189,8 +166,6 @@ const PreviousSequences = ({
 			}),
 	};
 
-	console.log(tableData);
-
 	return (
 		<MasterTable
 			tableData={tableData}
@@ -200,4 +175,4 @@ const PreviousSequences = ({
 	);
 };
 
-export default PreviousSequences;
+export default ActiveSequences;

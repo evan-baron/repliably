@@ -1,7 +1,7 @@
 'use client';
 
 // Library imports
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
@@ -17,7 +17,7 @@ import RepliesTable from '@/app/components/pageSpecificComponents/replies/Replie
 // Context imports
 
 // Types imports
-import { RepliesFromDB, RepliesResponse } from '@/types/repliesTypes';
+import { RepliesFromDB } from '@/types/repliesTypes';
 
 const RepliesClient = ({
 	initialReplies,
