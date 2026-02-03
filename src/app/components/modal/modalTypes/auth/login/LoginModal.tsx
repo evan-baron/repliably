@@ -131,7 +131,7 @@ export default function LoginModal() {
 					Continue with Google
 				</button>
 
-				<button
+				{/* <button
 					type='button'
 					onClick={() => handleSocialLogin('apple')}
 					className={`${styles.socialLoginBtn} ${styles.apple}`}
@@ -143,9 +143,9 @@ export default function LoginModal() {
 						/>
 					</svg>
 					Continue with Apple
-				</button>
+				</button> */}
 
-				<button
+				{/* <button
 					type='button'
 					onClick={() => handleSocialLogin('microsoft')}
 					className={`${styles.socialLoginBtn} ${styles.microsoft}`}
@@ -157,7 +157,7 @@ export default function LoginModal() {
 						<path fill='#ffb900' d='M13 13h10v10H13z' />
 					</svg>
 					Continue with Microsoft
-				</button>
+				</button> */}
 			</div>
 
 			<div className={styles.authFooter}>
