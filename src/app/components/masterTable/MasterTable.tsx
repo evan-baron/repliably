@@ -54,6 +54,8 @@ const MasterTable = ({
 		}
 	};
 
+	const parsedTableType = parseTableType(tableType);
+
 	const handleSort = (type: string) => {
 		if (sortType === type) {
 			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -88,7 +90,7 @@ const MasterTable = ({
 	if (!tableData.rowData.length)
 		return (
 			<div className={styles.activity}>
-				<p>No {parseTableType(tableType)} found</p>
+				<p>No {parsedTableType} found</p>
 			</div>
 		);
 

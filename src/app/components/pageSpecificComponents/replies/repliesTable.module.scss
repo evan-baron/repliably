@@ -1,5 +1,4 @@
-.master-table,
-.nested-table {
+.table {
 	width: 100%;
 	border-collapse: separate;
 	overflow: hidden;
@@ -18,7 +17,7 @@
 	}
 
 	.tableHeader {
-		.headerRow {
+		tr {
 			background: var(--gradient-primary-light);
 
 			th {
@@ -44,16 +43,19 @@
 		}
 	}
 
-	.tableBody {
-		.bodyRow {
+	tbody {
+		tr {
 			line-height: 1.25;
 
 			&:nth-child(odd) {
 				background-color: var(--background-tertiary);
 			}
-
 			&:nth-child(even) {
 				background-color: var(--background-tertiary-med);
+			}
+
+			&.unread {
+				font-weight: 600;
 			}
 
 			@media (hover: hover) {
@@ -61,19 +63,6 @@
 					background: var(--gradient-primary-lighter);
 					cursor: pointer;
 				}
-			}
-
-			&.scheduled {
-				font-style: italic;
-			}
-
-			&.cancelled {
-				font-style: italic;
-				opacity: 0.75;
-			}
-
-			&.selected {
-				background: var(--gradient-primary-lighter);
 			}
 
 			td {
@@ -107,100 +96,13 @@
 							white-space: nowrap;
 							overflow: hidden;
 							text-overflow: ellipsis;
-
-							&.subject {
-								font-weight: 600;
-							}
 						}
 					}
 				}
 
-				&.bold {
+				.link {
 					font-weight: 600;
-				}
-
-				&.italic {
-					font-style: italic;
-				}
-
-				&.pending {
-					font-weight: 600;
-					color: var(--accent-important);
-				}
-
-				&.scheduled {
-					font-weight: 600;
-					color: var(--color-primary);
-				}
-
-				&.transparent {
-					opacity: 0.75;
-					font-style: italic;
-				}
-
-				&.link {
-					color: var(--color-primary);
-					font-weight: 600;
-					font-style: italic;
 					text-decoration: underline;
-				}
-			}
-
-			// &.unread {
-			// 	font-weight: 600;
-			// }
-
-			// &.replies {
-			// 	.subject {
-			// 		font-weight: 600;
-			// 	}
-			// }
-
-			// &.expanded-row {
-			// 	background: var(--gradient-primary-lighter);
-			// }
-
-			// &.selected {
-			// 	background: var(--gradient-primary-lighter);
-			// }
-
-			// &.selectedMessage {
-			// 	background: var(--background-tertiary) !important;
-			// }
-
-			&.nested {
-				&.selected {
-					background: var(--gradient-greyscale-lighter);
-				}
-
-				&.expanded-row {
-					background: var(--gradient-greyscale-lighter);
-				}
-
-				@media (hover: hover) {
-					&:hover {
-						background: var(--gradient-greyscale-lighter);
-						cursor: pointer;
-					}
-				}
-			}
-		}
-	}
-}
-
-.nested-table {
-	.tableHeader {
-		.headerRow {
-			background: var(--gradient-greyscale) !important;
-		}
-	}
-
-	.tableBody {
-		.bodyRow {
-			@media (hover: hover) {
-				&:hover {
-					background: var(--gradient-greyscale-lighter);
-					cursor: pointer;
 				}
 			}
 		}

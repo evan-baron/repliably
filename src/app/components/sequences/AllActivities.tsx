@@ -20,7 +20,7 @@ const AllActivities = ({
 	const columnHeaders = [
 		{ label: 'Type', size: 'sm' },
 		{ label: 'Status', size: 'sm' },
-		{ label: 'Subject', size: 'lrg' },
+		{ label: 'Email', size: 'lrg' },
 		{ label: 'Send Date', size: 'sm', sortable: true },
 		{ label: 'Replied', size: 'sm' },
 	];

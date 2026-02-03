@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useReplyUpdate } from '@/hooks/useReplies';
 
 // Styles imports
-import styles from '../../sequences/tableStyles.module.scss';
+import styles from './repliesTable.module.scss';
 
 // MUI imports
 import { SwapVert } from '@mui/icons-material';
@@ -60,7 +60,7 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 	const sortedReplies = [...replies].sort((a, b) => {
 		const dateA = new Date(a.createdAt).getTime();
 		const dateB = new Date(b.createdAt).getTime();
-		return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+		return sortOrder === 'desc' ? dateA - dateB : dateB - dateA;
 	});
 
 	if (replies && !replies.length) {
@@ -75,10 +75,8 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 		<table className={styles.table}>
 			<thead className={styles.tableHeader}>
 				<tr>
-					<th className={styles.sm}>Name</th>
-					<th className={styles.md}>Subject</th>
-					<th className={styles.lrg}>Content</th>
-					<th className={styles.sm}>Status</th>
+					<th className={styles.sm}>Contact Name</th>
+					<th className={styles.lrg}>Message</th>
 					<th className={styles.sm} onClick={() => handleSort()}>
 						<span className={styles.sort}>
 							Reply Date
@@ -94,8 +92,8 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 				{sortedReplies.map((reply) => {
 					const replyDateDay = new Date(reply.createdAt);
 					const parsedContent = parseReplyContent(reply.replyContent);
-					const replyStatus =
-						reply.processed || clickedReplies.has(reply.id) ? 'Read' : 'Unread';
+					const message = [`${reply.replySubject}`, ...parsedContent];
+
 					const contactName = reply.contact?.firstName
 						? reply.contact.firstName + ' ' + reply.contact?.lastName
 						: 'Unknown';
@@ -104,35 +102,30 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 						<tr
 							key={reply.id}
 							onClick={() => handleClick(reply.id)}
-							className={`${
-								selectedReply === reply.id ? styles.selectedMessage : ''
-							} ${
-								!reply.processed && !clickedReplies.has(reply.id)
-									? styles.unread
-									: ''
-							} ${styles.replies}`}
+							className={`
+								${selectedReply === reply.id ? styles.selectedMessage : ''} 
+								${!reply.processed && !clickedReplies.has(reply.id) ? styles.unread : ''} 
+								${styles.replies}
+							`}
 						>
 							<td className={`${styles.sm} ${styles.name}`}>{contactName}</td>
-							<td className={`${styles.md} ${styles.subject}`}>
-								{reply.replySubject}
-							</td>
 
 							<td
-								className={`${styles.lrg} ${styles['content-cell']} ${styles.content}`}
+								className={`
+									${styles.lrg} 
+									${styles['content-cell']} 
+									${styles.content}
+								`}
 							>
 								<div className={styles['parsed-content']}>
-									<span className={styles['message-preview']}>
-										{parsedContent[0]}
-									</span>
+									<span className={styles.subject}>{message[0]}</span>
 									{selectedReply === reply.id &&
-										parsedContent.length > 1 &&
-										parsedContent
+										message.length > 1 &&
+										message
 											.slice(1)
 											.map((text, index) => <span key={index}>{text}</span>)}
 								</div>
 							</td>
-
-							<td className={`${styles.sm} ${styles.status}`}>{replyStatus}</td>
 
 							<td className={`${styles.sm} ${styles.right} ${styles.date}`}>
 								{replyDateDay.toLocaleDateString()}

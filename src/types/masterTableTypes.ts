@@ -26,8 +26,10 @@ type CellData = {
 	cellStyling?: CellStyling;
 	cellOrientation?: CellOrientation;
 	contentCell?: boolean;
+	isReplyContent?: boolean;
 	subjectContentCell?: boolean;
 	isDate?: boolean;
+	isLink?: boolean;
 };
 
 type NestedData = {
