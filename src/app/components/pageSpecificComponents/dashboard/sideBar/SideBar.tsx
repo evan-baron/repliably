@@ -59,12 +59,12 @@ export default function SideBar({
 		// { href: '/dashboard/in-progress', label: 'In Progress' },
 		{
 			href: '/dashboard/templates',
-			label: 'Templates',
+			label: 'Templates (Coming Soon)',
 			icon: <ContentCopyRounded className={styles.icon} />,
 		},
 		{
 			href: '/dashboard/analytics',
-			label: 'Analytics',
+			label: 'Analytics (Coming Soon)',
 			icon: <TimelineRounded className={styles.icon} />,
 		},
 		{
