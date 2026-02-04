@@ -3,6 +3,7 @@ import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
+import { getErrorMessage, isAppError } from '@/lib/errors';
 
 export async function GET(_req: NextRequest) {
 	try {
@@ -22,12 +23,13 @@ export async function GET(_req: NextRequest) {
 
 		// 4. Return contacts
 		return NextResponse.json({ contacts });
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Error fetching contacts:', error);
-		const message = error instanceof Error ? error.message : 'Failed to fetch contacts';
+		const message = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
 		return NextResponse.json(
 			{ error: message },
-			{ status: 500 }
+			{ status: statusCode }
 		);
 	}
 }
@@ -195,12 +197,13 @@ export async function POST(req: NextRequest) {
 			},
 			{ headers: rateLimit.headers }
 		);
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Contact creation error:', error);
-		const message = error instanceof Error ? error.message : 'Failed to create contact';
+		const message = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
 		return NextResponse.json(
 			{ error: message },
-			{ status: 500 }
+			{ status: statusCode }
 		);
 	}
 }

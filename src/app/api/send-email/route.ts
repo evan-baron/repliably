@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { deactivateSequence } from '@/services/sequenceService';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
+import { getErrorMessage, isAppError } from '@/lib/errors';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -185,9 +186,10 @@ export async function POST(req: NextRequest) {
 		}
 
 		return await sendAndStoreEmail();
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Email send error:', error);
-		const message = error instanceof Error ? error.message : 'Unknown error';
-		return NextResponse.json({ error: message }, { status: 500 });
+		const message = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
+		return NextResponse.json({ error: message }, { status: statusCode });
 	}
 }

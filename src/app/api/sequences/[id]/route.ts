@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { auditUserAction, AUDIT_ACTIONS } from '@/lib/audit';
+import { getErrorMessage, isAppError } from '@/lib/errors';
 
 export async function GET(
 	request: NextRequest,
@@ -31,12 +32,13 @@ export async function GET(
 			},
 		});
 		return NextResponse.json({ sequence });
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Error fetching sequences for contact:', error);
-		const message = error instanceof Error ? error.message : 'Failed to fetch sequences';
+		const message = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
 		return NextResponse.json(
 			{ error: message },
-			{ status: 500 }
+			{ status: statusCode }
 		);
 	}
 }
@@ -115,12 +117,13 @@ export async function PUT(
 			},
 			{ headers: rateLimit.headers }
 		);
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Error updating sequence:', error);
-		const message = error instanceof Error ? error.message : 'Failed to update sequence';
+		const message = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
 		return NextResponse.json(
 			{ error: message },
-			{ status: 500 }
+			{ status: statusCode }
 		);
 	}
 }

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyPubSubToken } from '@/lib/pubsub-auth';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
 import { auditWebhook, AUDIT_ACTIONS } from '@/lib/audit';
+import { getErrorMessage, isAppError, ExternalServiceError } from '@/lib/errors';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -75,9 +76,10 @@ export async function POST(req: NextRequest) {
 		await checkForNewEmails(message.historyId);
 
 		return NextResponse.json({ success: true }, { headers: rateLimit.headers });
-	} catch (error: unknown) {
+	} catch (error) {
 		console.error('Webhook error:', error);
-		const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+		const errorMessage = getErrorMessage(error);
+		const statusCode = isAppError(error) ? error.statusCode : 500;
 		await auditWebhook(
 			req,
 			AUDIT_ACTIONS.WEBHOOK_RECEIVED,
@@ -87,7 +89,7 @@ export async function POST(req: NextRequest) {
 		);
 		return NextResponse.json(
 			{ error: errorMessage },
-			{ status: 500, headers: rateLimit.headers }
+			{ status: statusCode, headers: rateLimit.headers }
 		);
 	}
 }
@@ -119,7 +121,8 @@ async function checkForNewEmails(historyId: string) {
 			}
 		}
 	} catch (error) {
-		console.error('Error checking emails:', error);
+		const gmailError = new ExternalServiceError('Gmail', getErrorMessage(error));
+		console.error('Error checking emails:', gmailError.message);
 		// Fallback to recent messages if history fails
 		await fallbackToRecentMessages(gmail);
 	}
@@ -232,7 +235,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			);
 		}
 	} catch (error) {
-		console.error('Error processing message:', error);
+		console.error('Error processing message:', getErrorMessage(error));
 	}
 }
 

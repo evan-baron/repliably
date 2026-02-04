@@ -1,6 +1,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis as UpstashRedis } from '@upstash/redis';
 import IORedis from 'ioredis';
+import { RedisError } from './errors';
 
 // ============================================
 // Configuration from environment variables
@@ -49,8 +50,8 @@ function getRedisClient(): RedisClient {
 		return redisClient;
 	}
 
-	throw new Error(
-		'Redis not configured. Set either REDIS_URL (for local/docker) or UPSTASH_REDIS_REST_URL (for serverless).'
+	throw new RedisError(
+		'Not configured. Set either REDIS_URL (for local/docker) or UPSTASH_REDIS_REST_URL (for serverless).'
 	);
 }
 
