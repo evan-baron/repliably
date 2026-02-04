@@ -124,6 +124,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			title: 'Deactivate Sequence',
 			width: '31.5rem',
 		},
+		deactivateAllSequences: {
+			component: <DeactivateSequenceModal allSequences={true} />,
+			title: 'Deactivate All Sequences',
+			width: '31.5rem',
+		},
 	} as const;
 
 	return (

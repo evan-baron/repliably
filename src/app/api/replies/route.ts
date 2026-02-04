@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest) {
 			},
 		});
 
-		return NextResponse.json(replies);
+		return NextResponse.json({ replies });
 	} catch (error: unknown) {
 		console.error('Error fetching replies:', error);
 		const message = error instanceof Error ? error.message : 'Unknown error';

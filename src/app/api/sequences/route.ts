@@ -17,6 +17,7 @@ export async function GET(_req: NextRequest) {
 		const sequences = await prisma.sequence.findMany({
 			where: { ownerId: user.id },
 			include: {
+				contact: true,
 				messages: {
 					orderBy: { createdAt: 'desc' },
 				},

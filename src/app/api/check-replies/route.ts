@@ -106,7 +106,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 					);
 					if (textPart?.body?.data) {
 						console.log(
-							'Message:',
+							'Message already processed:',
 							Buffer.from(textPart.body.data, 'base64').toString()
 						);
 					}
@@ -141,8 +141,6 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			// Check if this is an automated/OOO reply
 			const isAutoReply = isAutomatedReply(headers, subject || '', bodyContent);
 
-			console.log(`Reply from ${senderEmail} - Automated: ${isAutoReply}`);
-
 			// Get sequenceId of the original sent message
 			const sequenceId = sentMessage.sequenceId;
 
@@ -163,10 +161,24 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 				},
 			});
 
+			console.log(
+				'About to update original message and sequence...',
+				sentMessage.id
+			);
 			// Mark original message as having reply
 			await prisma.message.update({
-				where: { id: sentMessage.id },
+				where: { id: sentMessage.id, threadId: threadId },
 				data: { hasReply: true },
+			});
+
+			// Delete unsent messages from sequence
+			await prisma.message.deleteMany({
+				where: {
+					contactId: sentMessage.contactId,
+					sequenceId: sequenceId,
+					direction: 'outbound',
+					status: { in: ['scheduled', 'pending'] },
+				},
 			});
 
 			// Remove from sequence ONLY if it's a real human reply (not automated)
@@ -191,6 +203,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			} else if (isAutoReply) {
 				console.log('Automated reply detected - keeping sequence active');
 			}
+			console.log('Message successfully processed!');
 		}
 	} catch (error) {
 		console.error('Error processing message:', error);
