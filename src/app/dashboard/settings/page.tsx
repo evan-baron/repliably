@@ -1,15 +1,14 @@
 // Components imports
 import PageTemplate from '@/app/components/pageSpecificComponents/PageTemplate';
-
-// Context imports
+import SettingsClient from './SettingsClient';
 
 const Page = () => {
 	return (
 		<PageTemplate
 			title='Settings'
-			description='Manage your application settings'
+			description='Manage your account and application settings'
 		>
-			<div>Settings Page Content Coming Soon...</div>
+			<SettingsClient />
 		</PageTemplate>
 	);
 };
