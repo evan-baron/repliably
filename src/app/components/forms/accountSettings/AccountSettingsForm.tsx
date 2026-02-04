@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
 
 // Styles imports
-import styles from './AccountSettings.module.scss';
+import styles from './accountSettingsForm.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
@@ -18,10 +18,7 @@ import { UserToClientFromDB } from '@/types/userTypes';
 import { useAppContext } from '@/app/context/AppContext';
 import { useSettingsContext } from '@/app/context/SettingsContext';
 
-// Components imports
-import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';
-
-const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
+const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 	const {
 		modalType,
 		setModalType,
@@ -31,6 +28,7 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 		setLoading,
 		setLoadingMessage,
 	} = useAppContext();
+	const { isSaving, setIsSaving } = useSettingsContext();
 
 	const labelStyle = 'original';
 	const timezones = { ...allTimezones };
@@ -90,67 +88,69 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 	// };
 
 	return (
-		<div className={styles.accountSettings}>
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Profile Information</h3>
-				<AccountSettingsForm user={user} />
-			</section>
+		<div className={styles['account-settings-form-wrapper']}>
+			<form className={styles.form}>
+				<div className={styles['input-group']}>
+					<label htmlFor='firstName'>First Name</label>
+					<input type='text' id='firstName' {...register('firstName')} />
+				</div>
 
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Account Security</h3>
-				<div className={styles.options}>
-					<div className={styles.item}>
-						<div>
-							<h4>Password</h4>
-							<small>Manage your password through Auth0</small>
-						</div>
-						<button className={'button settings-button'}>
-							Change Password
-						</button>
-					</div>
+				<div className={styles['input-group']}>
+					<label htmlFor='lastName'>Last Name</label>
+					<input
+						type='text'
+						id='lastName'
+						{...register('lastName')}
+						placeholder='Enter last name'
+					/>
+				</div>
 
-					<div className={styles.item}>
-						<div>
-							<h4>Two-Factor Authentication</h4>
-							<small>Add an extra layer of security to your account</small>
-						</div>
-						<button className={'button settings-button'}>Enable 2FA</button>
-					</div>
-
-					<div className={styles.item}>
-						<div>
-							<h4>Active Sessions</h4>
-							<small>Manage devices where you're currently logged in</small>
-						</div>
-						<button className={'button settings-button'}>View Sessions</button>
+				<div className={styles['input-group']}>
+					<label htmlFor='email'>Email Address</label>
+					<div className={styles.input}>
+						<input
+							type='email'
+							id='email'
+							name='email'
+							value={user.email}
+							placeholder='Enter email address'
+							disabled
+						/>
+						<small className={styles.helpText}>
+							Email cannot be changed.{' '}
+							<Link href='/support'>Contact support for assistance.</Link>
+						</small>
 					</div>
 				</div>
-			</section>
 
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Account Data</h3>
-				<div className={styles.options}>
-					<div className={styles.item}>
-						<div>
-							<h4>Export Data</h4>
-							<small>Download all your contacts, messages, and sequences</small>
-						</div>
-						<button className={'button settings-button'}>Export Data</button>
-					</div>
-
-					<div className={styles.item}>
-						<div>
-							<h4>Delete Account</h4>
-							<small className={styles.dangerText}>
-								Permanently delete your account and all associated data
-							</small>
-						</div>
-						<button className={'button delete-account'}>Delete Account</button>
+				<div className={styles['input-group']}>
+					<label htmlFor='timezone'>Timezone</label>
+					<div className={styles.input}>
+						<select id='timezone' {...register('timezone')}>
+							{options.map((option) => (
+								<option key={option.value} value={option.value}>
+									{option.label}
+								</option>
+							))}
+						</select>
+						<small className={styles.helpText}>
+							Used for scheduling emails and displaying timestamps
+						</small>
 					</div>
 				</div>
-			</section>
+
+				<div className={styles['form-ctions']}>
+					<button
+						className={'button save-changes'}
+						type='submit'
+						disabled={isSaving}
+					>
+						{isSaving ? 'Saving...' : 'Save Changes'}
+					</button>
+				</div>
+			</form>
 		</div>
 	);
 };
 
-export default AccountSettings;
+export default AccountSettingsForm;

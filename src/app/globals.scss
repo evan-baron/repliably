@@ -96,13 +96,15 @@
 	--border-light: #e2e8f0;
 	--border-medium: #cbd5e0;
 	--shadow-sm: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.05);
-	--shadow-md: 0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.1),
+	--shadow-md:
+		0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.1),
 		0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
-	--shadow-lg: 0.5rem 0.5rem 1rem rgba(0, 0, 0, 0.1),
+	--shadow-lg:
+		0.5rem 0.5rem 1rem rgba(0, 0, 0, 0.1),
 		0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
 	--shadow-inset: inset 0.25rem 0.25rem 2.5rem rgba(0, 0, 0, 0.15);
-	--shadow-floating: 1rem 1rem 2rem rgba(0, 0, 0, 0.1),
-		0.5rem 0.5rem 1rem rgba(0, 0, 0, 0.04);
+	--shadow-floating:
+		1rem 1rem 2rem rgba(0, 0, 0, 0.1), 0.5rem 0.5rem 1rem rgba(0, 0, 0, 0.04);
 }
 
 html,
@@ -120,8 +122,9 @@ body {
 body {
 	color: var(--text-primary);
 	background: var(--background-primary);
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-		'Ubuntu', 'Cantarell', sans-serif;
+	font-family:
+		-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+		'Cantarell', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -161,7 +164,8 @@ a {
 	&.login,
 	&.send-email,
 	&.delete,
-	&.override {
+	&.override,
+	&.save-changes {
 		background: var(--gradient-primary) border-box;
 		color: white;
 		box-shadow: var(--shadow-sm);
@@ -203,6 +207,10 @@ a {
 		}
 	}
 
+	&.save-changes {
+		padding: 0.75rem 1.5rem !important;
+	}
+
 	&.login {
 		@media (hover: hover) {
 			&:hover {
@@ -214,12 +222,15 @@ a {
 
 	&.register,
 	&.back,
-	&.cancel {
+	&.cancel,
+	&.settings-button,
+	&.delete-account {
 		font-weight: 600;
 		font-size: 1rem;
 		padding: 1rem 2rem;
 		position: relative;
-		background: linear-gradient(white, white) padding-box,
+		background:
+			linear-gradient(white, white) padding-box,
 			var(--gradient-primary) border-box;
 		border: 2px solid transparent;
 		border-radius: var(--border-radius-sm);
@@ -230,7 +241,8 @@ a {
 
 		@media (hover: hover) {
 			&:hover {
-				background: linear-gradient(white, white) padding-box,
+				background:
+					linear-gradient(white, white) padding-box,
 					linear-gradient(
 							45deg,
 							var(--color-primary),
@@ -240,6 +252,18 @@ a {
 						border-box;
 				transform: scale(1.05);
 				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+			}
+		}
+	}
+
+	&.settings-button,
+	&.delete-account {
+		width: 12.5rem;
+		padding: 0.5rem 1rem;
+
+		@media (hover: hover) {
+			&:hover {
+				transform: scale(1);
 			}
 		}
 	}

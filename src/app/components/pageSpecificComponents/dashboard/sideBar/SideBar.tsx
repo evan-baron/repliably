@@ -17,6 +17,7 @@ import {
 	ContentCopyRounded,
 	TimelineRounded,
 	SettingsRounded,
+	HelpOutlineRounded,
 } from '@mui/icons-material';
 
 interface SidebarProps {
@@ -71,6 +72,11 @@ export default function SideBar({
 			href: '/dashboard/settings',
 			label: 'Settings',
 			icon: <SettingsRounded className={styles.icon} />,
+		},
+		{
+			href: '/help',
+			label: 'Help (Coming Soon)',
+			icon: <HelpOutlineRounded className={styles.icon} />,
 		},
 	];
 
