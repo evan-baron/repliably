@@ -1,14 +1,26 @@
+// Libraries imports
+import { redirect } from 'next/navigation';
+
+// Services imports
+import { getServerUser } from '@/services/getUserService';
+
 // Components imports
 import PageTemplate from '@/app/components/pageSpecificComponents/PageTemplate';
 import SettingsClient from './SettingsClient';
 
-const Page = () => {
+const Page = async () => {
+	const { user, error } = await getServerUser();
+
+	if (error || !user) {
+		redirect('/');
+	}
+
 	return (
 		<PageTemplate
 			title='Settings'
 			description='Manage your account and application settings'
 		>
-			<SettingsClient />
+			<SettingsClient initialUser={user} />
 		</PageTemplate>
 	);
 };

@@ -22,22 +22,7 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
 	return data;
 };
 
-// Email API functions
-export const emailAPI = {
-	send: (emailData: SentEmailData) =>
-		apiCall('/api/send-email', {
-			method: 'POST',
-			body: JSON.stringify(emailData),
-		}),
-};
-
-// Replies API functions
-export const repliesAPI = {
-	getAll: () => apiCall('/api/replies', { method: 'GET' }),
-	checkForNew: () => apiCall('/api/check-replies', { method: 'POST' }),
-	markAsReviewed: (replyId: number) =>
-		apiCall(`/api/replies/${replyId}`, { method: 'PUT' }),
-};
+// All API functions grouped by entity sorted alphabetically
 
 // Contact API functions
 export const contactAPI = {
@@ -65,24 +50,12 @@ export const contactAPI = {
 		}),
 };
 
-// Sequence API functions
-export const sequenceAPI = {
-	readAll: () => apiCall('/api/sequences', { method: 'GET' }),
-	readAllByContactId: (contactId: number) =>
-		apiCall(`/api/sequences/contact/${contactId}`, {
-			method: 'GET',
-		}),
-	readUnique: (sequenceId: number) =>
-		apiCall(`/api/sequences/${sequenceId}`, {
-			method: 'GET',
-		}),
-	deactivate: (sequenceId: number) =>
-		apiCall(`/api/sequences/${sequenceId}`, {
-			method: 'PUT',
-		}),
-	deactivateAll: () =>
-		apiCall('/api/sequences/deactivate-all', {
-			method: 'PUT',
+// Email API functions
+export const emailAPI = {
+	send: (emailData: SentEmailData) =>
+		apiCall('/api/send-email', {
+			method: 'POST',
+			body: JSON.stringify(emailData),
 		}),
 };
 
@@ -108,5 +81,42 @@ export const messageAPI = {
 		apiCall(`/api/messages/${messageId}/update`, {
 			method: 'PUT',
 			body: JSON.stringify({ contents, subject }),
+		}),
+};
+
+// Replies API functions
+export const repliesAPI = {
+	getAll: () => apiCall('/api/replies', { method: 'GET' }),
+	checkForNew: () => apiCall('/api/check-replies', { method: 'POST' }),
+	markAsReviewed: (replyId: number) =>
+		apiCall(`/api/replies/${replyId}`, { method: 'PUT' }),
+};
+
+// Sequence API functions
+export const sequenceAPI = {
+	readAll: () => apiCall('/api/sequences', { method: 'GET' }),
+	readAllByContactId: (contactId: number) =>
+		apiCall(`/api/sequences/contact/${contactId}`, {
+			method: 'GET',
+		}),
+	readUnique: (sequenceId: number) =>
+		apiCall(`/api/sequences/${sequenceId}`, {
+			method: 'GET',
+		}),
+	deactivate: (sequenceId: number) =>
+		apiCall(`/api/sequences/${sequenceId}`, {
+			method: 'PUT',
+		}),
+	deactivateAll: () =>
+		apiCall('/api/sequences/deactivate-all', {
+			method: 'PUT',
+		}),
+};
+
+// User API functions
+export const userAPI = {
+	getUser: () =>
+		apiCall('/api/user', {
+			method: 'GET',
 		}),
 };

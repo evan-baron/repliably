@@ -6,7 +6,10 @@ import { useState } from 'react';
 // Styles imports
 import styles from './AccountSettings.module.scss';
 
-const AccountSettings = () => {
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
+const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 	// TODO: Fetch user data from API
 	const [formData, setFormData] = useState({
 		firstName: '',
@@ -23,7 +26,7 @@ const AccountSettings = () => {
 	};
 
 	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));

@@ -1,7 +1,14 @@
 'use client';
 
 // Library imports
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
+// Hooks imports
+import { useUser } from '@/hooks/useUser';
+
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
 
 // Components imports
 import AccountSettings from '@/app/components/pageSpecificComponents/settings/AccountSettings';
@@ -13,6 +20,9 @@ import DisplayPreferences from '@/app/components/pageSpecificComponents/settings
 // Styles imports
 import styles from './settingsClient.module.scss';
 
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
 type SettingsTab =
 	| 'account'
 	| 'email'
@@ -20,7 +30,26 @@ type SettingsTab =
 	| 'notifications'
 	| 'display';
 
-const SettingsClient = () => {
+const SettingsClient = ({
+	initialUser,
+}: {
+	initialUser: UserToClientFromDB;
+}) => {
+	const queryClient = useQueryClient();
+	const userQuery = useUser();
+
+	const { setLoading, setLoadingMessage } = useAppContext();
+
+	useEffect(() => {
+		if (initialUser) {
+			queryClient.setQueryData<UserToClientFromDB>(['user-get'], initialUser);
+		}
+	}, [initialUser, queryClient]);
+
+	const { data: userData } = userQuery;
+
+	console.log('User in Settings Client:', userData);
+
 	const [activeTab, setActiveTab] = useState<SettingsTab>('account');
 
 	const tabs: { id: SettingsTab; label: string }[] = [
@@ -32,9 +61,15 @@ const SettingsClient = () => {
 	];
 
 	const renderTabContent = () => {
+		if (!userData) {
+			setLoading(true);
+			setLoadingMessage('Loading');
+			return null;
+		}
+
 		switch (activeTab) {
 			case 'account':
-				return <AccountSettings />;
+				return <AccountSettings user={userData} />;
 			case 'email':
 				return <EmailSettings />;
 			case 'sequences':
@@ -44,7 +79,7 @@ const SettingsClient = () => {
 			case 'display':
 				return <DisplayPreferences />;
 			default:
-				return <AccountSettings />;
+				return <AccountSettings user={userData} />;
 		}
 	};
 

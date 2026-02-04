@@ -18,8 +18,6 @@ const Page = async () => {
 
 	const { sequences } = await getAllSequencesByUserId();
 
-	console.log(sequences);
-
 	return (
 		<PageTemplate
 			title='Sequences'
