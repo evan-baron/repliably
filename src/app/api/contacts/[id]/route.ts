@@ -4,7 +4,7 @@ import { getApiUser } from '@/services/getUserService';
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		const { id } = await params;
@@ -20,14 +20,14 @@ export async function GET(
 		console.error('Error fetching contact:', error);
 		return NextResponse.json(
 			{ error: 'Failed to fetch contact' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		// 1. Check authentication
@@ -35,7 +35,7 @@ export async function PUT(
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 
@@ -53,26 +53,48 @@ export async function PUT(
 			updateData.importance = null; // Remove importance if not set
 		}
 
-		const existingContact = await prisma.contact.findFirst({
+		const existingContact = await prisma.contact.findUnique({
 			where: {
-				ownerId: user.id,
-				email: updateData.email,
+				id: contactId,
 			},
 		});
 
-		if (existingContact && existingContact.id !== contactId) {
+		if (!existingContact || existingContact.ownerId !== user.id) {
 			return NextResponse.json(
-				{
-					success: false,
-					error: 'Contact with this email already exists',
-				},
-				{ status: 400 }
+				{ success: false, error: 'Contact not found' },
+				{ status: 404 },
 			);
 		}
 
+		// Check if email is being changed to a different contact's email
+		if (updateData.email && updateData.email !== existingContact.email) {
+			const emailConflict = await prisma.contact.findFirst({
+				where: {
+					ownerId: user.id,
+					email: updateData.email,
+					id: { not: contactId },
+				},
+			});
+
+			if (emailConflict) {
+				return NextResponse.json(
+					{
+						success: false,
+						error: 'Contact with this email already exists',
+					},
+					{ status: 400 },
+				);
+			}
+		}
+
+		const emailChanged = existingContact.email !== updateData.email;
+
 		const updatedContact = await prisma.contact.update({
 			where: { id: contactId },
-			data: updateData,
+			data: {
+				...updateData,
+				validEmail: emailChanged ? null : existingContact.validEmail,
+			},
 		});
 
 		return NextResponse.json({
@@ -93,14 +115,14 @@ export async function PUT(
 		});
 		return NextResponse.json(
 			{ success: false, error: 'Failed to update contact' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
 
 export async function DELETE(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		// 1. Check authentication
@@ -108,7 +130,7 @@ export async function DELETE(
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 
@@ -125,7 +147,7 @@ export async function DELETE(
 		console.error('Error deleting contact:', error);
 		return NextResponse.json(
 			{ error: 'Failed to delete contact' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

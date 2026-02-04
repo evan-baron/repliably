@@ -50,10 +50,12 @@ const EditContactModal = ({
 			phone: selectedContact.phone || '',
 			linkedIn: selectedContact.linkedIn || '',
 			importance:
-				selectedContact.importance !== undefined &&
-				selectedContact.importance !== null
-					? String(selectedContact.importance)
-					: '',
+				(
+					selectedContact.importance !== undefined &&
+					selectedContact.importance !== null
+				) ?
+					String(selectedContact.importance)
+				:	'',
 			reasonForEmail: selectedContact.reasonForEmail || '',
 		},
 	});
