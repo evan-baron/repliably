@@ -1,7 +1,8 @@
 'use client';
 
 // Library imports
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 
 // Styles imports
 import styles from './AccountSettings.module.scss';
@@ -9,7 +10,21 @@ import styles from './AccountSettings.module.scss';
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
 
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
+import { useSettingsContext } from '@/app/context/SettingsContext';
+
 const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
+	const {
+		modalType,
+		setModalType,
+		selectedContact,
+		setSelectedContact,
+		setErrors,
+		setLoading,
+		setLoadingMessage,
+	} = useAppContext();
+
 	// TODO: Fetch user data from API
 	const [formData, setFormData] = useState({
 		firstName: '',
@@ -19,24 +34,24 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 		role: 'user',
 	});
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// TODO: Implement save functionality
-		console.log('Saving account settings:', formData);
-	};
+	// const handleSubmit = (e: React.FormEvent) => {
+	// 	e.preventDefault();
+	// 	// TODO: Implement save functionality
+	// 	console.log('Saving account settings:', formData);
+	// };
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
-	};
+	// const handleChange = (
+	// 	e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	// ) => {
+	// 	const { name, value } = e.target;
+	// 	setFormData((prev) => ({ ...prev, [name]: value }));
+	// };
 
 	return (
 		<div className={styles.accountSettings}>
-			<section className={styles.section}>
+			<section className={styles['account-settings-form-wrapper']}>
 				<h2 className={styles.sectionTitle}>Profile Information</h2>
-				<form onSubmit={handleSubmit} className={styles.form}>
+				<form className={styles.form}>
 					<div className={styles.formGroup}>
 						<label htmlFor='firstName'>First Name</label>
 						<input
@@ -44,7 +59,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 							id='firstName'
 							name='firstName'
 							value={formData.firstName}
-							onChange={handleChange}
 							placeholder='Enter first name'
 						/>
 					</div>
@@ -56,7 +70,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 							id='lastName'
 							name='lastName'
 							value={formData.lastName}
-							onChange={handleChange}
 							placeholder='Enter last name'
 						/>
 					</div>
@@ -68,7 +81,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 							id='email'
 							name='email'
 							value={formData.email}
-							onChange={handleChange}
 							placeholder='Enter email address'
 							disabled
 						/>
@@ -79,12 +91,7 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 
 					<div className={styles.formGroup}>
 						<label htmlFor='timezone'>Timezone</label>
-						<select
-							id='timezone'
-							name='timezone'
-							value={formData.timezone}
-							onChange={handleChange}
-						>
+						<select id='timezone' name='timezone' value={formData.timezone}>
 							<option value='America/New_York'>Eastern Time (ET)</option>
 							<option value='America/Chicago'>Central Time (CT)</option>
 							<option value='America/Denver'>Mountain Time (MT)</option>

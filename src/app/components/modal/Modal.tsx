@@ -21,6 +21,7 @@ import ErrorModal from './modalTypes/error/ErrorModal';
 import OverrideModal from './modalTypes/error/OverrideModal';
 import AlertModal from './modalTypes/alert/AlertModal';
 import DeactivateSequenceModal from './modalTypes/sequence/DeactivateSequenceModal';
+import UnsavedChangesModal from './modalTypes/alert/UnsavedChangesModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -127,6 +128,13 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			title: 'Deactivate All Sequences',
 			width: '31.5rem',
 		},
+		unsavedChanges: {
+			component: (
+				<UnsavedChangesModal message={errors[0]} clearAlert={handleClose} />
+			),
+			title: 'Unsaved Changes',
+			width: '31.5rem',
+		},
 	} as const;
 
 	return (
@@ -143,15 +151,15 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 						<div className={styles.modalHeader}>
 							<h2
 								className={
-									modalContent[currentModalType].title === 'Action Required:'
-										? styles.alert
-										: ''
+									modalContent[currentModalType].title === 'Action Required:' ?
+										styles.alert
+									:	''
 								}
 							>
 								{modalContent[currentModalType].title}
-								{modalContent[currentModalType].title === 'Action Required:' ? (
+								{modalContent[currentModalType].title === 'Action Required:' ?
 									<span> Edit Contact</span>
-								) : null}
+								:	null}
 							</h2>
 						</div>
 					)}

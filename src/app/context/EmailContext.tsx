@@ -1,7 +1,7 @@
 'use client';
 
 // Libraries imports
-import React, {
+import {
 	createContext,
 	useContext,
 	useEffect,
@@ -32,12 +32,12 @@ const EmailContext = createContext<EmailContextType | undefined>(undefined);
 export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient();
 	const [pendingEmail, setPendingEmail] = useState<PendingEmailData | null>(
-		null
+		null,
 	);
 	const [lastError, setLastError] = useState<any>(null);
 	const [resetForm, setResetForm] = useState<boolean>(false);
 	const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
-		null
+		null,
 	);
 	const [emailSentId, setEmailSentId] = useState<number | null>(null);
 
@@ -55,7 +55,7 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				if (!result.ok) {
 					console.error(
 						'Failed to trigger follow-up generation:',
-						await result.text()
+						await result.text(),
 					);
 					return;
 				}
@@ -68,7 +68,7 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 
 				if (!contactId) {
 					console.log(
-						'No contactId returned from follow-up generation. Nothing to invalidate.'
+						'No contactId returned from follow-up generation. Nothing to invalidate.',
 					);
 					return;
 				}
@@ -127,7 +127,7 @@ export const useEmailContext = (): EmailContextType => {
 	const context = useContext(EmailContext);
 	if (!context) {
 		throw new Error(
-			'useEmailContext must be used within an EmailContextProvider'
+			'useEmailContext must be used within an EmailContextProvider',
 		);
 	}
 	return context;

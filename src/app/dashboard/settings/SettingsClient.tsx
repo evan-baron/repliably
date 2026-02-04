@@ -9,6 +9,7 @@ import { useUser } from '@/hooks/useUser';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
+import { useSettingsContext } from '@/app/context/SettingsContext';
 
 // Components imports
 import AccountSettings from '@/app/components/pageSpecificComponents/settings/AccountSettings';
@@ -38,7 +39,9 @@ const SettingsClient = ({
 	const queryClient = useQueryClient();
 	const userQuery = useUser();
 
-	const { setLoading, setLoadingMessage } = useAppContext();
+	const { setLoading, setLoadingMessage, setModalType, setErrors } =
+		useAppContext();
+	const { activeTab, setActiveTab, hasUnsavedChanges } = useSettingsContext();
 
 	useEffect(() => {
 		if (initialUser) {
@@ -49,8 +52,6 @@ const SettingsClient = ({
 	const { data: userData } = userQuery;
 
 	console.log('User in Settings Client:', userData);
-
-	const [activeTab, setActiveTab] = useState<SettingsTab>('account');
 
 	const tabs: { id: SettingsTab; label: string }[] = [
 		{ id: 'account', label: 'Account' },
@@ -83,6 +84,16 @@ const SettingsClient = ({
 		}
 	};
 
+	const handleClick = (tabId: SettingsTab) => {
+		if (hasUnsavedChanges) {
+			setModalType('error');
+			setErrors([
+				'You have unsaved changes. Are you sure you want to switch tabs and lose those changes?',
+			]);
+		}
+		setActiveTab(tabId);
+	};
+
 	return (
 		<div className={styles.settingsContainer}>
 			<nav className={styles.nav}>
@@ -92,7 +103,7 @@ const SettingsClient = ({
 						className={`${styles.tabButton} ${
 							activeTab === tab.id ? styles.selected : ''
 						}`}
-						onClick={() => setActiveTab(tab.id)}
+						onClick={() => handleClick(tab.id)}
 					>
 						{tab.label}
 					</h2>

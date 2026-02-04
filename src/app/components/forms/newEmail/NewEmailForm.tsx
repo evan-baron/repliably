@@ -2,7 +2,7 @@
 
 // Library imports
 import { useState, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldErrors, set } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 
 // Hooks imports
 import { useEmailSend } from '@/hooks/useEmail';
@@ -38,6 +38,7 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		setLoading,
 		setLoadingMessage,
 	} = useAppContext();
+
 	const { resetForm, setResetForm } = useEmailContext();
 
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
@@ -99,9 +100,9 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		}
 
 		const referencePrevious =
-			!data.followUpCadence || data.followUpCadence === 'none'
-				? null
-				: !!data.referencePreviousEmail;
+			!data.followUpCadence || data.followUpCadence === 'none' ?
+				null
+			:	!!data.referencePreviousEmail;
 
 		const alterSubject = !data.followUpCadence ? null : !!data.alterSubjectLine;
 
@@ -302,9 +303,9 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 												id='autoSendDelay'
 												{...register('autoSendDelay', {
 													validate: (value) =>
-														!autoSendChecked || value !== ''
-															? true
-															: 'Please select a review time frame',
+														!autoSendChecked || value !== '' ?
+															true
+														:	'Please select a review time frame',
 												})}
 											>
 												<option value=''>Select time...</option>

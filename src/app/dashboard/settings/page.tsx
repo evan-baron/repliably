@@ -7,6 +7,7 @@ import { getServerUser } from '@/services/getUserService';
 // Components imports
 import PageTemplate from '@/app/components/pageSpecificComponents/PageTemplate';
 import SettingsClient from './SettingsClient';
+import { SettingsContextProvider } from '@/app/context/SettingsContext';
 
 const Page = async () => {
 	const { user, error } = await getServerUser();
@@ -20,7 +21,9 @@ const Page = async () => {
 			title='Settings'
 			description='Manage your account and application settings'
 		>
-			<SettingsClient initialUser={user} />
+			<SettingsContextProvider>
+				<SettingsClient initialUser={user} />
+			</SettingsContextProvider>
 		</PageTemplate>
 	);
 };
