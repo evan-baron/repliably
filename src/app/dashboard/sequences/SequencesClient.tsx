@@ -38,7 +38,7 @@ const SequencesClient = ({
 		if (initialSequences && initialSequences.length > 0) {
 			queryClient.setQueryData<SequenceFromDB[]>(
 				['sequences-get-all'],
-				initialSequences
+				initialSequences,
 			);
 		}
 	}, [initialSequences, queryClient]);
@@ -53,23 +53,19 @@ const SequencesClient = ({
 	const sequenceContent: SequenceContent = {
 		active: {
 			component:
-				activeSequences.length > 0 ? (
+				activeSequences.length > 0 ?
 					<ActiveSequences sequences={activeSequences} />
-				) : (
-					<div className={styles.activity}>
+				:	<div className={styles.activity}>
 						<p>No active sequences</p>
-					</div>
-				),
+					</div>,
 		},
 		previous: {
 			component:
-				previousSequences.length > 0 ? (
+				previousSequences.length > 0 ?
 					<PreviousSequences sequences={previousSequences} contact={true} />
-				) : (
-					<div className={styles.activity}>
+				:	<div className={styles.activity}>
 						<p>No previous sequences</p>
-					</div>
-				),
+					</div>,
 		},
 	};
 
@@ -78,21 +74,37 @@ const SequencesClient = ({
 			<DeactivateAllSequencesButton />
 
 			<div className={styles.content}>
-				<div className={styles.nav}>
+				<nav className={styles.nav}>
 					<h2
+						role='button'
 						className={selected === 'active' ? styles.selected : ''}
 						onClick={() => setSelected('active')}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								setSelected('active');
+							}
+						}}
+						aria-pressed={selected === 'active'}
 					>
 						Active Sequences
 					</h2>
 
 					<h2
+						role='button'
 						className={selected === 'previous' ? styles.selected : ''}
 						onClick={() => setSelected('previous')}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								setSelected('previous');
+							}
+						}}
+						aria-pressed={selected === 'previous'}
 					>
 						Previous Sequences
 					</h2>
-				</div>
+				</nav>
 				{sequenceContent[selected].component}
 			</div>
 		</div>

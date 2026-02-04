@@ -11,7 +11,7 @@ import NotificationSettings from '@/app/components/pageSpecificComponents/settin
 import DisplayPreferences from '@/app/components/pageSpecificComponents/settings/DisplayPreferences';
 
 // Styles imports
-import styles from './settings.module.scss';
+import styles from './settingsClient.module.scss';
 
 type SettingsTab =
 	| 'account'
@@ -50,17 +50,17 @@ const SettingsClient = () => {
 
 	return (
 		<div className={styles.settingsContainer}>
-			<nav className={styles.tabNav}>
+			<nav className={styles.nav}>
 				{tabs.map((tab) => (
-					<button
+					<h2
 						key={tab.id}
 						className={`${styles.tabButton} ${
-							activeTab === tab.id ? styles.active : ''
+							activeTab === tab.id ? styles.selected : ''
 						}`}
 						onClick={() => setActiveTab(tab.id)}
 					>
 						{tab.label}
-					</button>
+					</h2>
 				))}
 			</nav>
 
