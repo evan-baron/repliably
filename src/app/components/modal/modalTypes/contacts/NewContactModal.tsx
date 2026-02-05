@@ -97,8 +97,9 @@ const NewContactModal = () => {
 			const response = await createContact(data);
 
 			// Handle duplicate contact scenario
-			if (response.success === false && response.duplicate) {
-				const normalizedData = processDuplicate(data, response.existingContact);
+			if (response.success === false && response.duplicate && response.existingContact) {
+				const existingContact = response.existingContact;
+				const normalizedData = processDuplicate(data, existingContact);
 				reset(normalizedData);
 				return;
 			}

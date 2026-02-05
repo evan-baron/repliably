@@ -88,9 +88,22 @@ export const useEmailSend = () => {
 			setModalType('alert');
 			setAlertMessage('Email sent successfully!');
 		},
-		onError: (error: Error & { status?: number; responseData?: { sequenceExists?: boolean; emailData?: NewMessageData } }) => {
-			if (error.status === 409 && error.responseData?.sequenceExists) {
-				setPendingEmail({ ...error.responseData.emailData, override: true });
+		onError: (error: Error & { status?: number; responseData?: { sequenceExists?: boolean; emailData?: NewMessageData; activeSequenceId?: number } }) => {
+			if (error.status === 409 && error.responseData?.sequenceExists && error.responseData?.emailData) {
+				const emailData = error.responseData.emailData;
+				setPendingEmail({
+					to: emailData.to,
+					subject: emailData.subject,
+					cadenceType: emailData.cadenceType,
+					autoSend: emailData.autoSend,
+					autoSendDelay: emailData.autoSendDelay,
+					cadenceDuration: emailData.cadenceDuration,
+					body: emailData.body,
+					override: true,
+					referencePreviousEmail: emailData.referencePreviousEmail,
+					alterSubjectLine: emailData.alterSubjectLine,
+					activeSequenceId: error.responseData.activeSequenceId || 0,
+				});
 				setModalType('override');
 			} else {
 				console.error('Error sending email:', error);

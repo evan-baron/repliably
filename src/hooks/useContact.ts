@@ -47,10 +47,10 @@ export const useContactCreate = () => {
 			if (response?.contact) {
 				queryClient.setQueryData<ContactsResponse>(
 					['contacts-get-all'],
-					(old) => {
-						const prev = old?.contacts || [];
+					(old): ContactsResponse | undefined => {
+						if (!old) return old;
 						return {
-							contacts: [response.contact!, ...prev],
+							contacts: [response.contact as unknown as ContactFromDB, ...old.contacts],
 						};
 					}
 				);
@@ -87,11 +87,13 @@ export const useContactUpdate = () => {
 			if (response?.contact) {
 				queryClient.setQueryData<ContactsResponse>(
 					['contacts-get-all'],
-					(old) => {
-						const prev = old?.contacts || [];
+					(old): ContactsResponse | undefined => {
+						if (!old) return old;
 						return {
-							contacts: prev.map((contact) =>
-								contact.id === updateData.id ? response.contact! : contact
+							contacts: old.contacts.map((contact) =>
+								contact.id === updateData.id
+									? (response.contact as unknown as ContactFromDB)
+									: contact
 							),
 						};
 					}
