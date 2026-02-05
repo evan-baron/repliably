@@ -31,7 +31,7 @@ export default function NavigationItem({
 				aria-current={isActive ? 'page' : undefined}
 				aria-label={`Navigate to ${label} page`}
 			>
-				<div className={styles.linkInner}>
+				<div className={`${styles.linkInner} ${isActive ? styles.active : ''}`}>
 					{icon}
 					{label === 'Pending' ? 'Pending Emails' : label}
 				</div>

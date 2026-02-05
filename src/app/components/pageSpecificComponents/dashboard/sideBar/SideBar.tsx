@@ -1,5 +1,5 @@
 // Library imports
-import React from 'react';
+import { usePathname } from 'next/navigation';
 
 // Styles imports
 import styles from './sideBar.module.scss';
@@ -21,14 +21,10 @@ import {
 } from '@mui/icons-material';
 
 interface SidebarProps {
-	currentPath?: string;
 	notifications?: boolean;
 }
 
-export default function SideBar({
-	currentPath,
-	notifications = false,
-}: SidebarProps) {
+export default function SideBar({ notifications = false }: SidebarProps) {
 	// Navigation data
 	const navigationItems = [
 		{ href: '/dashboard/new-email', label: 'New Email' },
@@ -80,6 +76,15 @@ export default function SideBar({
 		},
 	];
 
+	const pathname = usePathname();
+
+	const isActive = (href: string) => {
+		if (href === '/dashboard') {
+			return pathname === '/dashboard' || pathname === '/dashboard/';
+		}
+		return pathname.includes(href);
+	};
+
 	return (
 		<aside
 			className={styles.sideBar}
@@ -92,12 +97,12 @@ export default function SideBar({
 				role='navigation'
 			>
 				<ul className={styles.navList} role='list'>
-					{navigationItems.map((item) => (
+					{navigationItems.map((item, index) => (
 						<NavigationItem
-							key={item.href}
+							key={index}
 							href={item.href}
 							label={item.label}
-							isActive={currentPath === item.href}
+							isActive={isActive(item.href)}
 							notifications={notifications && item.label === 'Pending'}
 							icon={item.icon}
 						/>

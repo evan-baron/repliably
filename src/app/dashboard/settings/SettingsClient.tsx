@@ -1,7 +1,7 @@
 'use client';
 
 // Library imports
-import { useEffect, useState } from 'react';
+import { useEffect, Fragment } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
@@ -93,9 +93,8 @@ const SettingsClient = ({
 		<div className={styles.settingsContainer}>
 			<nav className={styles.nav}>
 				{tabs.map((tab, index) => (
-					<>
+					<Fragment key={index}>
 						<h2
-							key={index}
 							className={`${styles.tabButton} ${
 								activeTab === tab.id ? styles.selected : ''
 							}`}
@@ -104,7 +103,7 @@ const SettingsClient = ({
 							{tab.label}
 						</h2>
 						{index < tabs.length - 1 && <div className={styles.divider}></div>}
-					</>
+					</Fragment>
 				))}
 			</nav>
 

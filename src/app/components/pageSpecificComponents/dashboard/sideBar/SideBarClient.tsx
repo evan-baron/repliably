@@ -1,9 +1,16 @@
 'use client';
 
+// Library imports
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import SideBar from './SideBar';
+
+// Hooks imports
 import { useMessagesGetAllPending } from '@/hooks/useMessages';
+
+// Components imports
+import SideBar from './SideBar';
+
+// Types imports
 import { MessageFromDB, MessagesResponse } from '@/types/messageTypes';
 
 export default function SideBarClient({
@@ -28,7 +35,7 @@ export default function SideBarClient({
 		if (data?.messages) {
 			queryClient.setQueryData<MessagesResponse>(
 				['pending-messages-get-all'],
-				data
+				data,
 			);
 		} else if (initialMessages?.length) {
 			queryClient.setQueryData<MessagesResponse>(['pending-messages-get-all'], {
