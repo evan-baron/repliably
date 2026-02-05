@@ -53,7 +53,7 @@ const SettingsClient = ({
 	const tabs: { id: SettingsTab; label: string }[] = [
 		{ id: 'account', label: 'Account' },
 		{ id: 'email', label: 'Email & Templates' },
-		{ id: 'sequences', label: 'Sequence Defaults' },
+		{ id: 'sequences', label: 'Sequences' },
 		{ id: 'notifications', label: 'Notifications' },
 		// { id: 'billing', label: 'Billing' },
 	];
@@ -92,16 +92,19 @@ const SettingsClient = ({
 	return (
 		<div className={styles.settingsContainer}>
 			<nav className={styles.nav}>
-				{tabs.map((tab) => (
-					<h2
-						key={tab.id}
-						className={`${styles.tabButton} ${
-							activeTab === tab.id ? styles.selected : ''
-						}`}
-						onClick={() => handleClick(tab.id)}
-					>
-						{tab.label}
-					</h2>
+				{tabs.map((tab, index) => (
+					<>
+						<h2
+							key={index}
+							className={`${styles.tabButton} ${
+								activeTab === tab.id ? styles.selected : ''
+							}`}
+							onClick={() => handleClick(tab.id)}
+						>
+							{tab.label}
+						</h2>
+						{index < tabs.length - 1 && <div className={styles.divider}></div>}
+					</>
 				))}
 			</nav>
 
