@@ -14,21 +14,33 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  auth0Id       String?   @unique
-  email         String    @unique
-  firstName     String?
-  lastName      String?
-  timezone      String?   // e.g. "America/Denver"
-  role          String?   // admin, user, etc.
-  lastSynced    DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  contacts      Contact[]
-  sequences     Sequence[]
-  messages      Message[]
-  templates     Template[]
-  signatures    UserSignature[]
+  id                               Int       @id @default(autoincrement())
+  auth0Id                          String?   @unique
+  email                            String    @unique
+  firstName                        String?
+  lastName                         String?
+  timezone                         String?   // e.g. "America/Denver"
+  role                             String?   // admin, user, etc.
+  lastSynced                       DateTime?
+  createdAt                        DateTime  @default(now())
+  updatedAt                        DateTime  @updatedAt
+  trackEmailOpens                  Boolean  @default(true)
+  trackLinkClicks                  Boolean  @default(true)
+  defaultRequireApproval           Boolean  @default(false)
+  defaultSequenceDuration          Int?
+  defaultReferencePrevious         Boolean  @default(true)
+  defaultAlterSubjectLine          Boolean  @default(false)
+  defaultSendDelay                 Int?
+  defaultSequenceType              Int      @default(3)
+  notificationBounce               Boolean  @default(true)
+  notificationSendFailure          Boolean  @default(true)
+  notificationSequenceComplete     Boolean  @default(true)
+  notificationMessageApproval      Boolean  @default(true)
+  contacts                         Contact[]
+  sequences                        Sequence[]
+  messages                         Message[]
+  templates                        Template[]
+  signatures                       UserSignature[]
 }
 
 model Contact {

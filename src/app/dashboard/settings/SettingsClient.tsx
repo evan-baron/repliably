@@ -50,6 +50,15 @@ const SettingsClient = ({
 
 	const { data: userData } = userQuery;
 
+	useEffect(() => {
+		if (!userData) {
+			setLoading(true);
+			setLoadingMessage('Loading');
+		} else {
+			setLoading(false);
+		}
+	}, [userData, setLoading, setLoadingMessage]);
+
 	const tabs: { id: SettingsTab; label: string }[] = [
 		{ id: 'account', label: 'Account' },
 		{ id: 'email', label: 'Email & Templates' },
@@ -60,8 +69,6 @@ const SettingsClient = ({
 
 	const renderTabContent = () => {
 		if (!userData) {
-			setLoading(true);
-			setLoadingMessage('Loading');
 			return null;
 		}
 
