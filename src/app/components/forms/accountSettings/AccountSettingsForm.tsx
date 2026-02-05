@@ -88,7 +88,7 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 	// };
 
 	return (
-		<div className={styles['account-settings-form-wrapper']}>
+		<div className={styles['settings-form-wrapper']}>
 			<form className={styles.form}>
 				<div className={styles['input-group']}>
 					<label htmlFor='firstName'>First Name</label>

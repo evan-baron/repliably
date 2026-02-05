@@ -43,7 +43,7 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 		});
 
 	return (
-		<div className={styles['account-settings-form-wrapper']}>
+		<div className={styles['settings-form-wrapper']}>
 			<form className={styles.form}>
 				<div className={`${styles['input-group']} ${styles['checkbox-group']}`}>
 					<input type='checkbox' id='trackOpens' {...register('trackOpens')} />

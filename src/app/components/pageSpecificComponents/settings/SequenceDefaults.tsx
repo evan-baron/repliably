@@ -4,10 +4,13 @@
 import { useState } from 'react';
 
 // Styles imports
-import styles from './SequenceDefaults.module.scss';
+import styles from './settings.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
+
+// Components imports
+import SequenceDefaultsForm from '../../forms/sequenceDefaultSettings/SequenceDefaultsForm';
 
 const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
 	const [formData, setFormData] = useState({
@@ -39,15 +42,17 @@ const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
 	};
 
 	return (
-		<div className={styles.sequenceDefaults}>
+		<div className={styles['settings-container']}>
 			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Default Sequence Settings</h2>
-				<p className={styles.sectionDescription}>
-					Configure default settings for new sequences. These can be overridden
-					when creating individual sequences.
+				<h3 className={styles['section-title']}>Default Sequence Settings</h3>
+				<p className={styles['section-description']}>
+					Configure default settings for new sequences.{' '}
+					<span className={styles.important}>
+						These can be overridden when creating individual sequences.
+					</span>
 				</p>
 
-				<form onSubmit={handleSubmit} className={styles.form}>
+				{/* <form onSubmit={handleSubmit} className={styles.form}>
 					<div className={styles.formSection}>
 						<h3 className={styles.subsectionTitle}>Automation</h3>
 
@@ -182,43 +187,8 @@ const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
 							Reset to System Defaults
 						</button>
 					</div>
-				</form>
-			</section>
-
-			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Sequence Templates</h2>
-				<p className={styles.sectionDescription}>
-					Predefined sequence structures for common use cases
-				</p>
-
-				<div className={styles.templateGrid}>
-					<div className={styles.templateCard}>
-						<h3>3-2-1 Sequence</h3>
-						<p>Wait 3 days → Wait 2 days → Wait 1 day</p>
-						<span className={styles.templateBadge}>Most Popular</span>
-						<button className={styles.iconButton}>Configure</button>
-					</div>
-
-					<div className={styles.templateCard}>
-						<h3>Weekly Follow-up</h3>
-						<p>Wait 7 days → Wait 7 days → Wait 7 days</p>
-						<span className={styles.templateBadge}>Professional</span>
-						<button className={styles.iconButton}>Configure</button>
-					</div>
-
-					<div className={styles.templateCard}>
-						<h3>Quick Follow-up</h3>
-						<p>Wait 1 day → Wait 2 days → Wait 3 days</p>
-						<span className={styles.templateBadge}>Aggressive</span>
-						<button className={styles.iconButton}>Configure</button>
-					</div>
-
-					<div className={styles.templateCard}>
-						<h3>Custom Sequence</h3>
-						<p>Define your own timing and steps</p>
-						<button className={styles.iconButton}>Create Custom</button>
-					</div>
-				</div>
+				</form> */}
+				<SequenceDefaultsForm user={user} />
 			</section>
 		</div>
 	);

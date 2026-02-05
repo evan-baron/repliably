@@ -52,8 +52,6 @@ const SettingsClient = ({
 
 	const { data: userData } = userQuery;
 
-	console.log('User in Settings Client:', userData);
-
 	const tabs: { id: SettingsTab; label: string }[] = [
 		{ id: 'account', label: 'Account' },
 		{ id: 'email', label: 'Email & Templates' },
