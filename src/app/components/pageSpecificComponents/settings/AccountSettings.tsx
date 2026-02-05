@@ -43,7 +43,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 		firstName: string;
 		lastName: string;
 		timezone: string;
-		role: string;
 	}
 
 	const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -72,7 +71,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 				firstName: user.firstName || '',
 				lastName: user.lastName || '',
 				timezone: user.timezone || findMatchingTimezone(defaultTimezone),
-				role: user.role || 'user',
 			},
 		});
 
@@ -115,14 +113,6 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 							<small>Add an extra layer of security to your account</small>
 						</div>
 						<button className={'button settings-button'}>Enable 2FA</button>
-					</div>
-
-					<div className={styles.item}>
-						<div>
-							<h4>Active Sessions</h4>
-							<small>Manage devices where you're currently logged in</small>
-						</div>
-						<button className={'button settings-button'}>View Sessions</button>
 					</div>
 				</div>
 			</section>
