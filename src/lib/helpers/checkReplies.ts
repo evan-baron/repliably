@@ -12,7 +12,7 @@ export async function checkForReplies(gmail: any) {
 
 	if (response.data.messages) {
 		console.log(
-			`Found ${response.data.messages.length} recent messages to check`
+			`Found ${response.data.messages.length} recent messages to check`,
 		);
 		for (const message of response.data.messages) {
 			await processMessage(gmail, message.id!);
@@ -37,7 +37,7 @@ export async function processMessage(gmail: any, messageId: string) {
 		const isBounceSenderResult = isBounceSender(
 			from,
 			message.data.payload.headers.find((h: any) => h.name === 'Return-Path')
-				?.value
+				?.value,
 		);
 
 		if (isBounceSenderResult) {
@@ -98,14 +98,14 @@ export async function processMessage(gmail: any, messageId: string) {
 
 			// Rest of processing...
 			const subject = headers.find(
-				(header: any) => header.name === 'Subject'
+				(header: any) => header.name === 'Subject',
 			)?.value;
 
 			// Extract email body (simplified)
 			let bodyContent = '';
 			if (message.data.payload.parts) {
 				const textPart = message.data.payload.parts.find(
-					(part: any) => part.mimeType === 'text/plain'
+					(part: any) => part.mimeType === 'text/plain',
 				);
 				if (textPart?.body?.data) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
@@ -113,7 +113,7 @@ export async function processMessage(gmail: any, messageId: string) {
 			} else if (message.data.payload.body?.data) {
 				bodyContent = Buffer.from(
 					message.data.payload.body.data,
-					'base64'
+					'base64',
 				).toString();
 			}
 
@@ -130,12 +130,20 @@ export async function processMessage(gmail: any, messageId: string) {
 				console.log(
 					'Bounce detected for message:',
 					messageId,
-					bounceInfo.reason
+					bounceInfo.reason,
 				);
-				// Update contact as invalid email
-				await prisma.contact.update({
-					where: { id: sentMessage.contactId },
-					data: { validEmail: false },
+
+				// Update contact as invalid email, deactivate sequence, etc.
+				await prisma.$transaction(async (transaction) => {
+					transaction.contact.update({
+						where: { id: sentMessage.contactId },
+						data: { validEmail: false, active: false },
+					});
+
+					transaction.sequence.updateMany({
+						where: { contactId: sentMessage.contactId, active: true },
+						data: { active: false, endDate: new Date() },
+					});
 				});
 				return;
 			}
@@ -220,20 +228,20 @@ export function extractEmailFromHeader(fromHeader: string): string {
 export function isAutomatedReply(
 	headers: any[],
 	subject: string,
-	body: string
+	body: string,
 ): boolean {
 	// Check headers for automation indicators
 	const autoSubmitted = headers.find(
-		(h: any) => h.name.toLowerCase() === 'auto-submitted'
+		(h: any) => h.name.toLowerCase() === 'auto-submitted',
 	)?.value;
 	const xAutorespond = headers.find(
-		(h: any) => h.name.toLowerCase() === 'x-autorespond'
+		(h: any) => h.name.toLowerCase() === 'x-autorespond',
 	)?.value;
 	const xAutoReply = headers.find(
-		(h: any) => h.name.toLowerCase() === 'x-autoreply'
+		(h: any) => h.name.toLowerCase() === 'x-autoreply',
 	)?.value;
 	const precedence = headers.find(
-		(h: any) => h.name.toLowerCase() === 'precedence'
+		(h: any) => h.name.toLowerCase() === 'precedence',
 	)?.value;
 
 	// Standard auto-reply headers
@@ -384,7 +392,7 @@ export function analyzeDeliveryStatusText(text: string) {
 // Check if sender indicates a bounce message
 export function isBounceSender(
 	fromHeader: string | undefined,
-	returnPath?: string
+	returnPath?: string,
 ) {
 	const f = (fromHeader || '').toLowerCase();
 	const rp = (returnPath || '').trim();
@@ -412,10 +420,10 @@ export function detectBounce(message: any) {
 	const from =
 		headers.find((h: any) => h.name.toLowerCase() === 'from')?.value || '';
 	const autoSubmitted = headers.find(
-		(h: any) => h.name.toLowerCase() === 'auto-submitted'
+		(h: any) => h.name.toLowerCase() === 'auto-submitted',
 	)?.value;
 	const xFailed = headers.find(
-		(h: any) => h.name.toLowerCase() === 'x-failed-recipients'
+		(h: any) => h.name.toLowerCase() === 'x-failed-recipients',
 	)?.value;
 
 	if (/mailer-daemon|postmaster/i.test(from)) {
@@ -442,8 +450,8 @@ export function detectBounce(message: any) {
 			(dsnPart.parts ?
 				decodePartBody(
 					dsnPart.parts.find(
-						(p: any) => p.mimeType === 'message/delivery-status'
-					)
+						(p: any) => p.mimeType === 'message/delivery-status',
+					),
 				)
 			:	'');
 		const parsed = analyzeDeliveryStatusText(deliveryText);
@@ -491,7 +499,7 @@ export function detectBounce(message: any) {
 }
 
 export function extractOriginalMessageIdFromBounce(
-	message: any
+	message: any,
 ): string | null {
 	const payload = message.data?.payload ?? message.payload ?? {};
 
@@ -515,8 +523,8 @@ export function extractOriginalMessageIdFromBounce(
 			(dsnPart.parts ?
 				decodePartBody(
 					dsnPart.parts.find(
-						(p: any) => p.mimeType === 'message/delivery-status'
-					)
+						(p: any) => p.mimeType === 'message/delivery-status',
+					),
 				)
 			:	'');
 		const origMatch =
