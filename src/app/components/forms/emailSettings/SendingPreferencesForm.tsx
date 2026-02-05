@@ -105,10 +105,10 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 					<div className={styles['send-limit']}>
 						<div className={styles.info}>
 							<p>Daily Send Limit:</p>
-							<p className={styles.limit}>20 emails</p>
+							<p className={styles.limit}>50 emails</p>
 						</div>
 						<small>
-							Your current plan allows up to 20 emails per day.{' '}
+							Your current plan allows up to 50 emails per day.{' '}
 							<span
 								className={styles.upgrade}
 								onClick={() => setActiveTab('billing')}

@@ -16,7 +16,6 @@ import AccountSettings from '@/app/components/pageSpecificComponents/settings/Ac
 import EmailSettings from '@/app/components/pageSpecificComponents/settings/EmailSettings';
 import SequenceDefaults from '@/app/components/pageSpecificComponents/settings/SequenceDefaults';
 import NotificationSettings from '@/app/components/pageSpecificComponents/settings/NotificationSettings';
-import DisplayPreferences from '@/app/components/pageSpecificComponents/settings/DisplayPreferences';
 
 // Styles imports
 import styles from './settingsClient.module.scss';
@@ -29,7 +28,6 @@ type SettingsTab =
 	| 'email'
 	| 'sequences'
 	| 'notifications'
-	| 'display'
 	| 'billing';
 
 const SettingsClient = ({
@@ -57,8 +55,7 @@ const SettingsClient = ({
 		{ id: 'email', label: 'Email & Templates' },
 		{ id: 'sequences', label: 'Sequence Defaults' },
 		{ id: 'notifications', label: 'Notifications' },
-		{ id: 'display', label: 'Display' },
-		{ id: 'billing', label: 'Billing' },
+		// { id: 'billing', label: 'Billing' },
 	];
 
 	const renderTabContent = () => {
@@ -77,8 +74,6 @@ const SettingsClient = ({
 				return <SequenceDefaults user={userData} />;
 			case 'notifications':
 				return <NotificationSettings user={userData} />;
-			case 'display':
-				return <DisplayPreferences user={userData} />;
 			default:
 				return <AccountSettings user={userData} />;
 		}
