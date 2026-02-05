@@ -15,7 +15,7 @@ import { UserToClientFromDB } from '@/types/userTypes';
 import { useAppContext } from '@/app/context/AppContext';
 import { useSettingsContext } from '@/app/context/SettingsContext';
 
-const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
+const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 	const {
 		modalType,
 		setModalType,
@@ -27,39 +27,42 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 	} = useAppContext();
 	const { isSaving, setIsSaving, setActiveTab } = useSettingsContext();
 
-	interface SendingPreferencesFormData {
-		trackOpens: boolean;
-		trackClicks: boolean;
-		autoMarkInvalid: boolean;
+	interface NotificationsFormData {
+		bounceAlerts: boolean;
+		sequenceCompletion: boolean;
+		messageApproval: boolean;
+		sendFailure: boolean;
 	}
 
 	const { register, watch, handleSubmit, reset, setValue } =
-		useForm<SendingPreferencesFormData>({
+		useForm<NotificationsFormData>({
 			defaultValues: {
-				trackOpens: true,
-				trackClicks: true,
-				autoMarkInvalid: false,
+				bounceAlerts: true,
+				sequenceCompletion: true,
+				messageApproval: true,
+				sendFailure: true,
 			},
 		});
 
 	return (
 		<div className={styles['settings-form-wrapper']}>
 			<form className={styles.form}>
+				<h3 className={styles['section-title']}>Contact Activity</h3>
 				<section className={styles.section}>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
-							id='trackOpens'
-							{...register('trackOpens')}
+							id='bounceAlerts'
+							{...register('bounceAlerts')}
 						/>
 						<div className={styles.input}>
-							<label htmlFor='trackOpens'>
-								<span>Track email opens</span>
+							<label htmlFor='bounceAlerts'>
+								<span>Bounce Alerts</span>
 							</label>
 							<small className={styles.helpText}>
-								Add tracking pixel to outbound emails
+								Get notified when an email bounces
 							</small>
 						</div>
 					</div>
@@ -69,15 +72,36 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 					>
 						<input
 							type='checkbox'
-							id='trackClicks'
-							{...register('trackClicks')}
+							id='sendFailure'
+							{...register('sendFailure')}
 						/>
 						<div className={styles.input}>
-							<label htmlFor='trackClicks'>
-								<span>Track link clicks</span>
+							<label htmlFor='sendFailure'>
+								<span>Send Failure</span>
 							</label>
 							<small className={styles.helpText}>
-								Monitor when recipients click links in your emails
+								Get notified when a message fails to send
+							</small>
+						</div>
+					</div>
+				</section>
+
+				<h3 className={styles['section-title']}>Sequence Activity</h3>
+				<section className={styles.section}>
+					<div
+						className={`${styles['input-group']} ${styles['checkbox-group']}`}
+					>
+						<input
+							type='checkbox'
+							id='sequenceCompletion'
+							{...register('sequenceCompletion')}
+						/>
+						<div className={styles.input}>
+							<label htmlFor='sequenceCompletion'>
+								<span>Sequence Completion</span>
+							</label>
+							<small className={styles.helpText}>
+								Get notified when a sequence completes
 							</small>
 						</div>
 					</div>
@@ -87,35 +111,17 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 					>
 						<input
 							type='checkbox'
-							id='autoMarkInvalid'
-							{...register('autoMarkInvalid')}
+							id='messageApproval'
+							{...register('messageApproval')}
 						/>
 						<div className={styles.input}>
-							<label htmlFor='autoMarkInvalid'>
-								<span>
-									Automatically mark contacts as invalid on hard bounce
-								</span>
+							<label htmlFor='messageApproval'>
+								<span>Message Approval</span>
 							</label>
 							<small className={styles.helpText}>
-								Prevents future emails to bounced addresses
+								Get notified when a message requires approval
 							</small>
 						</div>
-					</div>
-
-					<div className={styles['send-limit']}>
-						<div className={styles.info}>
-							<p>Daily Send Limit:</p>
-							<p className={styles.limit}>20 emails</p>
-						</div>
-						<small>
-							Your current plan allows up to 20 emails per day.{' '}
-							<span
-								className={styles.upgrade}
-								onClick={() => setActiveTab('billing')}
-							>
-								Upgrade your plan to increase this limit.
-							</span>
-						</small>
 					</div>
 				</section>
 
@@ -133,4 +139,4 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 	);
 };
 
-export default SendingPreferencesForm;
+export default NotificationsForm;

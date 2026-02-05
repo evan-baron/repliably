@@ -114,42 +114,6 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 			<section className={styles.section}>
 				<h3 className={styles['section-title']}>Email Templates</h3>
 				<p className={styles['section-description']}>Coming soon!</p>
-				{/* <p className={styles['section-description']}>
-					Create and manage reusable email templates with placeholders for
-					contact information.
-				</p>
-
-				<div className={styles.templateList}>
-					<div className={styles.templateHeader}>
-						<span>Template Name</span>
-						<span>Category</span>
-						<span>Usage</span>
-						<span>Status</span>
-						<span>Actions</span>
-					</div>
-
-					{templates.map((template) => (
-						<div key={template.id} className={styles.templateItem}>
-							<span className={styles.templateName}>{template.name}</span>
-							<span className={styles.category}>{template.category}</span>
-							<span className={styles.usage}>{template.usageCount} times</span>
-							<span
-								className={`${styles.status} ${
-									template.isActive ? styles.active : styles.inactive
-								}`}
-							>
-								{template.isActive ? 'Active' : 'Inactive'}
-							</span>
-							<div className={styles.templateActions}>
-								<button className={styles.iconButton}>Edit</button>
-								<button className={styles.iconButton}>Duplicate</button>
-								<button className={styles.iconButton}>Delete</button>
-							</div>
-						</div>
-					))}
-				</div>
-
-				<button className={'button settings-button'}>Create Template</button> */}
 			</section>
 
 			<section className={styles.section}>
@@ -166,17 +130,6 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 						</div>
 						<button className={'button settings-button'}>Reconnect</button>
 					</div>
-					{/* 
-					<div className={styles.item}>
-						<div>
-							<h4>OAuth Permissions</h4>
-							<p>Full Gmail access granted</p>
-							<small>Send, read, and manage emails</small>
-						</div>
-						<button className={styles.secondaryButton}>
-							Review Permissions
-						</button>
-					</div> */}
 				</div>
 			</section>
 
