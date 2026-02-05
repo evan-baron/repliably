@@ -19,13 +19,13 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 	const [signatures, setSignatures] = useState([
 		{
 			id: 1,
-			name: 'Signature 1',
+			name: 'Sample Signature Title 1',
 			isDefault: true,
 			content: 'Best regards,\n\nJohn Doe',
 		},
 		{
 			id: 2,
-			name: 'Signature 2',
+			name: 'Sample Signature Title 2',
 			isDefault: false,
 			content: 'Thanks,\n\nJohn',
 		},
@@ -60,8 +60,11 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 			<section className={styles.section}>
 				<h3 className={styles['section-title']}>Email Signatures</h3>
 				<p className={styles['section-description']}>
-					Manage your email signatures. Default signature will be automatically
-					appended to outbound messages.
+					Manage your email signatures.{' '}
+					<span className={styles.important}>
+						Default signature will be automatically appended to outbound
+						messages.
+					</span>
 				</p>
 
 				<div className={styles.signatureList}>
@@ -86,11 +89,18 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 								</div>
 								<div className={styles.signatureActions}>
 									<button className={styles['mini-button']}>Edit</button>
-									{!signature.isDefault && (
-										<button className={styles['mini-button']}>
+									{!signature.isDefault ?
+										<button
+											className={`${styles['mini-button']} ${styles['default-button']}`}
+										>
 											Set Default
 										</button>
-									)}
+									:	<button
+											className={`${styles['mini-button']} ${styles['default-button']}`}
+										>
+											Remove Default
+										</button>
+									}
 									<button className={styles['mini-button']}>Delete</button>
 								</div>
 							</div>
