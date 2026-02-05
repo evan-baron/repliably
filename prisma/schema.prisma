@@ -29,6 +29,14 @@ model User {
   messages      Message[]
   templates     Template[]
   signatures    UserSignature[]
+
+  // Google OAuth for Gmail API
+  googleEmail           String?   // Gmail address (may differ from Auth0 email)
+  googleAccessToken     String?   @db.Text
+  googleRefreshToken    String?   @db.Text
+  googleTokenExpiry     DateTime?
+  gmailConnected        Boolean   @default(false)
+  gmailConnectedAt      DateTime?
 }
 
 model Contact {

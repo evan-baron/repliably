@@ -1,34 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google, gmail_v1 } from 'googleapis';
 import { prisma } from '@/lib/prisma';
+import { getGmailClient } from '@/lib/gmail';
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
+// Legacy environment variables
+const LEGACY_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const LEGACY_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const LEGACY_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const LEGACY_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 
 // Gmail schema types (compatible with googleapis)
 type GmailHeader = gmail_v1.Schema$MessagePartHeader;
+
+function isLegacyModeConfigured(): boolean {
+	return !!(
+		LEGACY_CLIENT_ID &&
+		LEGACY_CLIENT_SECRET &&
+		LEGACY_REDIRECT_URI &&
+		LEGACY_REFRESH_TOKEN
+	);
+}
 
 export async function POST(_req: NextRequest) {
 	try {
 		console.log('Checking for new email replies...');
 
-		const oAuth2Client = new google.auth.OAuth2(
-			CLIENT_ID,
-			CLIENT_SECRET,
-			REDIRECT_URI
-		);
-		oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-		const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+		// Get all users with Gmail connected
+		const connectedUsers = await prisma.user.findMany({
+			where: { gmailConnected: true },
+			select: { id: true, googleEmail: true },
+		});
 
-		console.log('Gmail client initialized, checking for replies...');
+		console.log(`Found ${connectedUsers.length} users with Gmail connected`);
 
-		await checkForReplies(gmail);
+		// Check each connected user's inbox
+		for (const user of connectedUsers) {
+			try {
+				console.log(
+					`Checking replies for user ${user.id} (${user.googleEmail})`
+				);
+				const { gmail } = await getGmailClient(user.id);
+				await checkForReplies(gmail, user.id);
+			} catch (userError) {
+				console.error(
+					`Error checking replies for user ${user.id}:`,
+					userError
+				);
+				// Continue to next user
+			}
+		}
+
+		// Also check legacy account if configured and no users are connected
+		if (connectedUsers.length === 0 && isLegacyModeConfigured()) {
+			console.log('No connected users, using legacy Gmail configuration');
+			const oAuth2Client = new google.auth.OAuth2(
+				LEGACY_CLIENT_ID,
+				LEGACY_CLIENT_SECRET,
+				LEGACY_REDIRECT_URI
+			);
+			oAuth2Client.setCredentials({ refresh_token: LEGACY_REFRESH_TOKEN });
+			const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+			await checkForReplies(gmail, null);
+		}
 
 		return NextResponse.json({
 			success: true,
 			message: 'Checked for replies successfully',
+			usersChecked: connectedUsers.length,
 		});
 	} catch (error) {
 		console.error('Error checking for replies:', error);
@@ -39,8 +77,8 @@ export async function POST(_req: NextRequest) {
 	}
 }
 
-// Reuse existing processMessage function logic
-async function checkForReplies(gmail: gmail_v1.Gmail) {
+// Check for replies using a specific Gmail client
+async function checkForReplies(gmail: gmail_v1.Gmail, userId: number | null) {
 	console.log('Fetching recent messages from Gmail...');
 
 	const response = await gmail.users.messages.list({
@@ -54,12 +92,16 @@ async function checkForReplies(gmail: gmail_v1.Gmail) {
 			`Found ${response.data.messages.length} recent messages to check`
 		);
 		for (const message of response.data.messages) {
-			await processMessage(gmail, message.id!);
+			await processMessage(gmail, message.id!, userId);
 		}
 	}
 }
 
-async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
+async function processMessage(
+	gmail: gmail_v1.Gmail,
+	messageId: string,
+	checkingUserId: number | null
+) {
 	try {
 		const message = await gmail.users.messages.get({
 			userId: 'me',
@@ -73,12 +115,24 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 		const from = headers.find((h) => h.name === 'From')?.value;
 		const senderEmail = extractEmailFromHeader(from || '');
 
+		// Build query for finding sent message
+		// If checking a specific user's inbox, only match their messages
+		const whereClause: {
+			threadId: string | null | undefined;
+			direction: string;
+			ownerId?: number;
+		} = {
+			threadId: threadId,
+			direction: 'outbound',
+		};
+
+		if (checkingUserId !== null) {
+			whereClause.ownerId = checkingUserId;
+		}
+
 		// Check if this is a reply to one of user's sent emails
 		const sentMessage = await prisma.message.findFirst({
-			where: {
-				threadId: threadId,
-				direction: 'outbound',
-			},
+			where: whereClause,
 			include: {
 				contact: true,
 			},
@@ -111,7 +165,9 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			}
 
 			// Rest of processing...
-			const subject = headers.find((header) => header.name === 'Subject')?.value;
+			const subject = headers.find(
+				(header) => header.name === 'Subject'
+			)?.value;
 
 			// Extract email body (simplified)
 			let bodyContent = '';
@@ -124,10 +180,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
 				}
 			} else if (payload?.body?.data) {
-				bodyContent = Buffer.from(
-					payload.body.data,
-					'base64'
-				).toString();
+				bodyContent = Buffer.from(payload.body.data, 'base64').toString();
 			}
 
 			// Parse the email content into structured sections

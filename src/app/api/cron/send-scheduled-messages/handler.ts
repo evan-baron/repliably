@@ -2,6 +2,11 @@ import { sendGmail } from '@/lib/gmail';
 import { prisma } from '@/lib/prisma';
 import { parseSequenceData } from '@/lib/helperFunctions';
 
+// Check if legacy mode is available
+function hasLegacyGmailConfig(): boolean {
+	return !!(process.env.GOOGLE_REFRESH_TOKEN && process.env.EMAIL_ADDRESS);
+}
+
 export async function runSendScheduledMessages({ limit }: { limit: number }) {
 	const limitValue = limit || 50;
 
@@ -23,6 +28,12 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 		include: {
 			contact: true,
 			sequence: true,
+			owner: {
+				select: {
+					id: true,
+					gmailConnected: true,
+				},
+			},
 		},
 		take: limitValue,
 	});
@@ -56,12 +67,43 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 
 	const messagesToSend = await prisma.message.findMany({
 		where: { id: { in: candidateIds }, status: 'processing' },
-		include: { contact: true, sequence: true },
+		include: {
+			contact: true,
+			sequence: true,
+			owner: {
+				select: {
+					id: true,
+					gmailConnected: true,
+				},
+			},
+		},
 	});
 
 	const results = await Promise.allSettled(
 		messagesToSend.map(async (message) => {
 			const now = new Date();
+
+			// Check if owner has Gmail connected
+			const ownerHasGmail = message.owner?.gmailConnected ?? false;
+			const legacyAvailable = hasLegacyGmailConfig();
+
+			if (!ownerHasGmail && !legacyAvailable) {
+				console.error(
+					`Message ${message.id}: Owner ${message.ownerId} has no Gmail connected`
+				);
+				await prisma.message.update({
+					where: { id: message.id },
+					data: {
+						status: 'failed',
+						lastError: 'Gmail disconnected - please reconnect in Settings',
+					},
+				});
+				return {
+					success: false,
+					messageId: message.id,
+					error: 'Gmail disconnected',
+				};
+			}
 
 			// If message requires approval and is not approved, skip if there's no deadline (wait indefinitely) or if there's a future approvalDeadline
 			if (message.needsApproval && !message.approved) {
@@ -125,6 +167,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 
 			try {
 				const result = await sendGmail({
+					userId: ownerHasGmail ? message.ownerId : undefined,
 					to: contact.email,
 					subject: message.subject,
 					html: endOfSequence ? 'Did I lose you?' : message.contents,

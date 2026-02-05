@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendGmail } from '@/lib/gmail';
+import { sendGmail, isGmailConnected } from '@/lib/gmail';
 import { storeSentEmail } from '@/services/emailService';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
@@ -13,6 +13,26 @@ export async function POST(req: NextRequest) {
 				{ error: error.error },
 				{ status: error.status }
 			);
+		}
+
+		// Check if user has Gmail connected
+		const gmailConnected = await isGmailConnected(user.id);
+		if (!gmailConnected) {
+			// Check if legacy mode is available as fallback
+			const hasLegacyConfig = !!(
+				process.env.GOOGLE_REFRESH_TOKEN && process.env.EMAIL_ADDRESS
+			);
+			if (!hasLegacyConfig) {
+				return NextResponse.json(
+					{
+						error: 'Gmail not connected',
+						code: 'GMAIL_NOT_CONNECTED',
+						message:
+							'Please connect your Gmail account in Settings to send emails.',
+					},
+					{ status: 400 }
+				);
+			}
 		}
 
 		const {
@@ -45,7 +65,12 @@ export async function POST(req: NextRequest) {
 
 		// Helper: send email and update contact
 		const sendAndStoreEmail = async () => {
-			const result = await sendGmail({ to, subject, html: body });
+			const result = await sendGmail({
+				userId: gmailConnected ? user.id : undefined,
+				to,
+				subject,
+				html: body,
+			});
 
 			if (user && result.messageId && result.threadId) {
 				const { createdMessage, updatedContact, newContact } =

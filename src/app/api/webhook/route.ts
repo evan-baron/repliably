@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google, gmail_v1 } from 'googleapis';
 import { prisma } from '@/lib/prisma';
+import { getGmailClient } from '@/lib/gmail';
 
-// Unused type aliases removed - using googleapis types directly
+// Legacy environment variables
+const LEGACY_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const LEGACY_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const LEGACY_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const LEGACY_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
-const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
+function isLegacyModeConfigured(): boolean {
+	return !!(
+		LEGACY_CLIENT_ID &&
+		LEGACY_CLIENT_SECRET &&
+		LEGACY_REDIRECT_URI &&
+		LEGACY_REFRESH_TOKEN
+	);
+}
 
 export async function POST(req: NextRequest) {
 	try {
@@ -21,8 +30,11 @@ export async function POST(req: NextRequest) {
 
 		console.log('Decoded message:', message);
 
+		// The emailAddress in the notification tells us which inbox received the email
+		const notificationEmail = message.emailAddress;
+
 		// Check for new emails
-		await checkForNewEmails(message.historyId);
+		await checkForNewEmails(message.historyId, notificationEmail);
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
@@ -34,14 +46,57 @@ export async function POST(req: NextRequest) {
 	}
 }
 
-async function checkForNewEmails(historyId: string) {
-	const oAuth2Client = new google.auth.OAuth2(
-		CLIENT_ID,
-		CLIENT_SECRET,
-		REDIRECT_URI
-	);
-	oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-	const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+async function checkForNewEmails(
+	historyId: string,
+	notificationEmail?: string
+) {
+	let gmail: gmail_v1.Gmail;
+	let userId: number | null = null;
+
+	// Try to find the user by their googleEmail
+	if (notificationEmail) {
+		const user = await prisma.user.findFirst({
+			where: {
+				googleEmail: notificationEmail,
+				gmailConnected: true,
+			},
+			select: { id: true },
+		});
+
+		if (user) {
+			userId = user.id;
+			const client = await getGmailClient(user.id);
+			gmail = client.gmail;
+			console.log(
+				`Using credentials for user ${user.id} (${notificationEmail})`
+			);
+		} else if (isLegacyModeConfigured()) {
+			// Fall back to legacy mode
+			console.log('User not found, using legacy Gmail configuration');
+			const oAuth2Client = new google.auth.OAuth2(
+				LEGACY_CLIENT_ID,
+				LEGACY_CLIENT_SECRET,
+				LEGACY_REDIRECT_URI
+			);
+			oAuth2Client.setCredentials({ refresh_token: LEGACY_REFRESH_TOKEN });
+			gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+		} else {
+			console.error(`No credentials found for email: ${notificationEmail}`);
+			return;
+		}
+	} else if (isLegacyModeConfigured()) {
+		// No email in notification, use legacy mode
+		const oAuth2Client = new google.auth.OAuth2(
+			LEGACY_CLIENT_ID,
+			LEGACY_CLIENT_SECRET,
+			LEGACY_REDIRECT_URI
+		);
+		oAuth2Client.setCredentials({ refresh_token: LEGACY_REFRESH_TOKEN });
+		gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+	} else {
+		console.error('No Gmail credentials available for webhook processing');
+		return;
+	}
 
 	try {
 		// Use historyId to get only NEW changes (much more efficient)
@@ -55,7 +110,7 @@ async function checkForNewEmails(historyId: string) {
 			for (const historyItem of historyResponse.data.history) {
 				if (historyItem.messagesAdded) {
 					for (const messageAdded of historyItem.messagesAdded) {
-						await processMessage(gmail, messageAdded.message!.id!);
+						await processMessage(gmail, messageAdded.message!.id!, userId);
 					}
 				}
 			}
@@ -63,12 +118,15 @@ async function checkForNewEmails(historyId: string) {
 	} catch (error) {
 		console.error('Error checking emails:', error);
 		// Fallback to recent messages if history fails
-		await fallbackToRecentMessages(gmail);
+		await fallbackToRecentMessages(gmail, userId);
 	}
 }
 
 // Fallback method (your original approach)
-async function fallbackToRecentMessages(gmail: gmail_v1.Gmail) {
+async function fallbackToRecentMessages(
+	gmail: gmail_v1.Gmail,
+	userId: number | null
+) {
 	const response = await gmail.users.messages.list({
 		userId: 'me',
 		q: 'in:inbox',
@@ -77,12 +135,16 @@ async function fallbackToRecentMessages(gmail: gmail_v1.Gmail) {
 
 	if (response.data.messages) {
 		for (const message of response.data.messages) {
-			await processMessage(gmail, message.id!);
+			await processMessage(gmail, message.id!, userId);
 		}
 	}
 }
 
-async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
+async function processMessage(
+	gmail: gmail_v1.Gmail,
+	messageId: string,
+	checkingUserId: number | null
+) {
 	try {
 		const message = await gmail.users.messages.get({
 			userId: 'me',
@@ -96,12 +158,24 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 		const from = headers.find((h) => h.name === 'From')?.value;
 		const senderEmail = extractEmailFromHeader(from || '');
 
+		// Build query for finding sent message
+		// If checking a specific user's inbox, only match their messages
+		const whereClause: {
+			threadId: string | null | undefined;
+			direction: string;
+			ownerId?: number;
+		} = {
+			threadId: threadId,
+			direction: 'outbound',
+		};
+
+		if (checkingUserId !== null) {
+			whereClause.ownerId = checkingUserId;
+		}
+
 		// Check if this is a reply to one of our sent emails
 		const sentMessage = await prisma.message.findFirst({
-			where: {
-				threadId: threadId,
-				direction: 'outbound',
-			},
+			where: whereClause,
 			include: {
 				contact: true,
 			},
@@ -130,10 +204,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
 				}
 			} else if (payload?.body?.data) {
-				bodyContent = Buffer.from(
-					payload.body.data,
-					'base64'
-				).toString();
+				bodyContent = Buffer.from(payload.body.data, 'base64').toString();
 			}
 
 			// Store the reply
