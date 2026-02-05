@@ -30,7 +30,6 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 	interface SendingPreferencesFormData {
 		trackOpens: boolean;
 		trackClicks: boolean;
-		autoMarkInvalid: boolean;
 	}
 
 	const { register, watch, handleSubmit, reset, setValue } =
@@ -38,7 +37,6 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 			defaultValues: {
 				trackOpens: true,
 				trackClicks: true,
-				autoMarkInvalid: false,
 			},
 		});
 
@@ -78,26 +76,6 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							</label>
 							<small className={styles.helpText}>
 								Monitor when recipients click links in your emails
-							</small>
-						</div>
-					</div>
-
-					<div
-						className={`${styles['input-group']} ${styles['checkbox-group']}`}
-					>
-						<input
-							type='checkbox'
-							id='autoMarkInvalid'
-							{...register('autoMarkInvalid')}
-						/>
-						<div className={styles.input}>
-							<label htmlFor='autoMarkInvalid'>
-								<span>
-									Automatically mark contacts as invalid on hard bounce
-								</span>
-							</label>
-							<small className={styles.helpText}>
-								Prevents future emails to bounced addresses
 							</small>
 						</div>
 					</div>
