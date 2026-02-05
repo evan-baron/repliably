@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 // Hooks imports
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
+import { useUserAccountSettingsUpdate } from '@/hooks/useUserSettings';
 
 // Styles imports
 import styles from './settings.module.scss';
@@ -22,71 +23,6 @@ import { useSettingsContext } from '@/app/context/SettingsContext';
 import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';
 
 const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
-	const {
-		modalType,
-		setModalType,
-		selectedContact,
-		setSelectedContact,
-		setErrors,
-		setLoading,
-		setLoadingMessage,
-	} = useAppContext();
-
-	const labelStyle = 'original';
-	const timezones = { ...allTimezones };
-	const { options, parseTimezone } = useTimezoneSelect({
-		labelStyle,
-		timezones,
-	});
-
-	interface AccountFormData {
-		firstName: string;
-		lastName: string;
-		timezone: string;
-	}
-
-	const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-	// Find the matching option value for the user's timezone
-	const findMatchingTimezone = (tz: string | null) => {
-		if (!tz) return defaultTimezone;
-
-		// First try exact match
-		const exactMatch = options.find((opt) => opt.value === tz);
-
-		if (exactMatch) return tz;
-
-		// If no exact match, try to find by offset
-		const userTzOption = parseTimezone(tz);
-		const matchByOffset = options.find(
-			(opt) => opt.offset === userTzOption.offset,
-		);
-
-		return matchByOffset?.value || defaultTimezone;
-	};
-
-	const { register, watch, handleSubmit, reset, setValue } =
-		useForm<AccountFormData>({
-			defaultValues: {
-				firstName: user.firstName || '',
-				lastName: user.lastName || '',
-				timezone: user.timezone || findMatchingTimezone(defaultTimezone),
-			},
-		});
-
-	// const handleSubmit = (e: React.FormEvent) => {
-	// 	e.preventDefault();
-	// 	// TODO: Implement save functionality
-	// 	console.log('Saving account settings:', formData);
-	// };
-
-	// const handleChange = (
-	// 	e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	// ) => {
-	// 	const { name, value } = e.target;
-	// 	setFormData((prev) => ({ ...prev, [name]: value }));
-	// };
-
 	return (
 		<div className={styles['settings-container']}>
 			<section className={styles.section}>

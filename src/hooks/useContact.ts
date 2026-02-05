@@ -52,7 +52,7 @@ export const useContactCreate = () => {
 						return {
 							contacts: [response.contact, ...prev],
 						};
-					}
+					},
 				);
 			} else {
 				// If server only returns contact id or similar, simply invalidate to refetch authoritative data
@@ -89,10 +89,10 @@ export const useContactUpdate = () => {
 						const prev = old?.contacts || [];
 						return {
 							contacts: prev.map((contact: any) =>
-								contact.id === updateData.id ? response.contact : contact
+								contact.id === updateData.id ? response.contact : contact,
 							),
 						};
-					}
+					},
 				);
 			} else {
 				// If server does not return updated contact, invalidate to refetch authoritative data
@@ -110,7 +110,6 @@ export const useContactUpdate = () => {
 				return;
 			}
 			console.error('Failed to update contact:', error);
-			alert(`Failed to update contact: ${error.message}`);
 		},
 
 		onSettled: (_data, _error, variables) => {
@@ -140,7 +139,7 @@ export const useContactDelete = () => {
 					return {
 						contacts: prev.filter((contact: any) => contact.id !== contactId),
 					};
-				}
+				},
 			);
 		},
 

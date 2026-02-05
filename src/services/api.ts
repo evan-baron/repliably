@@ -1,5 +1,6 @@
 // Types imports
 import { ContactData, ContactUpdateData } from '@/types/contactTypes';
+import { UserFromDB } from '@/types/userTypes';
 import { SentEmailData } from '@/types/emailTypes';
 
 // Generic fetch wrapper
@@ -118,5 +119,10 @@ export const userAPI = {
 	getUser: () =>
 		apiCall('/api/user', {
 			method: 'GET',
+		}),
+	updateAccountSettings: (updateData: Partial<UserFromDB>) =>
+		apiCall('/api/user/accountSettings', {
+			method: 'PUT',
+			body: JSON.stringify({ updateData }),
 		}),
 };

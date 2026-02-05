@@ -1,12 +1,13 @@
 'use client';
 
 // Library imports
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import Link from 'next/link';
 
 // Hooks imports
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
+import { useUserAccountSettingsUpdate } from '@/hooks/useUserSettings';
 
 // Styles imports
 import styles from '../settingsForm.module.scss';
@@ -16,19 +17,12 @@ import { UserToClientFromDB } from '@/types/userTypes';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
-import { useSettingsContext } from '@/app/context/SettingsContext';
 
 const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
-	const {
-		modalType,
-		setModalType,
-		selectedContact,
-		setSelectedContact,
-		setErrors,
-		setLoading,
-		setLoadingMessage,
-	} = useAppContext();
-	const { isSaving, setIsSaving } = useSettingsContext();
+	const { setModalType, setErrors, setLoading, setLoadingMessage } =
+		useAppContext();
+	const { mutateAsync: updateUser, isPending: updatingUser } =
+		useUserAccountSettingsUpdate();
 
 	const labelStyle = 'original';
 	const timezones = { ...allTimezones };
@@ -41,18 +35,20 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 		firstName: string;
 		lastName: string;
 		timezone: string;
-		role: string;
 	}
 
-	const defaultTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	const defaultTimezone = useMemo(
+		() => Intl.DateTimeFormat().resolvedOptions().timeZone,
+		[],
+	);
 
 	// Find the matching option value for the user's timezone
-	const findMatchingTimezone = (tz: string | null) => {
-		if (!tz) return defaultTimezone;
+	const initialTimezone = useMemo(() => {
+		const tz = user.timezone;
+		if (!tz || options.length === 0) return defaultTimezone;
 
 		// First try exact match
 		const exactMatch = options.find((opt) => opt.value === tz);
-
 		if (exactMatch) return tz;
 
 		// If no exact match, try to find by offset
@@ -62,37 +58,64 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 		);
 
 		return matchByOffset?.value || defaultTimezone;
-	};
+	}, [user.timezone, options, parseTimezone, defaultTimezone]);
 
 	const { register, watch, handleSubmit, reset, setValue } =
 		useForm<AccountFormData>({
 			defaultValues: {
 				firstName: user.firstName || '',
 				lastName: user.lastName || '',
-				timezone: user.timezone || findMatchingTimezone(defaultTimezone),
-				role: user.role || 'user',
+				timezone: initialTimezone,
 			},
 		});
 
-	// const handleSubmit = (e: React.FormEvent) => {
-	// 	e.preventDefault();
-	// 	// TODO: Implement save functionality
-	// 	console.log('Saving account settings:', formData);
-	// };
+	// Update timezone when initialTimezone changes (after options load)
+	useEffect(() => {
+		if (initialTimezone) {
+			setValue('timezone', initialTimezone);
+		}
+	}, [initialTimezone, setValue]);
 
-	// const handleChange = (
-	// 	e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	// ) => {
-	// 	const { name, value } = e.target;
-	// 	setFormData((prev) => ({ ...prev, [name]: value }));
-	// };
+	const onSubmit: SubmitHandler<AccountFormData> = async (data) => {
+		try {
+			setLoading(true);
+			setLoadingMessage('Saving');
+			await updateUser({ ...data });
+			reset({
+				firstName: data.firstName,
+				lastName: data.lastName,
+				timezone: data.timezone,
+			});
+			setModalType(null);
+			setLoading(false);
+			setLoadingMessage(null);
+		} catch (error) {
+			// Error handling is done in the hook
+			setLoading(false);
+			setLoadingMessage(null);
+		}
+	};
 
 	return (
 		<div className={styles['settings-form-wrapper']}>
-			<form className={styles.form}>
+			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 				<div className={styles['input-group']}>
 					<label htmlFor='firstName'>First Name</label>
-					<input type='text' id='firstName' {...register('firstName')} />
+					<input
+						type='text'
+						id='firstName'
+						{...register('firstName', {
+							required: 'First name is required',
+							minLength: {
+								value: 1,
+								message: 'First name must be at least 1 character',
+							},
+							maxLength: {
+								value: 50,
+								message: 'First name cannot exceed 50 characters',
+							},
+						})}
+					/>
 				</div>
 
 				<div className={styles['input-group']}>
@@ -100,7 +123,17 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 					<input
 						type='text'
 						id='lastName'
-						{...register('lastName')}
+						{...register('lastName', {
+							required: 'Last name is required',
+							minLength: {
+								value: 1,
+								message: 'Last name must be at least 1 character',
+							},
+							maxLength: {
+								value: 50,
+								message: 'Last name cannot exceed 50 characters',
+							},
+						})}
 						placeholder='Enter last name'
 					/>
 				</div>
@@ -143,9 +176,9 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 					<button
 						className={'button save-changes'}
 						type='submit'
-						disabled={isSaving}
+						disabled={updatingUser}
 					>
-						{isSaving ? 'Saving...' : 'Save Changes'}
+						{updatingUser ? 'Saving...' : 'Save Changes'}
 					</button>
 				</div>
 			</form>

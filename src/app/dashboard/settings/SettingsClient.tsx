@@ -5,7 +5,7 @@ import { useEffect, Fragment } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
-import { useUser } from '@/hooks/useUser';
+import { useGetUser } from '@/hooks/useUserSettings';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
@@ -36,7 +36,7 @@ const SettingsClient = ({
 	initialUser: UserToClientFromDB;
 }) => {
 	const queryClient = useQueryClient();
-	const userQuery = useUser();
+	const userQuery = useGetUser();
 
 	const { setLoading, setLoadingMessage, setModalType, setErrors } =
 		useAppContext();
