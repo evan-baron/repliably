@@ -6,7 +6,10 @@ import { useState } from 'react';
 // Styles imports
 import styles from './DisplayPreferences.module.scss';
 
-const DisplayPreferences = () => {
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
+const DisplayPreferences = ({ user }: { user: UserToClientFromDB }) => {
 	const [preferences, setPreferences] = useState({
 		theme: 'system',
 		density: 'comfortable',
@@ -19,7 +22,7 @@ const DisplayPreferences = () => {
 	});
 
 	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
 		const { name, value, type } = e.target;
 		const checked = (e.target as HTMLInputElement).checked;

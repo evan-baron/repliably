@@ -29,7 +29,8 @@ type SettingsTab =
 	| 'email'
 	| 'sequences'
 	| 'notifications'
-	| 'display';
+	| 'display'
+	| 'billing';
 
 const SettingsClient = ({
 	initialUser,
@@ -59,6 +60,7 @@ const SettingsClient = ({
 		{ id: 'sequences', label: 'Sequence Defaults' },
 		{ id: 'notifications', label: 'Notifications' },
 		{ id: 'display', label: 'Display' },
+		{ id: 'billing', label: 'Billing' },
 	];
 
 	const renderTabContent = () => {
@@ -72,13 +74,13 @@ const SettingsClient = ({
 			case 'account':
 				return <AccountSettings user={userData} />;
 			case 'email':
-				return <EmailSettings />;
+				return <EmailSettings user={userData} />;
 			case 'sequences':
-				return <SequenceDefaults />;
+				return <SequenceDefaults user={userData} />;
 			case 'notifications':
-				return <NotificationSettings />;
+				return <NotificationSettings user={userData} />;
 			case 'display':
-				return <DisplayPreferences />;
+				return <DisplayPreferences user={userData} />;
 			default:
 				return <AccountSettings user={userData} />;
 		}

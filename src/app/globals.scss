@@ -83,8 +83,8 @@
 	--accent-light: #fde68a;
 	--accent-subtle: #fffbeb;
 	--accent-important: #f59e0b;
-	// --accent-important: #f74141;
-	--accent-important-dark: #b91c1c;
+	--accent-danger: #f74141;
+	--accent-danger-dark: #b91c1c;
 
 	/* Border radius */
 	--border-radius: 0.5rem;
@@ -208,6 +208,7 @@ a {
 	}
 
 	&.save-changes {
+		width: 12.5rem;
 		padding: 0.75rem 1.5rem !important;
 	}
 

@@ -6,7 +6,10 @@ import { useState } from 'react';
 // Styles imports
 import styles from './SequenceDefaults.module.scss';
 
-const SequenceDefaults = () => {
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
+const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
 	const [formData, setFormData] = useState({
 		autoSend: false,
 		autoSendDelay: 3,
@@ -24,7 +27,7 @@ const SequenceDefaults = () => {
 	};
 
 	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
 		const { name, value, type } = e.target;
 		const checked = (e.target as HTMLInputElement).checked;

@@ -53,9 +53,50 @@
 			select {
 				cursor: pointer;
 			}
+
+			&.checkbox-group {
+				flex-direction: row;
+				gap: 1rem;
+
+				label {
+					cursor: pointer;
+				}
+
+				input[type='checkbox'] {
+					width: 1.25rem;
+					height: 1.25rem;
+					cursor: pointer;
+				}
+			}
 		}
 
-		.form-actions {
+		.send-limit {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+
+			.info {
+				display: flex;
+				gap: 1rem;
+				font-size: 1.25rem;
+
+				.limit {
+					color: var(--color-primary-hover);
+				}
+			}
+
+			.upgrade {
+				color: var(--color-primary);
+				text-decoration: none;
+				transition: color 0.2s ease;
+				cursor: pointer;
+
+				@media (hover: hover) {
+					&:hover {
+						color: var(--color-primary-hover);
+					}
+				}
+			}
 		}
 	}
 }

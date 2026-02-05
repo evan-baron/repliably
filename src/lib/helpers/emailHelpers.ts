@@ -33,18 +33,9 @@ export const parseReplyContent = (replyContent: string) => {
 
 	const normalized = replyContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-	const paragraphs = normalized.split(/\n\s*\n+/);
+	const lines = normalized.split('\n');
 
-	const result = paragraphs
-		.map((paragraph) =>
-			paragraph
-				.split('\n')
-				.map((line) => line.trim())
-				.filter(Boolean)
-				.join(' ')
-				.trim()
-		)
-		.filter(Boolean);
+	const result = lines.map((line) => line.trim()).filter(Boolean);
 
 	return result;
 };

@@ -3,18 +3,32 @@
 // Library imports
 import { useState } from 'react';
 
-// Styles imports
-import styles from './EmailSettings.module.scss';
+// Helpers imports
+import { parseReplyContent } from '@/lib/helpers/emailHelpers';
 
-const EmailSettings = () => {
+// Styles imports
+import styles from './settings.module.scss';
+
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
+// Components imports
+import SendingPreferencesForm from '../../forms/emailSettings/SendingPreferencesForm';
+
+const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 	const [signatures, setSignatures] = useState([
 		{
 			id: 1,
-			name: 'Professional',
+			name: 'Signature 1',
 			isDefault: true,
-			content: 'Best regards,\nJohn Doe',
+			content: 'Best regards,\n\nJohn Doe',
 		},
-		{ id: 2, name: 'Casual', isDefault: false, content: 'Thanks,\nJohn' },
+		{
+			id: 2,
+			name: 'Signature 2',
+			isDefault: false,
+			content: 'Thanks,\n\nJohn',
+		},
 	]);
 
 	const [templates, setTemplates] = useState([
@@ -42,45 +56,55 @@ const EmailSettings = () => {
 	]);
 
 	return (
-		<div className={styles.emailSettings}>
+		<div className={styles['settings-container']}>
 			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Email Signatures</h2>
-				<p className={styles.sectionDescription}>
+				<h3 className={styles['section-title']}>Email Signatures</h3>
+				<p className={styles['section-description']}>
 					Manage your email signatures. Default signature will be automatically
 					appended to outbound messages.
 				</p>
 
 				<div className={styles.signatureList}>
-					{signatures.map((signature) => (
-						<div key={signature.id} className={styles.signatureItem}>
-							<div className={styles.signatureInfo}>
-								<h3>{signature.name}</h3>
-								{signature.isDefault && (
-									<span className={styles.defaultBadge}>Default</span>
-								)}
-								<pre className={styles.signaturePreview}>
-									{signature.content}
-								</pre>
+					{signatures.map((signature) => {
+						const parsedSignature = parseReplyContent(signature.content);
+
+						return (
+							<div key={signature.id} className={styles.signatureItem}>
+								<div className={styles.signatureInfo}>
+									<div className={styles.name}>
+										{signature.isDefault && signatures.length > 1 && (
+											<span className={styles.default}>Default</span>
+										)}
+										<h4>{signature.name}</h4>
+									</div>
+
+									<pre className={styles.preview}>
+										{parsedSignature.map((line, index) => (
+											<span key={index}>{line}</span>
+										))}
+									</pre>
+								</div>
+								<div className={styles.signatureActions}>
+									<button className={styles['mini-button']}>Edit</button>
+									{!signature.isDefault && (
+										<button className={styles['mini-button']}>
+											Set Default
+										</button>
+									)}
+									<button className={styles['mini-button']}>Delete</button>
+								</div>
 							</div>
-							<div className={styles.signatureActions}>
-								<button className={styles.iconButton}>Edit</button>
-								{!signature.isDefault && (
-									<button className={styles.iconButton}>Set Default</button>
-								)}
-								<button className={styles.iconButton}>Delete</button>
-							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 
-				<button className={styles.primaryButton}>
-					<span>+</span> Add New Signature
-				</button>
+				<button className={'button settings-button'}>Add New Signature</button>
 			</section>
 
 			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Email Templates</h2>
-				<p className={styles.sectionDescription}>
+				<h3 className={styles['section-title']}>Email Templates</h3>
+				<p className={styles['section-description']}>Coming soon!</p>
+				{/* <p className={styles['section-description']}>
 					Create and manage reusable email templates with placeholders for
 					contact information.
 				</p>
@@ -115,82 +139,40 @@ const EmailSettings = () => {
 					))}
 				</div>
 
-				<button className={styles.primaryButton}>
-					<span>+</span> Create Template
-				</button>
+				<button className={'button settings-button'}>Create Template</button> */}
 			</section>
 
 			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Gmail Integration</h2>
-				<div className={styles.integrationStatus}>
-					<div className={styles.statusCard}>
-						<div>
-							<h3>Connection Status</h3>
+				<h3 className={styles['section-title']}>Gmail Integration</h3>
+				<div className={styles.options}>
+					<div className={styles.item}>
+						<div className={styles.info}>
+							<h4>Connection Status</h4>
 							<p>
-								<span className={styles.statusDot} /> Connected to Gmail
+								<span className={`${styles['status-dot']} ${styles.active}`} />
+								Connected to Gmail
 							</p>
 							<small>Last synced: 2 hours ago</small>
 						</div>
-						<button className={styles.secondaryButton}>Reconnect</button>
+						<button className={'button settings-button'}>Reconnect</button>
 					</div>
-
-					<div className={styles.statusCard}>
+					{/* 
+					<div className={styles.item}>
 						<div>
-							<h3>OAuth Permissions</h3>
+							<h4>OAuth Permissions</h4>
 							<p>Full Gmail access granted</p>
 							<small>Send, read, and manage emails</small>
 						</div>
 						<button className={styles.secondaryButton}>
 							Review Permissions
 						</button>
-					</div>
+					</div> */}
 				</div>
 			</section>
 
 			<section className={styles.section}>
-				<h2 className={styles.sectionTitle}>Sending Preferences</h2>
-				<form className={styles.preferencesForm}>
-					<div className={styles.formGroup}>
-						<label>
-							<input type='checkbox' defaultChecked />
-							<span>Track email opens</span>
-						</label>
-						<small>Add tracking pixel to outbound emails</small>
-					</div>
-
-					<div className={styles.formGroup}>
-						<label>
-							<input type='checkbox' defaultChecked />
-							<span>Track link clicks</span>
-						</label>
-						<small>Monitor when recipients click links in your emails</small>
-					</div>
-
-					<div className={styles.formGroup}>
-						<label>
-							<input type='checkbox' />
-							<span>Automatically mark contacts as invalid on hard bounce</span>
-						</label>
-						<small>Prevents future emails to bounced addresses</small>
-					</div>
-
-					<div className={styles.formGroup}>
-						<label htmlFor='dailyLimit'>Daily send limit</label>
-						<input
-							type='number'
-							id='dailyLimit'
-							min='0'
-							max='500'
-							defaultValue='100'
-							placeholder='100'
-						/>
-						<small>Maximum emails to send per day (Gmail limit: 500)</small>
-					</div>
-
-					<button type='submit' className={styles.primaryButton}>
-						Save Preferences
-					</button>
-				</form>
+				<h3 className={styles['section-title']}>Sending Preferences</h3>
+				<SendingPreferencesForm user={user} />
 			</section>
 		</div>
 	);

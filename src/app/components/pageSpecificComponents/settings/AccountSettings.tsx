@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
 
 // Styles imports
-import styles from './AccountSettings.module.scss';
+import styles from './settings.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
@@ -90,7 +90,7 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 	// };
 
 	return (
-		<div className={styles.accountSettings}>
+		<div className={styles['settings-container']}>
 			<section className={styles.section}>
 				<h3 className={styles['section-title']}>Profile Information</h3>
 				<AccountSettingsForm user={user} />

@@ -6,7 +6,10 @@ import { useState } from 'react';
 // Styles imports
 import styles from './NotificationSettings.module.scss';
 
-const NotificationSettings = () => {
+// Types imports
+import { UserToClientFromDB } from '@/types/userTypes';
+
+const NotificationSettings = ({ user }: { user: UserToClientFromDB }) => {
 	const [notifications, setNotifications] = useState({
 		emailReplies: true,
 		bounceAlerts: true,

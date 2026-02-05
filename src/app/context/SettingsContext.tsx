@@ -8,7 +8,8 @@ type SettingsTab =
 	| 'email'
 	| 'sequences'
 	| 'notifications'
-	| 'display';
+	| 'display'
+	| 'billing';
 
 interface SettingsContextType {
 	activeTab: SettingsTab;

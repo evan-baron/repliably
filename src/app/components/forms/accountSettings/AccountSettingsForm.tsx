@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
 
 // Styles imports
-import styles from './accountSettingsForm.module.scss';
+import styles from '../settingsForm.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
