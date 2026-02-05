@@ -11,15 +11,14 @@ import styles from './masterTable.module.scss';
 // MUI imports
 import { SwapVert } from '@mui/icons-material';
 
-// Components imports
-
-// Context imports
+// Types imports
+import { ColumnHeader } from '@/types/masterTableTypes';
 
 const TableHeader = ({
 	columnHeaders,
 	handleSort,
 }: {
-	columnHeaders: any[];
+	columnHeaders: ColumnHeader[];
 	handleSort: (type: string) => void;
 }) => {
 	return (

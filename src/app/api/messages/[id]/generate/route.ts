@@ -7,7 +7,7 @@ export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const { user, error } = await getApiUser();
+	const { error } = await getApiUser();
 
 	if (error) {
 		return NextResponse.json({ error: error.error }, { status: error.status });

@@ -45,8 +45,7 @@ export default function ContactDetailsClient({
 }) {
 	const queryClient = useQueryClient();
 
-	const { setSelectedContact, setModalType, setLoading, setLoadingMessage } =
-		useAppContext();
+	const { setSelectedContact, setModalType } = useAppContext();
 
 	const contactQuery = useContactGetUnique(initialContact.id);
 	const sequencesQuery = useSequencesByContactId(initialContact.id);
@@ -57,13 +56,10 @@ export default function ContactDetailsClient({
 			setSelectedContact(initialContact);
 			setModalType('newContactFromNewEmail');
 		}
-	}, []);
+	}, [initialContact, setModalType, setSelectedContact]);
 
 	// hydrate server data into the cache
 	useEffect(() => {
-		// setLoading(true);
-		// setLoadingMessage('Loading');
-
 		if (initialContact) {
 			queryClient.setQueryData<ContactFromDB>(
 				['contact-get-unique', initialContact.id],
@@ -84,7 +80,7 @@ export default function ContactDetailsClient({
 				initialAllMessages
 			);
 		}
-	}, []);
+	}, [initialContact, initialSequences, initialAllMessages, queryClient]);
 
 	const { data } = contactQuery;
 	const contact = data || initialContact;

@@ -94,7 +94,7 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 			}
 		})();
 		setEmailSentId(null);
-	}, [emailSentId]);
+	}, [emailSentId, queryClient]);
 
 	const clearEmailContext = () => {
 		setPendingEmail(null);

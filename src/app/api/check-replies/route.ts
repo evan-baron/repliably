@@ -7,17 +7,8 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 
-// Gmail header type
-interface GmailHeader {
-	name: string;
-	value: string;
-}
-
-// Gmail message part type
-interface GmailMessagePart {
-	mimeType: string;
-	body: { data?: string };
-}
+// Gmail schema types (compatible with googleapis)
+type GmailHeader = gmail_v1.Schema$MessagePartHeader;
 
 export async function POST(_req: NextRequest) {
 	try {
@@ -75,12 +66,12 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			id: messageId,
 		});
 
-		const headers = message.data.payload.headers;
+		const headers = message.data.payload?.headers || [];
 		const threadId = message.data.threadId;
 
 		// Extract sender email and use it for validation
-		const from = headers.find((h: GmailHeader) => h.name === 'From')?.value;
-		const senderEmail = extractEmailFromHeader(from);
+		const from = headers.find((h) => h.name === 'From')?.value;
+		const senderEmail = extractEmailFromHeader(from || '');
 
 		// Check if this is a reply to one of user's sent emails
 		const sentMessage = await prisma.message.findFirst({
@@ -106,37 +97,35 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			});
 
 			if (existingReply) {
-				console.log(
-					'Message already processed:',
-					Buffer.from(
-						message.data.payload.parts.find(
-							(part: GmailMessagePart) => part.mimeType === 'text/plain'
-						).body.data,
-						'base64'
-					).toString()
-				);
+				const parts = message.data.payload?.parts || [];
+				const textPart = parts.find((part) => part.mimeType === 'text/plain');
+				if (textPart?.body?.data) {
+					console.log(
+						'Message already processed:',
+						Buffer.from(textPart.body.data, 'base64').toString()
+					);
+				}
 
 				//Reply already processed, SKIP
 				return;
 			}
 
 			// Rest of processing...
-			const subject = headers.find(
-				(header: GmailHeader) => header.name === 'Subject'
-			)?.value;
+			const subject = headers.find((header) => header.name === 'Subject')?.value;
 
 			// Extract email body (simplified)
 			let bodyContent = '';
-			if (message.data.payload.parts) {
-				const textPart = message.data.payload.parts.find(
-					(part: GmailMessagePart) => part.mimeType === 'text/plain'
+			const payload = message.data.payload;
+			if (payload?.parts) {
+				const textPart = payload.parts.find(
+					(part) => part.mimeType === 'text/plain'
 				);
 				if (textPart?.body?.data) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
 				}
-			} else if (message.data.payload.body?.data) {
+			} else if (payload?.body?.data) {
 				bodyContent = Buffer.from(
-					message.data.payload.body.data,
+					payload.body.data,
 					'base64'
 				).toString();
 			}
@@ -154,7 +143,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			await prisma.emailReply.create({
 				data: {
 					sequenceId: sequenceId,
-					threadId: threadId,
+					threadId: threadId || '',
 					contactId: sentMessage.contactId,
 					ownerId: sentMessage.ownerId || sentMessage.contact.ownerId, // Handle potential null
 					originalMessageId: sentMessage.messageId || '',
@@ -162,7 +151,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 					replySubject: subject || 'Reply',
 					replyContent: parsedEmail.reply || parsedEmail.raw,
 					replyHistory: parsedEmail.history || '',
-					replyDate: new Date(parseInt(message.data.internalDate)),
+					replyDate: new Date(parseInt(message.data.internalDate || '0')),
 					isAutomated: isAutoReply,
 				},
 			});
@@ -230,16 +219,16 @@ function isAutomatedReply(
 ): boolean {
 	// Check headers for automation indicators
 	const autoSubmitted = headers.find(
-		(h) => h.name.toLowerCase() === 'auto-submitted'
+		(h) => h.name?.toLowerCase() === 'auto-submitted'
 	)?.value;
 	const xAutorespond = headers.find(
-		(h) => h.name.toLowerCase() === 'x-autorespond'
+		(h) => h.name?.toLowerCase() === 'x-autorespond'
 	)?.value;
 	const xAutoReply = headers.find(
-		(h) => h.name.toLowerCase() === 'x-autoreply'
+		(h) => h.name?.toLowerCase() === 'x-autoreply'
 	)?.value;
 	const precedence = headers.find(
-		(h) => h.name.toLowerCase() === 'precedence'
+		(h) => h.name?.toLowerCase() === 'precedence'
 	)?.value;
 
 	// Standard auto-reply headers

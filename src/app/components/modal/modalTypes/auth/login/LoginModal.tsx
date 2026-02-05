@@ -1,45 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-
 // Styles imports
 import styles from './loginModal.module.scss';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
 
-interface LoginFormData {
-	email: string;
-	password: string;
-}
-
 export default function LoginModal() {
 	const { setModalType } = useAppContext();
-
-	// Form handling for email/password login (currently commented out in JSX)
-	const [_isLoading, _setIsLoading] = useState(false);
-	const {
-		register: _register,
-		handleSubmit: _handleSubmit,
-		formState: { errors: _errors },
-		reset: _reset,
-	} = useForm<LoginFormData>();
-
-	// Keeping for future email/password login implementation
-	const _onSubmit = async (data: LoginFormData) => {
-		_setIsLoading(true);
-		try {
-			// Handle email/password login here
-			console.log('Login attempt:', data);
-			// You would typically call your authentication API here
-		} catch (error) {
-			console.error('Login error:', error);
-		} finally {
-			_setIsLoading(false);
-			_reset();
-		}
-	};
 
 	const handleSocialLogin = (provider: string) => {
 		if (provider === 'apple' || provider === 'microsoft') {

@@ -1,4 +1,4 @@
-type ColumnHeader = {
+export type ColumnHeader = {
 	label: string;
 	size: string;
 	sortable?: boolean;
@@ -20,7 +20,7 @@ export type CellStyling =
 
 export type CellOrientation = 'left' | 'center' | 'right' | null;
 
-type CellData = {
+export type CellData = {
 	value: CellValue;
 	size: CellSize;
 	cellStyling?: CellStyling;

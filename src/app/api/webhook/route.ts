@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google, gmail_v1 } from 'googleapis';
 import { prisma } from '@/lib/prisma';
 
-// Gmail types
-interface GmailHeader {
-	name: string;
-	value: string;
-}
-
-interface GmailMessagePart {
-	mimeType: string;
-	body: { data?: string };
-}
+// Unused type aliases removed - using googleapis types directly
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -98,12 +89,12 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			id: messageId,
 		});
 
-		const headers = message.data.payload.headers;
+		const headers = message.data.payload?.headers || [];
 		const threadId = message.data.threadId;
 
 		// Extract sender email and USE it for validation
-		const from = headers.find((h: GmailHeader) => h.name === 'From')?.value;
-		const senderEmail = extractEmailFromHeader(from);
+		const from = headers.find((h) => h.name === 'From')?.value;
+		const senderEmail = extractEmailFromHeader(from || '');
 
 		// Check if this is a reply to one of our sent emails
 		const sentMessage = await prisma.message.findFirst({
@@ -126,20 +117,21 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 			}
 
 			// Rest of processing...
-			const subject = headers.find((h: GmailHeader) => h.name === 'Subject')?.value;
+			const subject = headers.find((h) => h.name === 'Subject')?.value;
 
 			// Extract email body (simplified)
 			let bodyContent = '';
-			if (message.data.payload?.parts) {
-				const textPart = message.data.payload.parts.find(
-					(part: GmailMessagePart) => part.mimeType === 'text/plain'
+			const payload = message.data.payload;
+			if (payload?.parts) {
+				const textPart = payload.parts.find(
+					(part) => part.mimeType === 'text/plain'
 				);
 				if (textPart?.body?.data) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
 				}
-			} else if (message.data.payload.body?.data) {
+			} else if (payload?.body?.data) {
 				bodyContent = Buffer.from(
-					message.data.payload.body.data,
+					payload.body.data,
 					'base64'
 				).toString();
 			}
@@ -154,7 +146,7 @@ async function processMessage(gmail: gmail_v1.Gmail, messageId: string) {
 					direction: 'inbound',
 					messageId: messageId,
 					threadId: threadId,
-					createdAt: new Date(parseInt(message.data.internalDate)),
+					createdAt: new Date(parseInt(message.data.internalDate || '0')),
 				},
 			});
 

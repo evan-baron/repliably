@@ -16,14 +16,7 @@ interface PreviewTileProps {
 	href?: string;
 }
 
-const PreviewTile = ({
-	title,
-	children,
-	className: _className,
-	loading: _loading,
-	error: _error,
-	href,
-}: PreviewTileProps) => {
+const PreviewTile = ({ title, children, href }: PreviewTileProps) => {
 	return (
 		<div className={styles.tileWrapper}>
 			<Link href={href || '/dashboard'} className={styles.tileHeader}>

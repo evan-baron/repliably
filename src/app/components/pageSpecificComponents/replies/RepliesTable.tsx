@@ -33,6 +33,7 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 				clickedReplies.add(reply.id);
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [replies]);
 
 	const handleClick = (replyId: number) => {

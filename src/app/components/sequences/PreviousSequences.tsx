@@ -15,6 +15,13 @@ import {
 // Components
 import MasterTable from '../masterTable/MasterTable';
 
+const NESTED_MESSAGES_HEADERS = [
+	{ label: 'Subject', size: 'md' },
+	{ label: 'Content', size: 'lrg', contentCell: true },
+	{ label: 'Status', size: 'sm' },
+	{ label: 'Sent Date', size: 'sm', sortable: true },
+];
+
 const PreviousSequences = ({
 	sequences,
 	contact,
@@ -37,15 +44,8 @@ const PreviousSequences = ({
 		? [{ label: 'Contact', size: 'sm', sortable: true }, ...columnHeaders]
 		: [];
 
-	const nestedMessagesHeaders = [
-		{ label: 'Subject', size: 'md' },
-		{ label: 'Content', size: 'lrg', contentCell: true },
-		{ label: 'Status', size: 'sm' },
-		{ label: 'Sent Date', size: 'sm', sortable: true },
-	];
-
 	const nestedTablesById = useMemo(() => {
-		const headers = nestedMessagesHeaders;
+		const headers = NESTED_MESSAGES_HEADERS;
 		return new Map(
 			sequences.map((sequence) => {
 				const rowData = sequence.messages.map((message) => {
@@ -93,7 +93,7 @@ const PreviousSequences = ({
 				return [sequence.id, nestedTable] as const;
 			})
 		);
-	}, [sequences, nestedMessagesHeaders]);
+	}, [sequences]);
 
 	const tableData: MasterTableData = {
 		columnHeaders: contact ? contactColumnHeaders : columnHeaders,

@@ -20,12 +20,22 @@ const eslintConfig = defineConfig([
     rules: {
       // Downgrade to warning - these should be fixed but don't block CI
       "@typescript-eslint/no-explicit-any": "warn",
+      // Allow underscore-prefixed unused vars (common pattern for destructuring/params)
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
       // React compiler rules - downgrade to warnings for legitimate patterns
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/refs": "warn",
       "react-hooks/preserve-manual-memoization": "warn",
       "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/incompatible-library": "warn",
     },
   },
 ]);

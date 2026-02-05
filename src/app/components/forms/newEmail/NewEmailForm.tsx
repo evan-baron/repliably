@@ -17,6 +17,9 @@ import TinyEditor from '../../editor/TinyEditor';
 import { useAppContext } from '@/app/context/AppContext';
 import { useEmailContext } from '@/app/context/EmailContext';
 
+// Types imports
+import { ContactFromDB } from '@/types/contactTypes';
+
 interface EmailFormData {
 	to: string;
 	subject: string;
@@ -129,8 +132,8 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 			reset(); // Reset form fields
 
 			const { newContact } = result;
-			if (newContact) {
-				setSelectedContact(result.contact);
+			if (newContact && result.contact) {
+				setSelectedContact(result.contact as unknown as ContactFromDB);
 				setModalType('newContactFromNewEmail');
 			}
 		} catch {

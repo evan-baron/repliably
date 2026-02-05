@@ -64,7 +64,7 @@ export async function sendGmail({
 		console.log('Sending email via Gmail API...');
 
 		// Send email using Gmail API directly
-		const requestBody: any = { raw: encodedMessage };
+		const requestBody: { raw: string; threadId?: string } = { raw: encodedMessage };
 		if (threadId) requestBody.threadId = threadId;
 
 		const result = await gmail.users.messages.send({
@@ -83,7 +83,7 @@ export async function sendGmail({
 			});
 			const headers = sent.data.payload?.headers || [];
 			const mid = headers.find(
-				(h: any) => h.name.toLowerCase() === 'message-id'
+				(h) => h.name?.toLowerCase() === 'message-id'
 			);
 			if (mid && mid.value) messageHeaderId = mid.value;
 		} catch (err) {

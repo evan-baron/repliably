@@ -13,7 +13,7 @@ import { parseEmailContent } from '@/lib/helperFunctions';
 import TableHeader from './TableHeader';
 
 // Types imports
-import { MasterTableData } from '@/types/masterTableTypes';
+import { MasterTableData, CellData } from '@/types/masterTableTypes';
 
 const NestedTable = ({
 	inModal,
@@ -111,11 +111,12 @@ const NestedTable = ({
 							}`}
 							onClick={() => handleClick(row.rowId)}
 						>
-							{row.cellData.map((cell: any, cellIndex: number) => {
-								const parsedContent =
-									cell.contentCell && parseEmailContent(cell.value);
+							{row.cellData.map((cell: CellData, cellIndex: number) => {
+								const parsedContent = cell.contentCell
+									? parseEmailContent(String(cell.value ?? ''))
+									: null;
 
-								return cell.contentCell ? (
+								return cell.contentCell && parsedContent ? (
 									<td
 										key={`nestedCellNested-${cellIndex}`}
 										className={`${styles[cell.size]} ${
@@ -151,7 +152,7 @@ const NestedTable = ({
 											cell.cellOrientation ? styles[cell.cellOrientation] : ''
 										}`}
 									>
-										{cell.value}
+										{String(cell.value ?? '')}
 									</td>
 								);
 							})}

@@ -15,7 +15,7 @@ import TableHeader from './TableHeader';
 import NestedTable from './NestedTable';
 
 // Types imports
-import { MasterTableData } from '@/types/masterTableTypes';
+import { MasterTableData, CellData } from '@/types/masterTableTypes';
 
 const MasterTable = ({
 	inModal,
@@ -117,16 +117,17 @@ const MasterTable = ({
 								`}
 								onClick={() => handleClick(row.rowId)}
 							>
-								{row.cellData.map((cell: any, cellIndex: number) => {
-									const parsedContent =
-										cell.contentCell && parseEmailContent(cell.value);
+								{row.cellData.map((cell: CellData, cellIndex: number) => {
+									const parsedContent = cell.contentCell
+										? parseEmailContent(String(cell.value ?? ''))
+										: null;
 
-									return cell.contentCell ? (
+									return cell.contentCell && parsedContent ? (
 										<td
 											key={`nestedCellMaster-${cellIndex}`}
 											className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+												${styles[cell.size]}
+												${cell.cellStyling ? styles[cell.cellStyling] : ''}
 												${styles['content-cell']}
 											`}
 										>
@@ -146,25 +147,25 @@ const MasterTable = ({
 										<td
 											key={`nestedCellMaster-${cellIndex}`}
 											className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+												${styles[cell.size]}
+												${cell.cellStyling ? styles[cell.cellStyling] : ''}
 												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
 												${cell.value === 'N/A' ? styles.transparent : ''}
 											`}
 										>
 											{cell.isDate ? (
-												new Date(cell.value as string).toLocaleDateString()
-											) : cell.isLink ? (
+												new Date(String(cell.value)).toLocaleDateString()
+											) : cell.isLink && cell.href ? (
 												<Link
 													href={cell.href}
 													onClick={(e) => {
 														e.stopPropagation();
 													}}
 												>
-													{cell.value}
+													{String(cell.value ?? '')}
 												</Link>
 											) : (
-												cell.value
+												String(cell.value ?? '')
 											)}
 										</td>
 									);
@@ -194,23 +195,24 @@ const MasterTable = ({
 							}`}
 							onClick={() => handleClick(row.rowId)}
 						>
-							{row.cellData.map((cell: any, index: number) => {
-								const parsedContent =
-									cell.contentCell && parseEmailContent(cell.value);
+							{row.cellData.map((cell: CellData, index: number) => {
+								const parsedContent = cell.contentCell
+									? parseEmailContent(String(cell.value ?? ''))
+									: null;
 
-								return cell.contentCell ? (
+								return cell.contentCell && parsedContent ? (
 									<td
 										key={index}
 										className={`
-											${styles[cell.size]} 
-											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+											${styles[cell.size]}
+											${cell.cellStyling ? styles[cell.cellStyling] : ''}
 											${styles['content-cell']}
 										`}
 									>
 										<div className={styles['parsed-content']}>
 											<span
 												className={`
-													${styles['message-preview']} 
+													${styles['message-preview']}
 													${
 														cell.subjectContentCell &&
 														row.rowStyling !== 'cancelled'
@@ -234,25 +236,25 @@ const MasterTable = ({
 									<td
 										key={index}
 										className={`
-											${styles[cell.size]} 
-											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+											${styles[cell.size]}
+											${cell.cellStyling ? styles[cell.cellStyling] : ''}
 											${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
 											${cell.value === 'N/A' ? styles.transparent : ''}
 										`}
 									>
 										{cell.isDate ? (
-											new Date(cell.value as string).toLocaleDateString()
-										) : cell.isLink ? (
+											new Date(String(cell.value)).toLocaleDateString()
+										) : cell.isLink && cell.href ? (
 											<Link
 												href={cell.href}
 												onClick={(e) => {
 													e.stopPropagation();
 												}}
 											>
-												{cell.value}
+												{String(cell.value ?? '')}
 											</Link>
 										) : (
-											cell.value
+											String(cell.value ?? '')
 										)}
 									</td>
 								);

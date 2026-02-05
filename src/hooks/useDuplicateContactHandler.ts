@@ -22,8 +22,22 @@ export const useDuplicateContactHandler = () => {
 		return String(value).trim().toLowerCase();
 	};
 
+	// API contact type with numeric importance
+	interface ApiContact {
+		id: number;
+		firstName: string;
+		lastName: string;
+		company: string;
+		title: string;
+		email: string;
+		phone: string;
+		linkedIn: string;
+		importance: number;
+		reasonForEmail: string;
+	}
+
 	// Step 3: Create processDuplicate function
-	const processDuplicate = (formData: ContactFormData, apiContact: ContactFormData & { id: number }) => {
+	const processDuplicate = (formData: ContactFormData, apiContact: ApiContact) => {
 		// Store what user originally submitted
 		setSubmittedData(formData);
 
