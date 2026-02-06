@@ -125,5 +125,13 @@ export const userAPI = {
 			method: 'PUT',
 			body: JSON.stringify({ updateData }),
 		}),
-	deleteUser: () => apiCall('/api/user', { method: 'DELETE' }),
+	deleteUser: (): Promise<{ success: boolean; auth0Id: string }> => {
+		console.log('userAPI.deleteUser called');
+		return apiCall('/api/user', { method: 'DELETE' });
+	},
+	deleteAuth0User: (auth0Id: string): Promise<{ success: boolean }> =>
+		apiCall('/api/auth/delete-auth0-user', {
+			method: 'POST',
+			body: JSON.stringify({ auth0Id }),
+		}),
 };

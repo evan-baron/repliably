@@ -43,23 +43,35 @@ export const useDeleteUser = () => {
 	const { setModalType } = useAppContext();
 	const queryClient = useQueryClient();
 	return useMutation<void, Error>({
-		mutationFn: () => userAPI.deleteUser(),
+		mutationFn: async () => {
+			console.log('Deleting user account...');
+
+			const { auth0Id } = await userAPI.deleteUser();
+
+			console.log('delete result auth0Id:', auth0Id);
+
+			if (auth0Id) {
+				console.log('Attempting to delete Auth0 user with ID:', auth0Id);
+				try {
+					await userAPI.deleteAuth0User(auth0Id);
+					console.log('Auth0 user deleted successfully');
+				} catch (error) {
+					console.error('Error deleting Auth0 user:', error);
+				}
+			}
+		},
 		onSuccess: () => {
-			// Clear user data from cache on successful deletion
-			queryClient.invalidateQueries({
-				predicate: (query) =>
-					[
-						'user-get',
-						'contacts-get-all',
-						'all-messages-by-contact-id',
-						'pending-messages-get-all',
-						'all-messages-by-contact-id',
-						'messages-get-by-contact',
-						'sequences-get-by-contact',
-					].includes(query.queryKey[0] as string),
-			});
+			console.log(
+				'User account deleted successfully, clearing cache and redirecting...',
+			);
+			queryClient.clear();
+
 			setModalType(null);
-			redirect('/');
+
+			console.log('Redirecting to homepage after account deletion');
+			const returnUrl = window.location.origin;
+			console.log('Redirecting to homepage after account deletion');
+			window.location.href = `/auth/logout?returnTo=${encodeURIComponent(returnUrl)}`;
 		},
 		onError: (error) => {
 			console.error('Error deleting user account:', error);

@@ -36,10 +36,22 @@ export async function DELETE(request: NextRequest) {
 		return NextResponse.json({ error: error.error }, { status: error.status });
 	}
 	try {
+		console.log('Attempting to delete user with ID:', apiUser.id);
+		const userToDelete = await prisma.user.findUnique({
+			where: { id: apiUser.id },
+			select: { auth0Id: true },
+		});
+
+		if (!userToDelete) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
+		console.log('Deleting user with auth0Id:', userToDelete.auth0Id);
 		await prisma.user.delete({
 			where: { id: apiUser.id },
 		});
-		return NextResponse.json({ success: true });
+
+		return NextResponse.json({ success: true, auth0Id: userToDelete.auth0Id });
 	} catch (error) {
 		console.error('Error deleting user:', error);
 		return NextResponse.json(

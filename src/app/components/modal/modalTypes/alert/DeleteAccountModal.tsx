@@ -23,7 +23,20 @@ const DeleteAccountModal = () => {
 	const confirmDeleteText = `repliably/delete-my-account`;
 
 	const handleDelete = async () => {
-		await deleteUser();
+		console.log('handleDelete called with typedDeleteText:', typedDeleteText);
+
+		if (typedDeleteText !== confirmDeleteText) {
+			console.warn('Typed text does not match confirm text. Aborting delete.');
+			return;
+		}
+
+		try {
+			console.log('Initiating account deletion...');
+			await deleteUser();
+			console.log('Account deletion successful, closing modal...');
+		} catch (error) {
+			console.error('Error deleting user account:', error);
+		}
 		setTypedDeleteText('');
 	};
 
