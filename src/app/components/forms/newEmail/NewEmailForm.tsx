@@ -233,14 +233,9 @@ const NewEmailForm = ({
 							</div>
 						</div>
 
-						{/* Email Body - RTE */}
-						<div className={styles['rte-wrapper']}>
-							<TinyEditor
-								initialValue={initialEditorContent ? initialEditorContent : ''}
-								setEditorContent={setEditorContent}
-							/>
-							<div className={styles['signatures-wrapper']}>
-								<label htmlFor='signatures'>Signatures:</label>
+						<div className={styles['input-group']}>
+							<div className={styles.input}>
+								<label htmlFor='signatures'>Signature:</label>
 								<select
 									id='signatures'
 									className={styles.select}
@@ -255,6 +250,14 @@ const NewEmailForm = ({
 									))}
 								</select>
 							</div>
+						</div>
+
+						{/* Email Body - RTE */}
+						<div className={styles['rte-wrapper']}>
+							<TinyEditor
+								initialValue={initialEditorContent ? initialEditorContent : ''}
+								setEditorContent={setEditorContent}
+							/>
 						</div>
 					</section>
 

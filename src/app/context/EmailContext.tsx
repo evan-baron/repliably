@@ -9,6 +9,7 @@ import {
 	ReactNode,
 } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
 
 // Types for email sending and override
 import { PendingEmailData } from '@/types/emailTypes';
@@ -33,6 +34,7 @@ const EmailContext = createContext<EmailContextType | undefined>(undefined);
 
 export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient();
+	const pathname = usePathname();
 	const [pendingEmail, setPendingEmail] = useState<PendingEmailData | null>(
 		null,
 	);
@@ -44,6 +46,11 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	const [emailSentId, setEmailSentId] = useState<number | null>(null);
 	const [originalBodyContent, setOriginalBodyContent] =
 		useState<string>('<p></p>');
+
+	// Reset originalBodyContent when route changes
+	useEffect(() => {
+		setOriginalBodyContent('<p></p>');
+	}, [pathname]);
 
 	useEffect(() => {
 		if (emailSentId === null) return;

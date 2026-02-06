@@ -11,6 +11,7 @@
 
 	.form-email-wrapper {
 		display: flex;
+		justify-content: space-evenly;
 		gap: 1.5rem;
 	}
 
@@ -48,6 +49,7 @@
 
 	.form-email {
 		width: 65%;
+		max-width: 50rem;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
@@ -67,7 +69,8 @@
 					font-size: 1.25rem;
 				}
 
-				input {
+				input,
+				select {
 					height: 100%;
 					width: 100%;
 					font-size: 1.125rem;
