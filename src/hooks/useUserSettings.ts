@@ -5,27 +5,34 @@ import { redirect } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Types imports
-import { UserFromDB } from '@/types/userTypes';
+import { UserToClientFromDB } from '@/types/userTypes';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
 
 export const useGetUser = () => {
-	return useQuery<UserFromDB>({
+	return useQuery<UserToClientFromDB>({
 		queryKey: ['user-get'],
 		queryFn: () => userAPI.getUser(),
+	});
+};
+
+export const useGetUserSettings = () => {
+	return useQuery<UserToClientFromDB>({
+		queryKey: ['user-settings-get'],
+		queryFn: () => userAPI.getUserSettings(),
 	});
 };
 
 export const useUserAccountSettingsUpdate = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<UserFromDB, Error, Partial<UserFromDB>>({
+	return useMutation<UserToClientFromDB, Error, Partial<UserToClientFromDB>>({
 		mutationFn: (updateData) => userAPI.updateAccountSettings(updateData),
 
 		onSuccess: (updatedUser) => {
 			// Update the user data in the cache with the updated user data
-			queryClient.setQueryData<UserFromDB>(['user-get'], updatedUser);
+			queryClient.setQueryData<UserToClientFromDB>(['user-get'], updatedUser);
 		},
 
 		onError: (error) => {

@@ -36,6 +36,8 @@ const SettingsClient = ({
 	const queryClient = useQueryClient();
 	const userQuery = useGetUser();
 
+	console.log('userQuery data:', userQuery.data);
+
 	const { setLoading, setLoadingMessage, setModalType, setErrors } =
 		useAppContext();
 	const { activeTab, setActiveTab, hasUnsavedChanges } = useSettingsContext();

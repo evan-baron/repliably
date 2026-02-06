@@ -9,6 +9,13 @@ export async function getApiUser() {
 
 	const user = await prisma.user.findUnique({
 		where: { auth0Id: session.user.sub },
+		include: {
+			signatures: {
+				orderBy: {
+					createdAt: 'desc',
+				},
+			},
+		},
 	});
 
 	if (!user) {
@@ -26,6 +33,13 @@ export async function getServerUser() {
 
 	const fullUser = await prisma.user.findUnique({
 		where: { auth0Id: session.user.sub },
+		include: {
+			signatures: {
+				orderBy: {
+					createdAt: 'desc',
+				},
+			},
+		},
 	});
 
 	if (!fullUser) {

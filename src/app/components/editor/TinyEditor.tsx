@@ -10,17 +10,23 @@ import styles from './tinyEditor.module.scss';
 
 const TinyEditor = ({
 	height,
+	width,
+	placeholder,
+	maxLength,
 	initialValue,
 	setEditorContent,
 }: {
 	height?: number;
+	width?: number;
+	placeholder?: string;
+	maxLength?: number;
 	initialValue?: string;
 	setEditorContent: (content: string) => void;
 }) => {
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 
 	const [value, setValue] = useState<string>(initialValue || '');
-	const sizeLimit = 4000;
+	const sizeLimit = maxLength || 4000;
 
 	const handleEditorChange = (content: string, editor: TinyMCEEditor) => {
 		const length = editor.getContent({ format: 'text' }).length;
@@ -51,6 +57,7 @@ const TinyEditor = ({
 				initialValue={initialValue || '<p></p>'}
 				init={{
 					height: height || 500,
+					width: width || 800,
 					menubar: false,
 					plugins: [
 						'advlist',
@@ -70,7 +77,7 @@ const TinyEditor = ({
 						'table',
 						'code',
 					],
-					placeholder: 'Compose your email here...',
+					placeholder: placeholder || 'Compose your email here...',
 					toolbar:
 						'undo redo | blocks | ' +
 						'bold italic forecolor | alignleft aligncenter ' +

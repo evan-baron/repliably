@@ -1,6 +1,6 @@
 // Types imports
 import { ContactData, ContactUpdateData } from '@/types/contactTypes';
-import { UserFromDB } from '@/types/userTypes';
+import { UserFromDB, UserToClientFromDB } from '@/types/userTypes';
 import { SentEmailData } from '@/types/emailTypes';
 
 // Generic fetch wrapper
@@ -120,8 +120,12 @@ export const userAPI = {
 		apiCall('/api/user', {
 			method: 'GET',
 		}),
+	getUserSettings: () =>
+		apiCall('/api/user/settings', {
+			method: 'GET',
+		}),
 	updateAccountSettings: (updateData: Partial<UserFromDB>) =>
-		apiCall('/api/user/accountSettings', {
+		apiCall('/api/user/settings/accountSettings', {
 			method: 'PUT',
 			body: JSON.stringify({ updateData }),
 		}),
@@ -133,5 +137,18 @@ export const userAPI = {
 		apiCall('/api/auth/delete-auth0-user', {
 			method: 'POST',
 			body: JSON.stringify({ auth0Id }),
+		}),
+	saveSignature: (emailSignature: {
+		name: string;
+		isDefault: boolean;
+		content: string;
+	}) =>
+		apiCall('/api/user/settings/emailSettings/signature', {
+			method: 'POST',
+			body: JSON.stringify({ emailSignature }),
+		}),
+	deleteSignature: (signatureId: number) =>
+		apiCall(`/api/user/settings/emailSettings/signature/${signatureId}`, {
+			method: 'DELETE',
 		}),
 };

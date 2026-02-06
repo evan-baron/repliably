@@ -12,6 +12,13 @@ export async function GET(request: NextRequest) {
 	try {
 		const userFromDB = await prisma.user.findUnique({
 			where: { id: apiUser.id },
+			include: {
+				signatures: {
+					orderBy: {
+						createdAt: 'desc',
+					},
+				},
+			},
 		});
 
 		if (!userFromDB) {
