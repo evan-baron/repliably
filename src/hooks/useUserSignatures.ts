@@ -39,3 +39,25 @@ export const useDeleteSignature = () => {
 		},
 	});
 };
+
+export const useUpdateSignature = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<
+		void,
+		Error,
+		{
+			signatureId: number;
+			emailSignature: { name?: string; isDefault?: boolean; content?: string };
+		}
+	>({
+		mutationFn: ({ signatureId, emailSignature }) =>
+			userAPI.updateSignature(signatureId, emailSignature),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['user-get'] });
+		},
+		onError: (error) => {
+			console.error('Error updating signature:', error);
+		},
+	});
+};

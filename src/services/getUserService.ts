@@ -12,7 +12,7 @@ export async function getApiUser() {
 		include: {
 			signatures: {
 				orderBy: {
-					createdAt: 'desc',
+					createdAt: 'asc',
 				},
 			},
 		},
@@ -36,7 +36,7 @@ export async function getServerUser() {
 		include: {
 			signatures: {
 				orderBy: {
-					createdAt: 'desc',
+					createdAt: 'asc',
 				},
 			},
 		},

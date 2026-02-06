@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 			include: {
 				signatures: {
 					orderBy: {
-						createdAt: 'desc',
+						createdAt: 'asc',
 					},
 				},
 			},

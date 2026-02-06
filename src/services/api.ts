@@ -147,6 +147,18 @@ export const userAPI = {
 			method: 'POST',
 			body: JSON.stringify({ emailSignature }),
 		}),
+	updateSignature: (
+		signatureId: number,
+		emailSignature: {
+			name?: string;
+			isDefault?: boolean;
+			content?: string;
+		},
+	) =>
+		apiCall(`/api/user/settings/emailSettings/signature/${signatureId}`, {
+			method: 'PUT',
+			body: JSON.stringify({ emailSignature }),
+		}),
 	deleteSignature: (signatureId: number) =>
 		apiCall(`/api/user/settings/emailSettings/signature/${signatureId}`, {
 			method: 'DELETE',

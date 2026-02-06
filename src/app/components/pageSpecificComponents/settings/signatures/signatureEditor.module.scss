@@ -1,0 +1,44 @@
+.editor-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	.input-group {
+		max-width: 50rem;
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+
+		label {
+			white-space: nowrap;
+			font-size: 1.25rem;
+			line-height: 2rem;
+		}
+
+		input {
+			width: 100%;
+			height: 2rem;
+			line-height: 2rem;
+			font-size: 1.125rem;
+			padding: 0 0.25rem;
+			border-radius: var(--border-radius-sm);
+			border: 1px solid var(--border-medium);
+			color: var(--text-primary);
+
+			&:focus {
+				outline: 2px solid var(--color-primary);
+			}
+
+			&:disabled {
+				background: var(--background-secondary);
+				color: var(--text-muted);
+				cursor: not-allowed;
+			}
+		}
+	}
+}
+
+.new-signature-actions {
+	display: flex;
+	gap: 1.5rem;
+}

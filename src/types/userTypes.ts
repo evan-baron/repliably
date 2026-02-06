@@ -4,7 +4,7 @@ export type UserFromDB = Prisma.UserGetPayload<{
 	include: {
 		signatures: {
 			orderBy: {
-				createdAt: 'desc';
+				createdAt: 'asc';
 			};
 		};
 	};
