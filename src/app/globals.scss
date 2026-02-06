@@ -48,6 +48,7 @@
 		hsl(0, 0%, 91%) 100%
 	);
 	--gradient-danger: linear-gradient(135deg, #f59f0a, #f8bc54);
+	--gradient-delete: linear-gradient(135deg, #b91c1c, #f74141);
 	--gradient-accent: linear-gradient(
 		135deg,
 		#f5b74d 0%,
@@ -170,7 +171,8 @@ a {
 	&.send-email,
 	&.delete,
 	&.override,
-	&.save-changes {
+	&.save-changes,
+	&.delete-account {
 		background: var(--gradient-primary) border-box;
 		color: white;
 		box-shadow: var(--shadow-sm);
@@ -229,8 +231,8 @@ a {
 	&.register,
 	&.back,
 	&.cancel,
-	&.settings-button,
-	&.delete-account {
+	&.cancel-delete,
+	&.settings-button {
 		font-weight: 600;
 		font-size: 1rem;
 		padding: 1rem 2rem;
@@ -242,8 +244,9 @@ a {
 		border-radius: var(--border-radius-sm);
 		box-sizing: border-box;
 		color: var(--color-primary);
-		transition: all 0.3s ease;
+		transition: all 0.3s ease-in-out;
 		will-change: transform;
+		transform-origin: center;
 
 		@media (hover: hover) {
 			&:hover {
@@ -262,13 +265,30 @@ a {
 		}
 	}
 
-	&.settings-button,
-	&.delete-account {
+	&.settings-button {
 		width: 12.5rem;
 		padding: 0.5rem 1rem;
 
 		@media (hover: hover) {
 			&:hover {
+				transform: scale(1);
+			}
+		}
+	}
+
+	&.delete-account {
+		background: var(--gradient-delete) border-box;
+	}
+
+	&.cancel-delete {
+		color: var(--text-muted);
+		background: transparent;
+		border: 2px solid var(--text-muted);
+		opacity: 0.75;
+
+		@media (hover: hover) {
+			&:hover {
+				opacity: 1;
 				transform: scale(1);
 			}
 		}

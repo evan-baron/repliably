@@ -18,6 +18,11 @@
 			font-weight: 600;
 		}
 
+		.delete-text {
+			user-select: none;
+			cursor: text;
+		}
+
 		.emphasized {
 			font-style: italic;
 		}

@@ -146,7 +146,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	return (
 		<div className={styles.modalScreen}>
 			<div
-				className={styles.modalContainer}
+				className={`${styles.modalContainer} ${currentModalType === 'deleteAccount' ? styles.danger : ''}`}
 				style={{ maxWidth: modalContent[currentModalType].width }}
 			>
 				<div

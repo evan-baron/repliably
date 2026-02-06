@@ -82,7 +82,7 @@ const AccountSettings = ({
 							</small>
 						</div>
 						<button
-							className={'button delete-account'}
+							className={'button settings-button'}
 							onClick={() => setModalType('deleteAccount')}
 						>
 							Delete Account

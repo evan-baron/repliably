@@ -23,17 +23,13 @@ const DeleteAccountModal = () => {
 	const confirmDeleteText = `repliably/delete-my-account`;
 
 	const handleDelete = async () => {
-		console.log('handleDelete called with typedDeleteText:', typedDeleteText);
-
 		if (typedDeleteText !== confirmDeleteText) {
 			console.warn('Typed text does not match confirm text. Aborting delete.');
 			return;
 		}
 
 		try {
-			console.log('Initiating account deletion...');
 			await deleteUser();
-			console.log('Account deletion successful, closing modal...');
 		} catch (error) {
 			console.error('Error deleting user account:', error);
 		}
@@ -52,8 +48,10 @@ const DeleteAccountModal = () => {
 			</p>
 			<p className={styles['confirm-delete']}>
 				To confirm, type "
-				<span className={styles.strong}>{confirmDeleteText}</span>" in the box
-				below:
+				<span className={`${styles.strong} ${styles['delete-text']}`}>
+					{confirmDeleteText}
+				</span>
+				" in the box below:
 			</p>
 			<input
 				type='text'
@@ -69,7 +67,7 @@ const DeleteAccountModal = () => {
 			<div className={styles.buttons}>
 				<button
 					type='button'
-					className={'button login'}
+					className={'button delete-account'}
 					disabled={!typedDeleteText || typedDeleteText !== confirmDeleteText}
 					onClick={handleDelete}
 				>
@@ -78,7 +76,7 @@ const DeleteAccountModal = () => {
 
 				<button
 					type='button'
-					className={'button cancel'}
+					className={'button cancel-delete'}
 					onClick={() => {
 						setTypedDeleteText('');
 						setModalType(null);
