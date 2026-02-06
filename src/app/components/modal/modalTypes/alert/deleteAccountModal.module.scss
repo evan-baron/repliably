@@ -1,9 +1,9 @@
-.deactivate-account-modal {
+.delete-account-modal {
 	display: flex;
 	flex-direction: column;
 	gap: 1.5rem;
 
-	.confirm-deactivate {
+	.confirm-delete {
 		color: var(--text-secondary);
 		text-align: left !important;
 		font-size: 1.1rem;

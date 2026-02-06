@@ -10,7 +10,7 @@ import { hasPasswordAuth, Auth0Identity } from '@/lib/helpers/checkAuthMethod';
 // Components imports
 import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';
 
-// Context imports
+// Context
 import { useAppContext } from '@/app/context/AppContext';
 
 const AccountSettings = ({
@@ -74,24 +74,20 @@ const AccountSettings = ({
 						</button>
 					</div>
 
-					{/* <div className={styles.item}>
+					<div className={styles.item}>
 						<div>
-							<h4>
-								{user.active ? 'Deactivate Account' : 'Reactivate Account'}
-							</h4>
+							<h4>Delete Account</h4>
 							<small className={styles.dangerText}>
-								{user.active ?
-									'Deactivate all sequences and stop all related activity. You can reactivate anytime.'
-								:	'Reactivate your account to enable all activities.'}
+								Permanently delete your account and all associated data
 							</small>
 						</div>
 						<button
 							className={'button delete-account'}
-							onClick={() => setModalType('deactivateAccount')}
+							onClick={() => setModalType('deleteAccount')}
 						>
-							{user.active ? 'Deactivate Account' : 'Reactivate Account'}
+							Delete Account
 						</button>
-					</div> */}
+					</div>
 				</div>
 			</section>
 		</div>

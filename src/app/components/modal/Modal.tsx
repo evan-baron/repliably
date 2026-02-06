@@ -22,7 +22,7 @@ import OverrideModal from './modalTypes/error/OverrideModal';
 import AlertModal from './modalTypes/alert/AlertModal';
 import DeactivateSequenceModal from './modalTypes/sequence/DeactivateSequenceModal';
 import UnsavedChangesModal from './modalTypes/alert/UnsavedChangesModal';
-import DeactivateAccountModal from './modalTypes/alert/DeactivateAccountModal';
+import DeleteAccountModal from './modalTypes/alert/DeleteAccountModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -136,9 +136,9 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 			title: 'Unsaved Changes',
 			width: '31.5rem',
 		},
-		deactivateAccount: {
-			component: <DeactivateAccountModal />,
-			title: 'Deactivate Account',
+		deleteAccount: {
+			component: <DeleteAccountModal />,
+			title: 'Delete Account',
 			width: '50rem',
 		},
 	} as const;

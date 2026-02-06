@@ -125,5 +125,5 @@ export const userAPI = {
 			method: 'PUT',
 			body: JSON.stringify({ updateData }),
 		}),
-	deactivateUser: () => apiCall('/api/user', { method: 'PUT' }),
+	deleteUser: () => apiCall('/api/user', { method: 'DELETE' }),
 };

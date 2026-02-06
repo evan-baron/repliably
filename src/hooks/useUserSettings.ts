@@ -39,13 +39,13 @@ export const useUserAccountSettingsUpdate = () => {
 	});
 };
 
-export const useDeactivateUser = () => {
+export const useDeleteUser = () => {
 	const { setModalType } = useAppContext();
 	const queryClient = useQueryClient();
 	return useMutation<void, Error>({
-		mutationFn: () => userAPI.deactivateUser(),
+		mutationFn: () => userAPI.deleteUser(),
 		onSuccess: () => {
-			// Clear user data from cache on successful deactivation
+			// Clear user data from cache on successful deletion
 			queryClient.invalidateQueries({
 				predicate: (query) =>
 					[
@@ -62,7 +62,7 @@ export const useDeactivateUser = () => {
 			redirect('/');
 		},
 		onError: (error) => {
-			console.error('Error deactivating user account:', error);
+			console.error('Error deleting user account:', error);
 		},
 	});
 };
