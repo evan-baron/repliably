@@ -11,3 +11,5 @@ export type UserFromDB = Prisma.UserGetPayload<{
 }>;
 
 export type UserToClientFromDB = Omit<UserFromDB, 'auth0Id'>;
+
+export type SignatureFromDB = Prisma.UserSignatureGetPayload<{}>;

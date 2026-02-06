@@ -25,6 +25,7 @@ import {
 import type { ContactFromDB } from '@/types/contactTypes';
 import type { SequencesResponse } from '@/types/sequenceTypes';
 import type { MessagesWithActiveSequence } from '@/types/messageTypes';
+import type { SignatureFromDB } from '@/types/userTypes';
 
 // Components
 import EditContactButton from '@/app/components/buttons/EditContactButton';
@@ -38,10 +39,12 @@ export default function ContactDetailsClient({
 	initialContact,
 	initialSequences,
 	initialAllMessages,
+	signatures,
 }: {
 	initialContact: ContactFromDB;
 	initialSequences: SequencesResponse;
 	initialAllMessages: MessagesWithActiveSequence[];
+	signatures: SignatureFromDB[];
 }) {
 	const queryClient = useQueryClient();
 
@@ -67,21 +70,21 @@ export default function ContactDetailsClient({
 		if (initialContact) {
 			queryClient.setQueryData<ContactFromDB>(
 				['contact-get-unique', initialContact.id],
-				initialContact
+				initialContact,
 			);
 		}
 
 		if (initialSequences) {
 			queryClient.setQueryData<SequencesResponse>(
 				['sequences-by-contact-id', initialContact.id],
-				initialSequences
+				initialSequences,
 			);
 		}
 
 		if (initialAllMessages) {
 			queryClient.setQueryData<MessagesWithActiveSequence[]>(
 				['all-messages-by-contact-id', initialContact.id],
-				initialAllMessages
+				initialAllMessages,
 			);
 		}
 	}, []);
@@ -96,7 +99,7 @@ export default function ContactDetailsClient({
 
 	const messagesWithActive = messages?.map((message) => {
 		const activeSequence = sequences.sequences.find(
-			(sequence) => sequence.id === message.sequenceId && sequence.active
+			(sequence) => sequence.id === message.sequenceId && sequence.active,
 		);
 		return { ...message, activeSequence: !!activeSequence };
 	});
@@ -232,6 +235,7 @@ export default function ContactDetailsClient({
 				contact={contact}
 				sequences={sequences}
 				allMessages={allMessages}
+				signatures={signatures}
 			/>
 		</>
 	);

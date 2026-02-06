@@ -25,6 +25,8 @@ interface EmailContextType {
 	setSelectedSequenceId: (sequenceId: number | null) => void;
 	emailSentId: number | null;
 	setEmailSentId: (id: number | null) => void;
+	originalBodyContent: string;
+	setOriginalBodyContent: (content: string) => void;
 }
 
 const EmailContext = createContext<EmailContextType | undefined>(undefined);
@@ -40,6 +42,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 		null,
 	);
 	const [emailSentId, setEmailSentId] = useState<number | null>(null);
+	const [originalBodyContent, setOriginalBodyContent] =
+		useState<string>('<p></p>');
 
 	useEffect(() => {
 		if (emailSentId === null) return;
@@ -116,6 +120,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				setSelectedSequenceId,
 				emailSentId,
 				setEmailSentId,
+				originalBodyContent,
+				setOriginalBodyContent,
 			}}
 		>
 			{children}

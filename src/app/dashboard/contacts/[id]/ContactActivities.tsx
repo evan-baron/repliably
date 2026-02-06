@@ -22,15 +22,18 @@ import AllActivities from '@/app/components/sequences/AllActivities';
 import { ContactFromDB } from '@/types/contactTypes';
 import { SequencesResponse, SequenceFromDB } from '@/types/sequenceTypes';
 import { MessagesWithActiveSequence } from '@/types/messageTypes';
+import { SignatureFromDB } from '@/types/userTypes';
 
 const ContactActivities = ({
 	contact,
 	sequences,
 	allMessages,
+	signatures,
 }: {
 	contact: ContactFromDB;
 	sequences: SequencesResponse;
 	allMessages: MessagesWithActiveSequence[];
+	signatures: SignatureFromDB[];
 }) => {
 	type SelectedType = 'active' | 'previous' | 'email' | 'all';
 	const [selected, setSelected] = useState<SelectedType>('active');
@@ -45,34 +48,33 @@ const ContactActivities = ({
 	const messageList = allMessages;
 
 	const activeSequence: SequenceFromDB | undefined = sequenceList.find(
-		(seq) => seq.active
+		(seq) => seq.active,
 	);
 	const previousSequences: SequenceFromDB[] = sequenceList.filter(
-		(seq) => !seq.active
+		(seq) => !seq.active,
 	);
 
 	const activityContent: ActivityContent = {
 		active: {
-			component: activeSequence ? (
-				<ActiveSequence sequence={activeSequence} />
-			) : (
-				<div className={styles.activity}>
-					<p>No active sequences</p>
-				</div>
-			),
+			component:
+				activeSequence ?
+					<ActiveSequence sequence={activeSequence} />
+				:	<div className={styles.activity}>
+						<p>No active sequences</p>
+					</div>,
 		},
 		previous: {
 			component:
-				previousSequences.length > 0 ? (
+				previousSequences.length > 0 ?
 					<PreviousSequences sequences={previousSequences} />
-				) : (
-					<div className={styles.activity}>
+				:	<div className={styles.activity}>
 						<p>No previous sequences</p>
-					</div>
-				),
+					</div>,
 		},
 		email: {
-			component: <NewEmailForm contactEmail={contact.email} />,
+			component: (
+				<NewEmailForm contactEmail={contact.email} signatures={signatures} />
+			),
 		},
 		all: {
 			component: <AllActivities messages={messageList} />,

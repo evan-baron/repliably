@@ -10,6 +10,9 @@ import { useEmailSend } from '@/hooks/useEmail';
 // Styles imports
 import styles from './newEmailForm.module.scss';
 
+// Types imports
+import { SignatureFromDB } from '@/types/userTypes';
+
 // Component imports
 import TinyEditor from '../../editor/TinyEditor';
 
@@ -28,7 +31,13 @@ interface EmailFormData {
 	alterSubjectLine?: boolean;
 }
 
-const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
+const NewEmailForm = ({
+	contactEmail,
+	signatures,
+}: {
+	contactEmail?: string;
+	signatures?: SignatureFromDB[];
+}) => {
 	const {
 		modalType,
 		setModalType,
@@ -38,14 +47,45 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 		setLoading,
 		setLoadingMessage,
 	} = useAppContext();
-
-	const { resetForm, setResetForm } = useEmailContext();
-
+	const {
+		resetForm,
+		setResetForm,
+		originalBodyContent,
+		setOriginalBodyContent,
+	} = useEmailContext();
 	const { mutateAsync: sendEmail, isPending: sending } = useEmailSend();
-
-	const [editorContent, setEditorContent] = useState<string>('');
-
 	const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+	const defaultSignature = signatures?.find((signature) => signature.isDefault);
+	const [selectedSignatureId, setSelectedSignatureId] = useState<number | null>(
+		defaultSignature?.id || null,
+	);
+	const [signature, setSignature] = useState<string>(
+		defaultSignature?.content || '',
+	);
+
+	const initialEditorContent = originalBodyContent + signature;
+
+	const [editorContent, setEditorContent] = useState<string>(
+		initialEditorContent || '',
+	);
+
+	// Handle signature change
+	const handleSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		const signatureId = parseInt(e.target.value);
+		setSelectedSignatureId(signatureId);
+		setOriginalBodyContent(editorContent.replace(signature, '')); // Remove old signature from original content
+
+		if (signatureId === -1) {
+			setSignature('');
+			return;
+		}
+
+		const selectedSignature = signatures?.find((sig) => sig.id === signatureId);
+		if (selectedSignature) {
+			setSignature(selectedSignature.content);
+		}
+	};
 
 	const { register, watch, handleSubmit, reset, setValue } =
 		useForm<EmailFormData>({
@@ -60,16 +100,15 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 				alterSubjectLine: false,
 			},
 		});
+	const autoSendChecked = watch('autoSend');
+	const followingUp =
+		watch('followUpCadence') !== 'none' && watch('followUpCadence') !== '';
 
 	const extractFormErrors = (errors: FieldErrors<EmailFormData>): string[] => {
 		return Object.values(errors)
 			.map((error) => error?.message)
 			.filter(Boolean) as string[];
 	};
-
-	const autoSendChecked = watch('autoSend');
-	const followingUp =
-		watch('followUpCadence') !== 'none' && watch('followUpCadence') !== '';
 
 	useEffect(() => {
 		if (selectedContact?.email && modalType !== 'newContactFromNewEmail') {
@@ -196,7 +235,26 @@ const NewEmailForm = ({ contactEmail }: { contactEmail?: string }) => {
 
 						{/* Email Body - RTE */}
 						<div className={styles['rte-wrapper']}>
-							<TinyEditor setEditorContent={setEditorContent} />
+							<TinyEditor
+								initialValue={initialEditorContent ? initialEditorContent : ''}
+								setEditorContent={setEditorContent}
+							/>
+							<div className={styles['signatures-wrapper']}>
+								<label htmlFor='signatures'>Signatures:</label>
+								<select
+									id='signatures'
+									className={styles.select}
+									value={selectedSignatureId || ''}
+									onChange={handleSignatureChange}
+								>
+									<option value={-1}>None</option>
+									{signatures?.map((signature) => (
+										<option key={signature.id} value={signature.id}>
+											{signature.name}
+										</option>
+									))}
+								</select>
+							</div>
 						</div>
 					</section>
 

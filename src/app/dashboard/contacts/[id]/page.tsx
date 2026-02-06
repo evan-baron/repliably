@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getContactById } from '@/services/contactsService';
 import { getSequencesByContactId } from '@/services/sequenceService';
 import { getAllMessagesByContactId } from '@/services/messageService';
+import { getServerUser } from '@/services/getUserService';
 
 // Styles imports
 import styles from './contactPage.module.scss';
@@ -32,7 +33,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
 	const initialMessages = messages.map((message) => {
 		const activeSequence = sequences.find(
-			(sequence) => sequence.id === message.sequenceId && sequence.active
+			(sequence) => sequence.id === message.sequenceId && sequence.active,
 		);
 		return { ...message, activeSequence: !!activeSequence };
 	});
@@ -41,12 +42,21 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 		redirect('/dashboard/contacts');
 	}
 
+	const { user } = await getServerUser();
+
+	if (!user) {
+		redirect('/');
+	}
+
+	const { signatures } = user;
+
 	return (
 		<div className={styles['page-wrapper']}>
 			<ContactDetailsClient
 				initialContact={contact}
 				initialSequences={sequencesData}
 				initialAllMessages={initialMessages}
+				signatures={signatures}
 			/>
 			<Link
 				href='/dashboard/contacts'

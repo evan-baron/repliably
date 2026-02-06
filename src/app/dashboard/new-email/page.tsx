@@ -1,5 +1,8 @@
-// Library imports
-import React from 'react';
+// Libraries imports
+import { redirect } from 'next/navigation';
+
+// Services imports
+import { getServerUser } from '@/services/getUserService';
 
 // Hooks imports
 
@@ -9,7 +12,15 @@ import styles from './newEmail.module.scss';
 // Components imports
 import NewEmailForm from '../../components/forms/newEmail/NewEmailForm';
 
-const Page = () => {
+const Page = async () => {
+	const { user, error } = await getServerUser();
+
+	if (!user || error) {
+		redirect('/');
+	}
+
+	const { signatures } = user;
+
 	return (
 		<div className={styles['page-wrapper']}>
 			<section className={styles['header-section']}>
@@ -22,7 +33,7 @@ const Page = () => {
 			</section>
 
 			<section className={styles['email-form-section']}>
-				<NewEmailForm />
+				<NewEmailForm signatures={signatures} />
 			</section>
 		</div>
 	);
