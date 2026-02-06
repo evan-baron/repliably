@@ -35,7 +35,6 @@ export async function findOrCreateUser(user: any) {
 		email: user.email,
 		firstName,
 		lastName,
-		timezone: user.timezone || null,
 	};
 
 	return prisma.user.upsert({

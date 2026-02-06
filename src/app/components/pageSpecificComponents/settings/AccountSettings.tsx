@@ -1,23 +1,10 @@
 'use client';
 
-// Library imports
-import { useState, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
-import Link from 'next/link';
-
-// Hooks imports
-import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
-import { useUserAccountSettingsUpdate } from '@/hooks/useUserSettings';
-
 // Styles imports
 import styles from './settings.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
-
-// Context imports
-import { useAppContext } from '@/app/context/AppContext';
-import { useSettingsContext } from '@/app/context/SettingsContext';
 
 // Components imports
 import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';

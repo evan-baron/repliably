@@ -161,6 +161,11 @@ a {
 	font-size: 0.875rem;
 	border: 2px solid transparent;
 
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
 	&.login,
 	&.send-email,
 	&.delete,

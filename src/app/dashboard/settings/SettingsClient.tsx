@@ -23,12 +23,7 @@ import styles from './settingsClient.module.scss';
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
 
-type SettingsTab =
-	| 'account'
-	| 'email'
-	| 'sequences'
-	| 'notifications'
-	| 'billing';
+type SettingsTab = 'account' | 'email' | 'sequences' | 'notifications';
 
 const SettingsClient = ({
 	initialUser,
@@ -48,24 +43,21 @@ const SettingsClient = ({
 		}
 	}, [initialUser, queryClient]);
 
-	const { data: userData } = userQuery;
-
-	useEffect(() => {
-		if (!userData) {
-			setLoading(true);
-			setLoadingMessage('Loading');
-		} else {
-			setLoading(false);
-		}
-	}, [userData, setLoading, setLoadingMessage]);
+	const userData = userQuery.data || initialUser;
 
 	const tabs: { id: SettingsTab; label: string }[] = [
 		{ id: 'account', label: 'Account' },
 		{ id: 'email', label: 'Email & Templates' },
 		{ id: 'sequences', label: 'Sequences' },
 		{ id: 'notifications', label: 'Notifications' },
-		// { id: 'billing', label: 'Billing' },
 	];
+
+	const tabContent: { [key in SettingsTab]: React.ReactNode } = {
+		account: <AccountSettings user={userData} />,
+		email: <EmailSettings user={userData} />,
+		sequences: <SequenceDefaults user={userData} />,
+		notifications: <NotificationSettings user={userData} />,
+	};
 
 	const renderTabContent = () => {
 		if (!userData) {

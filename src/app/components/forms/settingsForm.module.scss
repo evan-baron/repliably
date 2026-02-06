@@ -75,7 +75,7 @@
 					}
 
 					input[type='radio'] {
-						// display: none;
+						display: none;
 					}
 				}
 			}
@@ -93,6 +93,8 @@
 
 			input,
 			select {
+				display: flex;
+				align-items: center;
 				max-width: 30rem;
 				height: 2rem;
 				font-size: 1.125rem;

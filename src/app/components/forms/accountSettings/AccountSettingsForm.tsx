@@ -1,8 +1,8 @@
 'use client';
 
 // Library imports
-import { useState, useEffect, useMemo } from 'react';
-import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import Link from 'next/link';
 
 // Hooks imports
@@ -37,18 +37,15 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 		timezone: string;
 	}
 
-	const defaultTimezone = useMemo(
-		() => Intl.DateTimeFormat().resolvedOptions().timeZone,
-		[],
-	);
+	const userClientTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 	// Find the matching option value for the user's timezone
-	const initialTimezone = useMemo(() => {
-		const tz = user.timezone;
-		if (!tz || options.length === 0) return defaultTimezone;
+	const findMatchingTimezone = (tz: string | null) => {
+		if (!tz) return userClientTimezone;
 
 		// First try exact match
 		const exactMatch = options.find((opt) => opt.value === tz);
+
 		if (exactMatch) return tz;
 
 		// If no exact match, try to find by offset
@@ -57,38 +54,48 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 			(opt) => opt.offset === userTzOption.offset,
 		);
 
-		return matchByOffset?.value || defaultTimezone;
-	}, [user.timezone, options, parseTimezone, defaultTimezone]);
+		return matchByOffset?.value || userClientTimezone;
+	};
+
+	const defaultTimezone = findMatchingTimezone(userClientTimezone) || '';
+
+	const initialValues = {
+		firstName: user.firstName || '',
+		lastName: user.lastName || '',
+		timezone: user.timezone ? user.timezone : defaultTimezone,
+	};
 
 	const { register, watch, handleSubmit, reset, setValue } =
 		useForm<AccountFormData>({
-			defaultValues: {
-				firstName: user.firstName || '',
-				lastName: user.lastName || '',
-				timezone: initialTimezone,
-			},
+			defaultValues: initialValues,
 		});
 
-	// Update timezone when initialTimezone changes (after options load)
+	// Watch all form fields
+	const formValues = watch();
+
+	// Check if form has changed
+	const [hasChanged, setHasChanged] = useState(false);
+
 	useEffect(() => {
-		if (initialTimezone) {
-			setValue('timezone', initialTimezone);
-		}
-	}, [initialTimezone, setValue]);
+		const isChanged =
+			formValues.firstName !== initialValues.firstName ||
+			formValues.lastName !== initialValues.lastName ||
+			formValues.timezone !== initialValues.timezone;
+
+		setHasChanged(isChanged);
+	}, [formValues, initialValues]);
 
 	const onSubmit: SubmitHandler<AccountFormData> = async (data) => {
 		try {
 			setLoading(true);
 			setLoadingMessage('Saving');
 			await updateUser({ ...data });
-			reset({
-				firstName: data.firstName,
-				lastName: data.lastName,
-				timezone: data.timezone,
-			});
-			setModalType(null);
-			setLoading(false);
-			setLoadingMessage(null);
+
+			// Delaying by a small amount to ensure the user sees the loading state
+			setTimeout(() => {
+				setLoading(false);
+				setLoadingMessage(null);
+			}, 800);
 		} catch (error) {
 			// Error handling is done in the hook
 			setLoading(false);
@@ -108,11 +115,11 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 							required: 'First name is required',
 							minLength: {
 								value: 1,
-								message: 'First name must be at least 1 character',
+								message: 'First name must be at least 1 characters',
 							},
 							maxLength: {
 								value: 50,
-								message: 'First name cannot exceed 50 characters',
+								message: 'First name must be less than 50 characters',
 							},
 						})}
 					/>
@@ -127,11 +134,11 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 							required: 'Last name is required',
 							minLength: {
 								value: 1,
-								message: 'Last name must be at least 1 character',
+								message: 'Last name must be at least 1 characters',
 							},
 							maxLength: {
 								value: 50,
-								message: 'Last name cannot exceed 50 characters',
+								message: 'Last name must be less than 50 characters',
 							},
 						})}
 						placeholder='Enter last name'
@@ -145,7 +152,7 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 							type='email'
 							id='email'
 							name='email'
-							value={user.email}
+							value={user.email || ''}
 							placeholder='Enter email address'
 							disabled
 						/>
@@ -176,9 +183,9 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 					<button
 						className={'button save-changes'}
 						type='submit'
-						disabled={updatingUser}
+						disabled={updatingUser || !hasChanged}
 					>
-						{updatingUser ? 'Saving...' : 'Save Changes'}
+						Save Changes
 					</button>
 				</div>
 			</form>
