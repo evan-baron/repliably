@@ -2,7 +2,7 @@
 import { redirect } from 'next/navigation';
 
 // Services imports
-import { getServerUser } from '@/services/getUserService';
+import { getServerUser, getSessionUser } from '@/services/getUserService';
 
 // Components imports
 import PageTemplate from '@/app/components/pageSpecificComponents/PageTemplate';
@@ -16,13 +16,18 @@ const Page = async () => {
 		redirect('/');
 	}
 
+	const { identities, error: sessionError } = await getSessionUser();
+	if (sessionError || error || !user) {
+		redirect('/');
+	}
+
 	return (
 		<PageTemplate
 			title='Settings'
 			description='Manage your account and application settings'
 		>
 			<SettingsContextProvider>
-				<SettingsClient initialUser={user} />
+				<SettingsClient initialUser={user} identities={identities} />
 			</SettingsContextProvider>
 		</PageTemplate>
 	);

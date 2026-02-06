@@ -5,11 +5,20 @@ import styles from './settings.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
+import { hasPasswordAuth, Auth0Identity } from '@/lib/helpers/checkAuthMethod';
 
 // Components imports
 import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';
 
-const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
+const AccountSettings = ({
+	user,
+	identities,
+}: {
+	user: UserToClientFromDB;
+	identities: Auth0Identity[];
+}) => {
+	const passwordAuth = hasPasswordAuth(identities);
+
 	return (
 		<div className={styles['settings-container']}>
 			<section className={styles.section}>
@@ -23,20 +32,28 @@ const AccountSettings = ({ user }: { user: UserToClientFromDB }) => {
 					<div className={styles.item}>
 						<div>
 							<h4>Password</h4>
-							<small>Manage your password through Auth0</small>
+							<small>
+								{passwordAuth ?
+									'Manage your password through Auth0'
+								:	'Password management is not available for your authentication method (eg. Google, Microsoft, etc.)'
+								}
+							</small>
 						</div>
-						<button className={'button settings-button'}>
+						<button
+							className={'button settings-button'}
+							disabled={!passwordAuth}
+						>
 							Change Password
 						</button>
 					</div>
 
-					<div className={styles.item}>
+					{/* <div className={styles.item}>
 						<div>
 							<h4>Two-Factor Authentication</h4>
 							<small>Add an extra layer of security to your account</small>
 						</div>
 						<button className={'button settings-button'}>Enable 2FA</button>
-					</div>
+					</div> */}
 				</div>
 			</section>
 

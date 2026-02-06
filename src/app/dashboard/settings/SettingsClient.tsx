@@ -22,13 +22,16 @@ import styles from './settingsClient.module.scss';
 
 // Types imports
 import { UserToClientFromDB } from '@/types/userTypes';
+import { Auth0Identity } from '@/lib/helpers/checkAuthMethod';
 
 type SettingsTab = 'account' | 'email' | 'sequences' | 'notifications';
 
 const SettingsClient = ({
 	initialUser,
+	identities,
 }: {
 	initialUser: UserToClientFromDB;
+	identities: Auth0Identity[];
 }) => {
 	const queryClient = useQueryClient();
 	const userQuery = useGetUser();
@@ -52,13 +55,6 @@ const SettingsClient = ({
 		{ id: 'notifications', label: 'Notifications' },
 	];
 
-	const tabContent: { [key in SettingsTab]: React.ReactNode } = {
-		account: <AccountSettings user={userData} />,
-		email: <EmailSettings user={userData} />,
-		sequences: <SequenceDefaults user={userData} />,
-		notifications: <NotificationSettings user={userData} />,
-	};
-
 	const renderTabContent = () => {
 		if (!userData) {
 			return null;
@@ -66,7 +62,7 @@ const SettingsClient = ({
 
 		switch (activeTab) {
 			case 'account':
-				return <AccountSettings user={userData} />;
+				return <AccountSettings user={userData} identities={identities} />;
 			case 'email':
 				return <EmailSettings user={userData} />;
 			case 'sequences':
@@ -74,7 +70,7 @@ const SettingsClient = ({
 			case 'notifications':
 				return <NotificationSettings user={userData} />;
 			default:
-				return <AccountSettings user={userData} />;
+				return <AccountSettings user={userData} identities={identities} />;
 		}
 	};
 

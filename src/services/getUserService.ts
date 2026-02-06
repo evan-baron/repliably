@@ -36,3 +36,14 @@ export async function getServerUser() {
 
 	return { user, error: null };
 }
+
+export async function getSessionUser() {
+	const session = await auth0.getSession();
+	if (!session?.user) {
+		return { user: null, error: { error: 'Unauthorized', status: 401 } };
+	}
+
+	return {
+		identities: session.user.identities || [],
+	};
+}
