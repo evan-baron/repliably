@@ -10,6 +10,9 @@ import { hasPasswordAuth, Auth0Identity } from '@/lib/helpers/checkAuthMethod';
 // Components imports
 import AccountSettingsForm from '@/app/components/forms/accountSettings/AccountSettingsForm';
 
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
+
 const AccountSettings = ({
 	user,
 	identities,
@@ -17,6 +20,7 @@ const AccountSettings = ({
 	user: UserToClientFromDB;
 	identities: Auth0Identity[];
 }) => {
+	const { setModalType } = useAppContext();
 	const passwordAuth = hasPasswordAuth(identities);
 
 	return (
@@ -62,21 +66,32 @@ const AccountSettings = ({
 				<div className={styles.options}>
 					<div className={styles.item}>
 						<div>
-							<h4>Export Data</h4>
+							<h4>Export Data (Coming Soon)</h4>
 							<small>Download all your contacts, messages, and sequences</small>
 						</div>
-						<button className={'button settings-button'}>Export Data</button>
+						<button className={'button settings-button'} disabled={true}>
+							Export Data
+						</button>
 					</div>
 
-					<div className={styles.item}>
+					{/* <div className={styles.item}>
 						<div>
-							<h4>Delete Account</h4>
+							<h4>
+								{user.active ? 'Deactivate Account' : 'Reactivate Account'}
+							</h4>
 							<small className={styles.dangerText}>
-								Permanently delete your account and all associated data
+								{user.active ?
+									'Deactivate all sequences and stop all related activity. You can reactivate anytime.'
+								:	'Reactivate your account to enable all activities.'}
 							</small>
 						</div>
-						<button className={'button delete-account'}>Delete Account</button>
-					</div>
+						<button
+							className={'button delete-account'}
+							onClick={() => setModalType('deactivateAccount')}
+						>
+							{user.active ? 'Deactivate Account' : 'Reactivate Account'}
+						</button>
+					</div> */}
 				</div>
 			</section>
 		</div>

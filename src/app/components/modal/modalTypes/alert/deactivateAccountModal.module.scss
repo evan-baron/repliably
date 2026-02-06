@@ -1,0 +1,58 @@
+.deactivate-account-modal {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+
+	.confirm-deactivate {
+		color: var(--text-secondary);
+		text-align: left !important;
+		font-size: 1.1rem;
+		line-height: 1.25 !important;
+
+		.important {
+			color: var(--accent-danger);
+			font-weight: 600;
+		}
+
+		.strong {
+			font-weight: 600;
+		}
+
+		.emphasized {
+			font-style: italic;
+		}
+	}
+
+	input {
+		display: flex;
+		align-items: center;
+		max-width: 30rem;
+		height: 2rem;
+		font-size: 1.125rem;
+		padding: 0 0.25rem;
+		border-radius: var(--border-radius-sm);
+		border: 1px solid var(--border-medium);
+		color: var(--text-primary);
+
+		&:focus {
+			outline: 2px solid var(--color-primary);
+		}
+
+		&::placeholder {
+			color: var(--text-muted);
+			opacity: 0.75;
+		}
+
+		&:disabled {
+			background: var(--background-secondary);
+			color: var(--text-muted);
+			cursor: not-allowed;
+		}
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		gap: 1.5rem;
+	}
+}

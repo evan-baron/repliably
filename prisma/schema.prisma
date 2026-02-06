@@ -37,17 +37,19 @@ model User {
   notificationSequenceComplete     Boolean            @default(true)
   notificationMessageApproval      Boolean            @default(true)
   subscriptionTier                 SubscriptionTier   @default(free)
+  active                           Boolean            @default(true)
   contacts                         Contact[]
   sequences                        Sequence[]
   messages                         Message[]
   templates                        Template[]
   signatures                       UserSignature[]
+  emailReplies                     EmailReply[]
 }
 
 model Contact {
   id             Int       @id @default(autoincrement())
   ownerId        Int
-  owner          User      @relation(fields: [ownerId], references: [id])
+  owner          User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   email          String
   firstName      String?
   lastName       String?
@@ -75,7 +77,7 @@ model Message {
   contactId                 Int
   contact                   Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
   ownerId                   Int
-  owner                     User          @relation(fields: [ownerId], references: [id])
+  owner                     User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sequenceId                Int?
   sequence                  Sequence?     @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
   templateId                Int?
@@ -106,6 +108,7 @@ model Message {
 model EmailReply {
   id                Int       @id @default(autoincrement())
   ownerId           Int
+  owner             User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   originalMessageId String    // Gmail messageId of the original outbound message
   replyMessageId    String    // Gmail messageId of the reply
   threadId          String    // Gmail threadId
@@ -160,7 +163,7 @@ model Job {
 model Template {
   id           Int      @id @default(autoincrement())
   userId       Int
-  owner        User     @relation(fields: [userId], references: [id])
+  owner        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name         String   // "Follow-up Template #1", "Initial Outreach"
   subject      String   // Email subject line with placeholders
   content      String   @db.Text // Quill delta JSON or HTML content
@@ -179,7 +182,7 @@ model Template {
 model UserSignature {
   id        Int      @id @default(autoincrement())
   userId    Int
-  owner     User     @relation(fields: [userId], references: [id])
+  owner     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String   // "Professional", "Casual", "Default"
   content   String   @db.Text // Quill delta JSON or HTML
   isDefault Boolean  @default(false)
