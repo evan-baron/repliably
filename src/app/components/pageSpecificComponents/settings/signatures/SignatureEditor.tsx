@@ -11,7 +11,7 @@ import styles from './signatureEditor.module.scss';
 // Icon imports
 
 // Components imports
-import TinyEditor from '@/app/components/editor/TinyEditor';
+import TinyEditor from '@/app/components/tinyEditor/TinyEditor';
 
 // Context imports
 

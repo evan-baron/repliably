@@ -14,7 +14,7 @@ import styles from './newEmailForm.module.scss';
 import { SignatureFromDB } from '@/types/userTypes';
 
 // Component imports
-import TinyEditor from '../../editor/TinyEditor';
+import TinyEditor from '../../tinyEditor/TinyEditor';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';

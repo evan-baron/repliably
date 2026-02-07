@@ -21,7 +21,7 @@ import { UserToClientFromDB } from '@/types/userTypes';
 
 // Components imports
 import SendingPreferencesForm from '../../forms/emailSettings/SendingPreferencesForm';
-import TinyEditor from '../../editor/TinyEditor';
+import TinyEditor from '../../tinyEditor/TinyEditor';
 import SignatureItem from './signatures/SignatureItem';
 import SignatureEditor from './signatures/SignatureEditor';
 

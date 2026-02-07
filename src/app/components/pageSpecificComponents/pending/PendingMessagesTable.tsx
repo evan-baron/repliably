@@ -20,7 +20,7 @@ import { parseEmailContent } from '@/lib/helpers/emailHelpers';
 import { MessageWithContact } from '@/types/messageTypes';
 
 // Components imports
-import TinyEditor from '../../editor/TinyEditor';
+import TinyEditor from '../../tinyEditor/TinyEditor';
 
 const PendingMessagesTable = ({
 	messages,
@@ -63,7 +63,7 @@ const PendingMessagesTable = ({
 
 	const handleEdit = (
 		e: React.MouseEvent<HTMLButtonElement>,
-		messageId: number
+		messageId: number,
 	) => {
 		e.stopPropagation();
 		if (messageId !== selectedMessage) {

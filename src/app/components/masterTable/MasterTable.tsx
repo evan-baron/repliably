@@ -69,6 +69,11 @@ const MasterTable = ({
 	};
 
 	const handleClick = (rowId: number) => {
+		const selection = window.getSelection();
+		if (selection && selection.toString().length > 0) {
+			return;
+		}
+
 		if (selectedRow === rowId) {
 			setSelectedRow(null);
 			return;
@@ -79,7 +84,7 @@ const MasterTable = ({
 
 	const sortedRowData = tableData.rowData.sort((a, b) => {
 		const sortIndex = tableData.columnHeaders.findIndex(
-			(header) => header.label === sortType
+			(header) => header.label === sortType,
 		);
 
 		if (!sortType) return 0;

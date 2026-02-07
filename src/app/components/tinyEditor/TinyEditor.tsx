@@ -90,6 +90,9 @@ const TinyEditor = ({
 					// 'div { margin: 0; padding: 0; }',
 					statusbar: false,
 					maxlength: 4500,
+					forced_root_block: false,
+					force_br_newlines: true,
+					force_p_newlines: false,
 				}}
 			/>
 		</div>
