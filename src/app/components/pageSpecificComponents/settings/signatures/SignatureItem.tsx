@@ -43,7 +43,7 @@ const SignatureItem = ({
 
 				<pre className={styles.preview}>
 					{parsedSignature.map((line, index) => (
-						<span key={`parse-${index}`}>{line}</span>
+						<span key={`parse-${index}`}>{line || '\u00A0'}</span>
 					))}
 				</pre>
 			</div>

@@ -198,8 +198,6 @@ const MasterTable = ({
 									const parsedContent =
 										cell.contentCell && parseEmailContent(cell.value);
 
-									console.log('parsedContent for cell:', parsedContent);
-
 									return cell.contentCell ?
 											<td
 												key={index}

@@ -54,7 +54,6 @@ const NestedTable = ({
 	};
 
 	const handleSort = (type: string) => {
-		console.log('click registered for:', type);
 		if (sortType === type) {
 			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
 		} else {
@@ -74,10 +73,8 @@ const NestedTable = ({
 
 	const sortedRowData = tableData.rowData.sort((a, b) => {
 		const sortIndex = tableData.columnHeaders.findIndex(
-			(header) => header.label === sortType
+			(header) => header.label === sortType,
 		);
-
-		console.log('sortIndex:', sortIndex);
 
 		if (!sortType) return 0;
 		const valA = (a.cellData[sortIndex]?.value || '').toString().toLowerCase();

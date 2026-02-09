@@ -51,8 +51,6 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 	const autoSendEnabled = watch('autoSend');
 	const selectedSequenceType = watch('sequenceType');
 
-	console.log('selectedSequenceType:', selectedSequenceType);
-
 	const withAutoSendDeadlineOptions = [
 		{ label: '1 day', value: 1 },
 		{ label: '2 days', value: 2 },

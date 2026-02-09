@@ -4,7 +4,10 @@
 import { useState } from 'react';
 
 // Helpers imports
-import { parseEmailContent } from '@/lib/helpers/emailHelpers';
+import {
+	parseEmailContent,
+	parseTinyMceContent,
+} from '@/lib/helpers/emailHelpers';
 
 // Hooks imports
 import {
@@ -21,7 +24,6 @@ import { UserToClientFromDB } from '@/types/userTypes';
 
 // Components imports
 import SendingPreferencesForm from '../../forms/emailSettings/SendingPreferencesForm';
-import TinyEditor from '../../tinyEditor/TinyEditor';
 import SignatureItem from './signatures/SignatureItem';
 import SignatureEditor from './signatures/SignatureEditor';
 
@@ -146,7 +148,6 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 	};
 
 	const handleDeleteSignature = async (signatureId: number) => {
-		console.log('Deleting signature with ID:', signatureId);
 		try {
 			await deleteSignature(signatureId);
 		} catch (error) {
@@ -190,7 +191,9 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 				{user.signatures.length > 0 && (
 					<div className={styles['signature-list']}>
 						{user.signatures.map((signature, index) => {
-							const parsedSignature = parseEmailContent(signature.content);
+							const parsedSignature = parseEmailContent(
+								parseTinyMceContent(signature.content),
+							);
 
 							return editing === signature.id ?
 									<SignatureEditor
