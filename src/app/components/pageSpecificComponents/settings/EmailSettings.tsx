@@ -36,30 +36,6 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 	const [signatureName, setSignatureName] = useState<string>('');
 	const [editing, setEditing] = useState<number | null>(null);
 
-	const [templates, setTemplates] = useState([
-		{
-			id: 1,
-			name: 'Initial Outreach',
-			category: 'initial',
-			usageCount: 45,
-			isActive: true,
-		},
-		{
-			id: 2,
-			name: 'Follow-up #1',
-			category: 'follow-up',
-			usageCount: 32,
-			isActive: true,
-		},
-		{
-			id: 3,
-			name: 'Thank You',
-			category: 'thank-you',
-			usageCount: 18,
-			isActive: true,
-		},
-	]);
-
 	const handleAddSignature = () => {
 		setAddingNewSignature(true);
 	};
@@ -188,7 +164,7 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 						/>
 					</div>
 				)}
-				{user.signatures.length > 0 && (
+				{user.signatures?.length > 0 && (
 					<div className={styles['signature-list']}>
 						{user.signatures.map((signature, index) => {
 							const parsedSignature = parseEmailContent(
