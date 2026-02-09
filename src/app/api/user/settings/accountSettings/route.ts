@@ -21,14 +21,68 @@ export async function PUT(request: NextRequest) {
 
 		const body = await request.json();
 
-		const { updateData } = body;
+		const { firstName, lastName, timezone } = body.updateData;
+
+		// Server-side validation
+		const nameRegex = /^[a-zA-Z\s'-]+$/;
+
+		if (
+			!firstName ||
+			typeof firstName !== 'string' ||
+			firstName.trim().length < 1 ||
+			firstName.length > 50
+		) {
+			return NextResponse.json(
+				{ error: 'Invalid first name' },
+				{ status: 400 },
+			);
+		}
+
+		if (
+			!lastName ||
+			typeof lastName !== 'string' ||
+			lastName.trim().length < 1 ||
+			lastName.length > 50
+		) {
+			return NextResponse.json({ error: 'Invalid last name' }, { status: 400 });
+		}
+
+		if (!nameRegex.test(firstName.trim())) {
+			return NextResponse.json(
+				{ error: 'First name contains invalid characters' },
+				{ status: 400 },
+			);
+		}
+
+		if (!nameRegex.test(lastName.trim())) {
+			return NextResponse.json(
+				{ error: 'Last name contains invalid characters' },
+				{ status: 400 },
+			);
+		}
+
+		// VALIDATE TIMEZONE - whitelist approach
+		const validTimezones = Intl.supportedValuesOf('timeZone');
+		if (
+			!timezone ||
+			typeof timezone !== 'string' ||
+			!validTimezones.includes(timezone)
+		) {
+			return NextResponse.json({ error: 'Invalid timezone' }, { status: 400 });
+		}
+
+		// Sanitize inputs
+		const sanitizedData = {
+			firstName: firstName.trim().replace(/[<>"/;`%]/g, ''),
+			lastName: lastName.trim().replace(/[<>"/;`%]/g, ''),
+			timezone: timezone,
+		};
 
 		const updatedUser = await prisma.user.update({
 			where: { id: user.id },
-			data: {
-				...updateData,
-			},
+			data: sanitizedData,
 		});
+
 		return NextResponse.json({ success: true, user: updatedUser });
 	} catch (error) {
 		console.error('Error updating user:', error);

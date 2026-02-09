@@ -87,9 +87,49 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 
 	const onSubmit: SubmitHandler<AccountFormData> = async (data) => {
 		try {
+			// Sanitize inputs - trim whitespace and remove dangerous characters
+			const sanitizedData = {
+				firstName: data.firstName.trim().replace(/[<>"/;`%]/g, ''),
+				lastName: data.lastName.trim().replace(/[<>"/;`%]/g, ''),
+				timezone: data.timezone,
+			};
+
+			// Additional validation
+			if (
+				sanitizedData.firstName.length < 1 ||
+				sanitizedData.firstName.length > 50
+			) {
+				setErrors(['First name must be between 1 and 50 characters']);
+				setModalType('error');
+				return;
+			}
+
+			if (
+				sanitizedData.lastName.length < 1 ||
+				sanitizedData.lastName.length > 50
+			) {
+				setErrors(['Last name must be between 1 and 50 characters']);
+				setModalType('error');
+				return;
+			}
+
+			// Check for valid characters (letters, spaces, hyphens, apostrophes)
+			const nameRegex = /^[a-zA-Z\s'-]+$/;
+			if (!nameRegex.test(sanitizedData.firstName)) {
+				setErrors(['First name contains invalid characters']);
+				setModalType('error');
+				return;
+			}
+
+			if (!nameRegex.test(sanitizedData.lastName)) {
+				setErrors(['Last name contains invalid characters']);
+				setModalType('error');
+				return;
+			}
+
 			setLoading(true);
 			setLoadingMessage('Saving');
-			await updateUser({ ...data });
+			await updateUser({ ...sanitizedData });
 
 			// Delaying by a small amount to ensure the user sees the loading state
 			setTimeout(() => {
@@ -121,6 +161,11 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 								value: 50,
 								message: 'First name must be less than 50 characters',
 							},
+							pattern: {
+								value: /^[a-zA-Z\s'-]+$/,
+								message:
+									'First name can only contain letters, spaces, hyphens, and apostrophes',
+							},
 						})}
 					/>
 				</div>
@@ -139,6 +184,11 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 							maxLength: {
 								value: 50,
 								message: 'Last name must be less than 50 characters',
+							},
+							pattern: {
+								value: /^[a-zA-Z\s'-]+$/,
+								message:
+									'Last name can only contain letters, spaces, hyphens, and apostrophes',
 							},
 						})}
 						placeholder='Enter last name'
