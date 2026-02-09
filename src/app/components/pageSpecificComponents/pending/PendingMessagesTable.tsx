@@ -216,7 +216,9 @@ const PendingMessagesTable = ({
 											emailContent.length > 1 &&
 											emailContent
 												.slice(1)
-												.map((text, index) => <span key={index}>{text}</span>)}
+												.map((text, index) => (
+													<span key={index}>{text || '\u00A0'}</span>
+												))}
 									</div>
 								}
 							</td>

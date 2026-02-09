@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 		) {
 			return NextResponse.json(
 				{ error: 'Missing parameters' },
-				{ status: 400 }
+				{ status: 400 },
 			);
 		}
 
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
 			return NextResponse.json(
 				{ error: 'Failed to send email or create message.' },
-				{ status: 500 }
+				{ status: 500 },
 			);
 		};
 
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 					},
 					message: 'Contact already part of an active sequence.',
 				},
-				{ status: 409 }
+				{ status: 409 },
 			);
 		}
 

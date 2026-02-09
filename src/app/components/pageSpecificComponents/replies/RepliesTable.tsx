@@ -91,6 +91,7 @@ const RepliesTable = ({ replies }: { replies: RepliesFromDB[] }) => {
 			<tbody>
 				{sortedReplies.map((reply) => {
 					const replyDateDay = new Date(reply.createdAt);
+
 					const parsedContent = parseReplyContent(reply.replyContent);
 					const message = [`${reply.replySubject}`, ...parsedContent];
 

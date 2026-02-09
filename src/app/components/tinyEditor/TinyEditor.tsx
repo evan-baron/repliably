@@ -85,14 +85,9 @@ const TinyEditor = ({
 						'removeformat ',
 					toolbar_location: 'bottom',
 					content_style:
-						'body { font-family:Calibri,Arial,sans-serif; font-size:16px; margin:.75rem;}',
-					// 'p { margin: 0; padding: 0; }' +
-					// 'div { margin: 0; padding: 0; }',
+						'body { font-family:Calibri,Arial,sans-serif; font-size:16px; margin:.75rem;} p { margin: 0; padding: 0; }',
 					statusbar: false,
 					maxlength: 4500,
-					forced_root_block: false,
-					force_br_newlines: true,
-					force_p_newlines: false,
 				}}
 			/>
 		</div>

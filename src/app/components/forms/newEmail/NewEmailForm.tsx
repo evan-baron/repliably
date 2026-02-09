@@ -7,6 +7,9 @@ import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 // Hooks imports
 import { useEmailSend } from '@/hooks/useEmail';
 
+// Helper functions imports
+import { parseTinyMceContent } from '@/lib/helpers/emailHelpers';
+
 // Styles imports
 import styles from './newEmailForm.module.scss';
 
@@ -138,6 +141,8 @@ const NewEmailForm = ({
 			return;
 		}
 
+		const parsedContent = parseTinyMceContent(editorContent);
+
 		const referencePrevious =
 			!data.followUpCadence || data.followUpCadence === 'none' ?
 				null
@@ -156,7 +161,7 @@ const NewEmailForm = ({
 				autoSendDelay: data.autoSendDelay,
 				cadenceDuration: data.cadenceDuration,
 				referencePreviousEmail: referencePrevious,
-				body: editorContent,
+				body: parsedContent,
 				alterSubjectLine: alterSubject,
 			});
 

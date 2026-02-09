@@ -136,14 +136,14 @@ const MasterTable = ({
 											`}
 												>
 													<div className={styles['parsed-content']}>
-														<span className={styles['message-preview']}>
+														<div className={styles['message-preview']}>
 															{parsedContent[0]}
-														</span>
+														</div>
 														{parsedContent.length > 1 &&
 															parsedContent
 																.slice(1)
 																.map((text: string, index: number) => (
-																	<span key={index}>{text}</span>
+																	<div key={index}>{text}</div>
 																))}
 													</div>
 												</td>
@@ -198,48 +198,56 @@ const MasterTable = ({
 									const parsedContent =
 										cell.contentCell && parseEmailContent(cell.value);
 
+									console.log('parsedContent for cell:', parsedContent);
+
 									return cell.contentCell ?
 											<td
 												key={index}
 												className={`
-											${styles[cell.size]} 
-											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-											${styles['content-cell']}
-										`}
+													${styles[cell.size]} 
+													${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+													${styles['content-cell']}
+												`}
 											>
 												<div className={styles['parsed-content']}>
-													<span
+													<div
 														className={`
-													${styles['message-preview']} 
-													${
-														(
-															cell.subjectContentCell &&
-															row.rowStyling !== 'cancelled'
-														) ?
-															styles.subject
-														:	''
-													}
-												`}
+															${styles['message-preview']} 
+															${
+																(
+																	cell.subjectContentCell &&
+																	row.rowStyling !== 'cancelled'
+																) ?
+																	styles.subject
+																:	''
+															}
+															`}
 													>
 														{parsedContent[0]}
-													</span>
+													</div>
 													{selectedRow === row.rowId &&
 														parsedContent.length > 1 &&
 														parsedContent
 															.slice(1)
-															.map((text: string, index: number) => (
-																<span key={index}>{text}</span>
-															))}
+															.map((text: string, index: number) => {
+																console.log(
+																	'Rendering additional parsed content:',
+																	text,
+																);
+																return (
+																	<div key={index}>{text || '\u00A0'}</div>
+																);
+															})}
 												</div>
 											</td>
 										:	<td
 												key={index}
 												className={`
-											${styles[cell.size]} 
-											${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-											${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
-											${cell.value === 'N/A' ? styles.transparent : ''}
-										`}
+													${styles[cell.size]} 
+													${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+													${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
+													${cell.value === 'N/A' ? styles.transparent : ''}
+												`}
 											>
 												{cell.isDate ?
 													new Date(cell.value as string).toLocaleDateString()

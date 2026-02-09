@@ -30,35 +30,36 @@ function extractJsonObject(text: string): string | null {
 
 export const generateMessage = async (
 	previousEmailContents: PreviousEmailContentsType,
-	options: GenerateOptions = {}
+	options: GenerateOptions = {},
 ): Promise<GeneratedMessage> => {
 	const model = 'gpt-4o-mini';
 	const MAX_TOKENS = 4000;
 	const MAX_BODY_WORDS = 200;
 
 	const preserveThreadContext =
-		typeof options.preserveThreadContext === 'boolean'
-			? options.preserveThreadContext
-			: true;
+		typeof options.preserveThreadContext === 'boolean' ?
+			options.preserveThreadContext
+		:	true;
 
-	const systemInstruction = `RETURN ONLY one MINIFIED JSON object with keys: subject, bodyHtml, bodyPlain. bodyPlain MUST be <= ${MAX_BODY_WORDS} words. NO commentary, analysis, chain-of-thought, or role-play as any recipient. Use proper paragraphs (no <br>). Tone: polite, concise, "checking in". No em dashes.`;
+	const formattingNote = `CRITICAL FORMATTING: bodyHtml MUST use Gmail-compatible format: wrap each line of text in <div></div> tags. For blank lines, use <div><br></div>. DO NOT use <p> tags, <br> alone, or any other HTML structure. Example: <div>Hi John,</div><div><br></div><div>Just checking in.</div><div><br></div><div>Best regards,</div><div>-Evan</div>`;
+
+	const systemInstruction = `RETURN ONLY one MINIFIED JSON object with keys: subject, bodyHtml, bodyPlain. bodyPlain MUST be <= ${MAX_BODY_WORDS} words. NO commentary, analysis, chain-of-thought, or role-play as any recipient. ${formattingNote}. Tone: polite, concise, "checking in". No em dashes.`;
 
 	const keepSubjectNote =
-		options.keepSubject && previousEmailContents.previousSubject
-			? `Keep the existing subject exactly as provided.`
-			: 'You may rewrite the subject if it will improve response rate.';
+		options.keepSubject && previousEmailContents.previousSubject ?
+			`Keep the existing subject exactly as provided.`
+		:	'You may rewrite the subject if it will improve response rate.';
 
-	const contactNameNote = previousEmailContents.contactName
-		? `Address the contact by name like "Hi ${previousEmailContents.contactName},".`
-		: `No contact name was provided. If possible, use the name from the greeting/intro in the previous email: ${previousEmailContents.previousBody}; otherwise, use the generic greeting "Hello,".`;
+	const contactNameNote =
+		previousEmailContents.contactName ?
+			`Address the contact by name like "Hi ${previousEmailContents.contactName},".`
+		:	`No contact name was provided. If possible, use the name from the greeting/intro in the previous email: ${previousEmailContents.previousBody}; otherwise, use the generic greeting "Hello,".`;
 
 	const userPrompt = `Context: You are a professional executive assistant acting as the original sender. You are writing a short follow-up email no longer than 3 sentences or ${MAX_BODY_WORDS} words in length. ${keepSubjectNote} ${
-		preserveThreadContext
-			? 'Preserve thread context, if it makes sense to, include a brief reference to the previous message (1-2 sentences MAX) to remind the recipient why you are reaching out, and keep key topic nouns so recipients recognize the thread.'
-			: 'Do NOT include the full original body; summarize key facts in one sentence and feel free to rewrite the body a little more freely.'
-	} ${contactNameNote} Include one short check-in CTA (e.g., "Are you available for a 15-minute call next week?"). Make sure the CTA is not identical to the previously used CTA. Also make sure the CTA is on its own line/paragraph. Sign off the exact same as the previous message did, making sure to NEVER use <br> at all but proper paragraphs. Here is the previous message for context:\n${
-		previousEmailContents.previousBody
-	}\n\nProduce the compact JSON object now.`;
+		preserveThreadContext ?
+			'Preserve thread context, if it makes sense to, include a brief reference to the previous message (1-2 sentences MAX) to remind the recipient why you are reaching out, and keep key topic nouns so recipients recognize the thread.'
+		:	'Do NOT include the full original body; summarize key facts in one sentence and feel free to rewrite the body a little more freely.'
+	} ${contactNameNote} Include one short check-in CTA (e.g., "Are you available for a 15-minute call next week?"). Make sure the CTA is not identical to the previously used CTA. Also make sure the CTA is on its own line/paragraph. Sign off the exact same as the previous message did. Here is the previous message for context:\n${previousEmailContents.previousBody}\n\nProduce the compact JSON object now.`;
 
 	const promptTemplate = `${systemInstruction}\n\n${userPrompt}`;
 
@@ -80,13 +81,11 @@ export const generateMessage = async (
 				temperature: 0.2,
 			});
 
-			console.log('Response from OpenAI:', response);
-
 			if (response.status === 'incomplete') {
 				throw new Error(
 					`LLM response incomplete: ${
 						response.incomplete_details?.reason || 'unknown reason'
-					}`
+					}`,
 				);
 			}
 
@@ -110,11 +109,11 @@ export const generateMessage = async (
 			}
 
 			const subject =
-				options.keepSubject && previousEmailContents.previousSubject
-					? previousEmailContents.previousSubject.includes('Re: ')
-						? previousEmailContents.previousSubject
-						: `Re: ${previousEmailContents.previousSubject}`
-					: parsed.subject || parsed.subject_line || '';
+				options.keepSubject && previousEmailContents.previousSubject ?
+					previousEmailContents.previousSubject.includes('Re: ') ?
+						previousEmailContents.previousSubject
+					:	`Re: ${previousEmailContents.previousSubject}`
+				:	parsed.subject || parsed.subject_line || '';
 			const bodyHtml =
 				parsed.bodyHtml || parsed.body_html || parsed.html || parsed.body || '';
 			const bodyPlain =
@@ -131,12 +130,12 @@ export const generateMessage = async (
 				attempt,
 			};
 
-			// console.log('Generated message meta from messageGenerationService.ts:', {
-			// 	subject,
-			// 	bodyHtml,
-			// 	bodyPlain,
-			// 	generationMeta,
-			// });
+			console.log('Generated message meta from messageGenerationService.ts:', {
+				subject,
+				bodyHtml,
+				bodyPlain,
+				generationMeta,
+			});
 
 			return {
 				subject,
@@ -153,6 +152,6 @@ export const generateMessage = async (
 	}
 
 	throw new Error(
-		`Message generation failed: ${lastError?.message || lastError}`
+		`Message generation failed: ${lastError?.message || lastError}`,
 	);
 };
