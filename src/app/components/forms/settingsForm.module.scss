@@ -3,6 +3,10 @@
 	flex-direction: column;
 	gap: 1rem;
 
+	&.disabled {
+		cursor: not-allowed !important;
+	}
+
 	.form {
 		display: flex;
 		flex-direction: column;
@@ -131,12 +135,20 @@
 
 				label {
 					cursor: pointer;
+
+					&.disabled {
+						cursor: not-allowed !important;
+					}
 				}
 
 				input[type='checkbox'] {
 					width: 1.25rem;
 					height: 1.25rem;
 					cursor: pointer;
+
+					&:disabled {
+						cursor: not-allowed !important;
+					}
 				}
 			}
 		}

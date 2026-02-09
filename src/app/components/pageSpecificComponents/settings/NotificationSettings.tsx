@@ -16,8 +16,13 @@ const NotificationSettings = ({ user }: { user: UserToClientFromDB }) => {
 	return (
 		<div className={styles['settings-container']}>
 			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Email Notifications</h3>
-				<p className={styles['section-description']}>
+				<h3 className={styles['section-title']}>
+					Email Notifications (Coming soon!)
+				</h3>
+				<p
+					className={styles['section-description']}
+					style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+				>
 					Choose which events trigger email notifications to your account email.
 				</p>
 				<NotificationsForm user={user} />

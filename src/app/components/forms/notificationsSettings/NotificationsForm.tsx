@@ -2,8 +2,10 @@
 
 // Library imports
 import { useState, useEffect } from 'react';
-import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
-import Link from 'next/link';
+import { useForm, SubmitHandler } from 'react-hook-form';
+
+// Hooks imports
+import { useUserAccountSettingsUpdate } from '@/hooks/useUserSettings';
 
 // Styles imports
 import styles from '../settingsForm.module.scss';
@@ -13,7 +15,6 @@ import { UserToClientFromDB } from '@/types/userTypes';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
-import { useSettingsContext } from '@/app/context/SettingsContext';
 
 const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 	const {
@@ -25,40 +26,92 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 		setLoading,
 		setLoadingMessage,
 	} = useAppContext();
-	const { isSaving, setIsSaving, setActiveTab } = useSettingsContext();
+	const { mutateAsync: updateUser, isPending: updatingUser } =
+		useUserAccountSettingsUpdate();
 
 	interface NotificationsFormData {
-		bounceAlerts: boolean;
-		sequenceCompletion: boolean;
-		messageApproval: boolean;
-		sendFailure: boolean;
+		notificationBounce: boolean;
+		notificationSequenceComplete: boolean;
+		notificationMessageApproval: boolean;
+		notificationSendFailure: boolean;
 	}
+
+	const initialValues = {
+		notificationBounce: user.notificationBounce,
+		notificationSequenceComplete: user.notificationSequenceComplete,
+		notificationMessageApproval: user.notificationMessageApproval,
+		notificationSendFailure: user.notificationSendFailure,
+	};
 
 	const { register, watch, handleSubmit, reset, setValue } =
 		useForm<NotificationsFormData>({
-			defaultValues: {
-				bounceAlerts: true,
-				sequenceCompletion: true,
-				messageApproval: true,
-				sendFailure: true,
-			},
+			defaultValues: initialValues,
 		});
 
+	// Watch all form fields
+	const formValues = watch();
+
+	// Check if form has changed
+	const [hasChanged, setHasChanged] = useState(false);
+
+	useEffect(() => {
+		const isChanged =
+			formValues.notificationBounce !== initialValues.notificationBounce ||
+			formValues.notificationSequenceComplete !==
+				initialValues.notificationSequenceComplete ||
+			formValues.notificationMessageApproval !==
+				initialValues.notificationMessageApproval ||
+			formValues.notificationSendFailure !==
+				initialValues.notificationSendFailure;
+
+		setHasChanged(isChanged);
+	}, [formValues, initialValues]);
+
+	const onSubmit: SubmitHandler<NotificationsFormData> = async (data) => {
+		try {
+			setLoading(true);
+			setLoadingMessage('Saving');
+			await updateUser({ ...data });
+
+			// Delaying by a small amount to ensure the user sees the loading state
+			setTimeout(() => {
+				setLoading(false);
+				setLoadingMessage(null);
+			}, 800);
+		} catch (error) {
+			// Error handling is done in the hook
+			setLoading(false);
+			setLoadingMessage(null);
+		}
+	};
+
 	return (
-		<div className={styles['settings-form-wrapper']}>
-			<form className={styles.form}>
-				<h3 className={styles['section-title']}>Contact Activity</h3>
+		<div className={`${styles['settings-form-wrapper']} ${styles.disabled}`}>
+			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+				<h3
+					className={styles['section-title']}
+					style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+				>
+					Contact Activity
+				</h3>
 				<section className={styles.section}>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
-							id='bounceAlerts'
-							{...register('bounceAlerts')}
+							id='notificationBounce'
+							{...register('notificationBounce')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='bounceAlerts'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='notificationBounce'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Bounce Alerts</span>
 							</label>
 							<small className={styles.helpText}>
@@ -72,11 +125,18 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 					>
 						<input
 							type='checkbox'
-							id='sendFailure'
-							{...register('sendFailure')}
+							id='notificationSendFailure'
+							{...register('notificationSendFailure')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='sendFailure'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='notificationSendFailure'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Send Failure</span>
 							</label>
 							<small className={styles.helpText}>
@@ -86,18 +146,30 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 					</div>
 				</section>
 
-				<h3 className={styles['section-title']}>Sequence Activity</h3>
+				<h3
+					className={styles['section-title']}
+					style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+				>
+					Sequence Activity
+				</h3>
 				<section className={styles.section}>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
-							id='sequenceCompletion'
-							{...register('sequenceCompletion')}
+							id='notificationSequenceComplete'
+							{...register('notificationSequenceComplete')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='sequenceCompletion'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='notificationSequenceComplete'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Sequence Completion</span>
 							</label>
 							<small className={styles.helpText}>
@@ -111,11 +183,18 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 					>
 						<input
 							type='checkbox'
-							id='messageApproval'
-							{...register('messageApproval')}
+							id='notificationMessageApproval'
+							{...register('notificationMessageApproval')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='messageApproval'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='notificationMessageApproval'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Message Approval</span>
 							</label>
 							<small className={styles.helpText}>
@@ -129,9 +208,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 					<button
 						className={'button save-changes'}
 						type='submit'
-						disabled={isSaving}
+						disabled // REMOVE WHEN FEATURE IS READY AND REPLACE WITH BELOW LINE
+						// disabled={updatingUser || !hasChanged}
 					>
-						{isSaving ? 'Saving...' : 'Save Changes'}
+						{updatingUser ? 'Saving...' : 'Save Changes'}
 					</button>
 				</div>
 			</form>
