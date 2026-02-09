@@ -70,6 +70,18 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 		}
 	};
 
+	const sendLimitTiers = {
+		free: 5,
+		basic: 25,
+		pro: 50,
+		elite: Infinity,
+	};
+
+	const userLimit =
+		user.subscriptionTier === 'elite' ?
+			'Unlimited'
+		:	sendLimitTiers[user.subscriptionTier];
+
 	return (
 		<div className={styles['settings-form-wrapper']}>
 			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -113,16 +125,30 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 					<div className={styles['send-limit']}>
 						<div className={styles.info}>
 							<p>Daily Send Limit:</p>
-							<p className={styles.limit}>50 emails</p>
+							<p className={styles.limit}>
+								{userLimit}
+								{user.subscriptionTier !== 'elite' ? ' emails' : ''}
+							</p>
 						</div>
 						<small>
-							Your current plan allows up to 50 emails per day.{' '}
-							<span
-								className={styles.upgrade}
-								onClick={() => setActiveTab('billing')}
-							>
-								Upgrade your plan to increase this limit.
-							</span>
+							{user.subscriptionTier !== 'elite' ?
+								`Your current plan allows up to ${userLimit} outbound emails per
+							day.`
+							:	'Your current plan allows unlimited outbound emails. Thank you for being an elite subscriber!'
+							}{' '}
+							{user.subscriptionTier !== 'elite' ?
+								<span
+									className={styles.upgrade}
+									onClick={() => setActiveTab('billing')}
+								>
+									Upgrade your plan to increase this limit.
+								</span>
+							:	<span className={styles.important}>
+									<br />
+									Note: Standard email providers enforce a maximum of 500 emails
+									per day to prevent spam.
+								</span>
+							}
 						</small>
 					</div>
 				</section>

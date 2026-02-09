@@ -203,6 +203,6 @@ enum MessageStatus {
 enum SubscriptionTier {
   free
   basic
-  premium
-  unlimited
+  pro
+  elite
 }
