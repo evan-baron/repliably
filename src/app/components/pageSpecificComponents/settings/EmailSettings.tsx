@@ -211,18 +211,36 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 			</section>
 
 			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Gmail Integration</h3>
+				<h3 className={styles['section-title']}>Email Integration</h3>
+				<p className={styles['section-description']}>
+					Manage your email account connection.{' '}
+					<small>
+						<span className={styles.important}>
+							Only Gmail is supported at this time.
+						</span>
+					</small>
+				</p>
 				<div className={styles.options}>
 					<div className={styles.item}>
 						<div className={styles.info}>
 							<h4>Connection Status</h4>
 							<p>
-								<span className={`${styles['status-dot']} ${styles.active}`} />
-								Connected to Gmail
+								<span
+									className={`${styles['status-dot']} ${user.emailConnectionActive ? styles.active : styles.inactive}`}
+								/>
+								{user.emailConnectionActive ?
+									'Connected to Gmail'
+								:	'Not connected'}
 							</p>
-							<small>Last synced: 2 hours ago</small>
+							<small>
+								{user.emailConnectedAt ?
+									`Last synced: ${new Date(user.emailConnectedAt).toLocaleString()}`
+								:	''}
+							</small>
 						</div>
-						<button className={'button settings-button'}>Reconnect</button>
+						<button className={'button settings-button'}>
+							{user.emailConnectionActive ? 'Disconnect' : 'Connect'}
+						</button>
 					</div>
 				</div>
 			</section>

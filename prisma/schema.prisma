@@ -38,6 +38,11 @@ model User {
   notificationMessageApproval      Boolean            @default(true)
   subscriptionTier                 SubscriptionTier   @default(free)
   active                           Boolean            @default(true)
+  gmailRefreshToken                String?            @db.Text
+  connectedEmail                   String?
+  emailConnectedAt                 DateTime?
+  emailConnectionActive            Boolean            @default(false)
+  emailTokenExpiresAt              DateTime?
   contacts                         Contact[]
   sequences                        Sequence[]
   messages                         Message[]

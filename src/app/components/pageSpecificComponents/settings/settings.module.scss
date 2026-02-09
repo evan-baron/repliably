@@ -25,7 +25,6 @@
 
 			.important {
 				font-weight: 600;
-				text-decoration: underline;
 			}
 		}
 
@@ -61,7 +60,7 @@
 							}
 
 							&.inactive {
-								background: var(--color-danger);
+								background: var(--accent-danger);
 							}
 						}
 					}
