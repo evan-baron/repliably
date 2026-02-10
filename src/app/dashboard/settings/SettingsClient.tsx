@@ -3,6 +3,7 @@
 // Library imports
 import { useEffect, Fragment } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter, usePathname } from 'next/navigation';
 
 // Hooks imports
 import { useGetUser } from '@/hooks/useUserSettings';
@@ -29,12 +30,20 @@ type SettingsTab = 'account' | 'email' | 'sequences' | 'notifications';
 const SettingsClient = ({
 	initialUser,
 	identities,
+	emailStatus,
+	errorStatus,
+	initialTab,
 }: {
 	initialUser: UserToClientFromDB;
 	identities: Auth0Identity[];
+	emailStatus?: string;
+	errorStatus?: string;
+	initialTab?: SettingsTab;
 }) => {
 	const queryClient = useQueryClient();
 	const userQuery = useGetUser();
+	const router = useRouter();
+	const pathname = usePathname();
 
 	const { setLoading, setLoadingMessage, setModalType, setErrors } =
 		useAppContext();
@@ -45,6 +54,18 @@ const SettingsClient = ({
 			queryClient.setQueryData<UserToClientFromDB>(['user-get'], initialUser);
 		}
 	}, [initialUser, queryClient]);
+
+	useEffect(() => {
+		const validTabs: SettingsTab[] = [
+			'account',
+			'email',
+			'sequences',
+			'notifications',
+		];
+		if (initialTab && validTabs.includes(initialTab)) {
+			setActiveTab(initialTab);
+		}
+	}, [initialTab, setActiveTab]);
 
 	const userData = userQuery.data || initialUser;
 
@@ -64,7 +85,13 @@ const SettingsClient = ({
 			case 'account':
 				return <AccountSettings user={userData} identities={identities} />;
 			case 'email':
-				return <EmailSettings user={userData} />;
+				return (
+					<EmailSettings
+						user={userData}
+						emailStatus={emailStatus}
+						errorStatus={errorStatus}
+					/>
+				);
 			case 'sequences':
 				return <SequenceDefaults user={userData} />;
 			case 'notifications':
@@ -82,6 +109,7 @@ const SettingsClient = ({
 			]);
 		}
 		setActiveTab(tabId);
+		router.push(`${pathname}?tab=${tabId}`, { scroll: false });
 	};
 
 	return (

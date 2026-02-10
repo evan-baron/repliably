@@ -1,4 +1,6 @@
 import { google } from 'googleapis';
+import { prisma } from '@/lib/prisma';
+import { decrypt } from '@/lib/encryption';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -6,7 +8,60 @@ const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 const SENDER_EMAIL = process.env.EMAIL_ADDRESS!;
 
+/**
+ * Get an OAuth2 client configured with a specific user's credentials
+ * @param userId - The user's database ID
+ * @returns Configured OAuth2Client
+ */
+export const getUserOAuth2Client = async (userId: number) => {
+	// Fetch user's encrypted refresh token from database
+	const user = await prisma.user.findUnique({
+		where: { id: userId },
+		select: {
+			gmailRefreshToken: true,
+			connectedEmail: true,
+			emailConnectionActive: true,
+		},
+	});
+
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	if (!user.emailConnectionActive || !user.gmailRefreshToken) {
+		throw new Error(
+			'Gmail account not connected. Please connect your Gmail account in settings.',
+		);
+	}
+
+	// Decrypt the refresh token
+	const refreshToken = decrypt(user.gmailRefreshToken);
+
+	// Create a new OAuth2 client for this user
+	const userOAuth2Client = new google.auth.OAuth2(
+		process.env.GOOGLE_CLIENT_ID,
+		process.env.GOOGLE_CLIENT_SECRET,
+		process.env.NEXT_PUBLIC_APP_URL + '/api/auth/google/callback',
+	);
+
+	// Set the user's credentials
+	userOAuth2Client.setCredentials({
+		refresh_token: refreshToken,
+	});
+
+	return userOAuth2Client;
+};
+
+/**
+ * Send an email using Gmail API with user's own credentials
+ * @param userId - The user's database ID
+ * @param to - Recipient email address
+ * @param subject - Email subject
+ * @param message - Email body (HTML)
+ * @param fromName - Optional sender name
+ */
 export async function sendGmail({
+	userId,
 	to,
 	subject,
 	text,
@@ -15,6 +70,7 @@ export async function sendGmail({
 	references,
 	threadId,
 }: {
+	userId: number;
 	to: string;
 	subject: string;
 	text?: string;
@@ -25,23 +81,37 @@ export async function sendGmail({
 	threadId?: string; // Gmail threadId to explicitly attach to
 }) {
 	try {
-		// Create OAuth2 client
-		const oAuth2Client = new google.auth.OAuth2(
-			CLIENT_ID,
-			CLIENT_SECRET,
-			REDIRECT_URI
-		);
+		// // Create OAuth2 client
+		// const oAuth2Client = new google.auth.OAuth2(
+		// 	CLIENT_ID,
+		// 	CLIENT_SECRET,
+		// 	'https://developers.google.com/oauthplayground',
+		// );
 
-		// Set credentials
-		oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+		const userOAuth2Client = await getUserOAuth2Client(userId);
+
+		// // Set credentials
+		// oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			select: {
+				connectedEmail: true,
+			},
+		});
+
+		if (!user?.connectedEmail) {
+			throw new Error('User email not found');
+		}
 
 		// Get Gmail API instance
-		const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+		const gmail = google.gmail({ version: 'v1', auth: userOAuth2Client });
+		// const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
 		// Build headers for threading if provided
 		const headers: string[] = [];
 		headers.push(`To: ${to}`);
-		headers.push(`From: ${SENDER_EMAIL}`);
+		headers.push(`From: ${user.connectedEmail}`);
 		headers.push(`Subject: ${subject}`);
 		if (inReplyTo) headers.push(`In-Reply-To: ${inReplyTo}`);
 		if (references && references.length > 0)
@@ -83,7 +153,7 @@ export async function sendGmail({
 			});
 			const headers = sent.data.payload?.headers || [];
 			const mid = headers.find(
-				(h: any) => h.name.toLowerCase() === 'message-id'
+				(h: any) => h.name.toLowerCase() === 'message-id',
 			);
 			if (mid && mid.value) messageHeaderId = mid.value;
 		} catch (err) {
@@ -99,6 +169,24 @@ export async function sendGmail({
 		};
 	} catch (error) {
 		console.error('Gmail sending error:', error);
+
+		// Handle specific OAuth errors
+		if (error instanceof Error) {
+			if (
+				error.message.includes('invalid_grant') ||
+				error.message.includes('Token has been expired or revoked')
+			) {
+				// Mark user's connection as inactive
+				await prisma.user.update({
+					where: { id: userId },
+					data: { emailConnectionActive: false },
+				});
+				throw new Error(
+					'Gmail connection expired. Please reconnect your Gmail account in settings.',
+				);
+			}
+		}
+
 		throw error;
 	}
 }

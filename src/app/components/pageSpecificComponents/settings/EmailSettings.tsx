@@ -1,7 +1,8 @@
 'use client';
 
 // Library imports
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // Helpers imports
 import {
@@ -15,6 +16,7 @@ import {
 	useSaveSignature,
 	useUpdateSignature,
 } from '@/hooks/useUserSignatures';
+import { useDisconnectEmail } from '@/hooks/useDisconnectEmail';
 
 // Styles imports
 import styles from './settings.module.scss';
@@ -27,14 +29,52 @@ import SendingPreferencesForm from '../../forms/emailSettings/SendingPreferences
 import SignatureItem from './signatures/SignatureItem';
 import SignatureEditor from './signatures/SignatureEditor';
 
-const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
+
+const EmailSettings = ({
+	user,
+	emailStatus,
+	errorStatus,
+}: {
+	user: UserToClientFromDB;
+	emailStatus?: string;
+	errorStatus?: string;
+}) => {
 	const { mutateAsync: saveSignature } = useSaveSignature();
 	const { mutateAsync: deleteSignature } = useDeleteSignature();
 	const { mutateAsync: updateSignature } = useUpdateSignature();
+	const { mutateAsync: disconnectEmail, isPending: isDisconnecting } =
+		useDisconnectEmail();
 	const [addingNewSignature, setAddingNewSignature] = useState(false);
 	const [editorContent, setEditorContent] = useState<string>('');
 	const [signatureName, setSignatureName] = useState<string>('');
 	const [editing, setEditing] = useState<number | null>(null);
+	const [isConnecting, setIsConnecting] = useState<boolean>(false);
+	const { setModalType, setErrors, setAlertMessage } = useAppContext();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (emailStatus === 'connected') {
+			setModalType('alert');
+			setAlertMessage('Email connected successfully!');
+		} else if (errorStatus) {
+			let errorMessage = 'An error occurred while connecting email.';
+			if (errorStatus === 'access_denied') {
+				errorMessage = 'You denied access to your email account.';
+			} else if (errorStatus === 'no_code') {
+				errorMessage = 'No authorization code received from email.';
+			} else if (errorStatus === 'not_authenticated') {
+				errorMessage = 'You must be logged in to connect your email account.';
+			} else if (errorStatus === 'no_refresh_token') {
+				errorMessage =
+					'No refresh token received. This may happen if you have previously connected your email account. Please try disconnecting and reconnecting your account.';
+			}
+			setModalType('error');
+			setErrors([errorMessage]);
+			router.replace('/dashboard/settings?tab=email');
+		}
+	}, [emailStatus, errorStatus, setModalType, setErrors, router]);
 
 	const handleAddSignature = () => {
 		setAddingNewSignature(true);
@@ -129,6 +169,22 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 		} catch (error) {
 			// Handle error (e.g., show notification)
 			console.error('Error deleting signature:', error);
+		}
+	};
+
+	const handleConnectEmail = () => {
+		setIsConnecting(true);
+		window.location.href = '/api/auth/google/initiate';
+	};
+
+	const handleDisconnectEmail = async () => {
+		try {
+			await disconnectEmail();
+			setModalType('alert');
+			setAlertMessage('Email account disconnected successfully!');
+		} catch (error) {
+			setModalType('error');
+			setErrors(['Failed to disconnect from Email']);
 		}
 	};
 
@@ -238,8 +294,20 @@ const EmailSettings = ({ user }: { user: UserToClientFromDB }) => {
 								:	''}
 							</small>
 						</div>
-						<button className={'button settings-button'}>
-							{user.emailConnectionActive ? 'Disconnect' : 'Connect'}
+						<button
+							className={'button settings-button'}
+							onClick={
+								user.emailConnectionActive ?
+									handleDisconnectEmail
+								:	handleConnectEmail
+							}
+							disabled={isConnecting}
+						>
+							{isConnecting ?
+								'Connecting...'
+							: user.emailConnectionActive ?
+								'Disconnect'
+							:	'Connect'}
 						</button>
 					</div>
 				</div>
