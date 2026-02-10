@@ -2,10 +2,10 @@ import { generateMessage } from '@/services/messageGenerationService';
 import { prisma } from '@/lib/prisma';
 
 export async function runGenerateNextMessages({ limit }: { limit: number }) {
-	const limitValue = limit || 50;
+	const limitValue = Math.min(Math.max(1, limit || 50), 100); // Ensure limit is between 1 and 100 though the API route should already enforce it will always be 50
 
 	console.log(
-		`[${new Date().toISOString()}] Cron: generate-next-messages started`
+		`[${new Date().toISOString()}] Cron: generate-next-messages started`,
 	);
 
 	const candidates = await prisma.message.findMany({
@@ -24,7 +24,13 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 
 	if (!candidates.length) {
 		console.log('No messages to process');
-		return { success: true, processed: 0, message: 'No messages to process' };
+		return {
+			success: true,
+			processed: 0,
+			succeeded: 0,
+			failed: 0,
+			message: 'No messages to process',
+		};
 	}
 
 	const candidateIds = candidates.map((msg) => msg.id);
@@ -45,6 +51,8 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 		return {
 			success: true,
 			processed: 0,
+			succeeded: 0,
+			failed: 0,
 			message: 'No messages claimed for processing',
 		};
 	}
@@ -62,38 +70,100 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 
 	if (!messagesToProcess.length) {
 		console.log('No messages to process');
-		return { success: true, processed: 0, message: 'No messages to process' };
+		return {
+			success: true,
+			processed: 0,
+			succeeded: 0,
+			failed: 0,
+			message: 'No messages to process',
+		};
 	}
 
 	console.log(`Found ${messagesToProcess.length} messages to process`);
 
 	const results = await Promise.allSettled(
 		messagesToProcess.map(async (message) => {
-			const sequence = message.sequence;
-			const contact = message.contact;
-
 			try {
+				// ✅ Validate required data exists
+				if (!message.sequence || !message.contact) {
+					console.error(`Message ${message.id} missing sequence or contact`);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'Missing required data (sequence or contact)',
+							nextMessageGenerated: true,
+							needsFollowUp: false,
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Missing required data',
+					};
+				}
+
+				const sequence = message.sequence;
+				const contact = message.contact;
+
 				// Checking if sequence is still active
-				if (!sequence || !sequence.active) {
+				if (!sequence.active) {
 					console.log(`Skipping message ${message.id} - sequence inactive`);
 
 					//Mark as processed so not included in next processing
 					await prisma.message.update({
 						where: { id: message.id },
-						data: { nextMessageGenerated: true },
+						data: {
+							status: 'cancelled',
+							lastError: 'Sequence deactivated',
+							nextMessageGenerated: true,
+							needsFollowUp: false,
+						},
 					});
 					return { success: true, messageId: message.id, skipped: true };
 				}
-			} catch (error) {
-				console.error(`Error processing message ${message.id}:`, error);
-				return {
-					success: false,
-					messageId: message.id,
-					error: (error as Error).message,
-				};
-			}
 
-			try {
+				// Validate previous message has content
+				if (!message.subject?.trim() || !message.contents?.trim()) {
+					console.error(`Message ${message.id} has empty subject or content`);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'Empty subject or content in previous message',
+							nextMessageGenerated: true,
+							needsFollowUp: false,
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Empty subject or content in previous message',
+					};
+				}
+
+				// Validate sequence has nextStepDue
+				const scheduledAt = sequence.nextStepDue || null;
+				if (!scheduledAt) {
+					console.log(
+						`No scheduled time for next message in sequence ${sequence.id} for message ${message.id}`,
+					);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'No nextStepDue date in sequence',
+							nextMessageGenerated: true,
+							needsFollowUp: false,
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'No scheduled time',
+					};
+				}
+
 				// Generate the next message
 				const generatedMessage = await generateMessage(
 					{
@@ -104,28 +174,37 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 					{
 						keepSubject: !sequence.alterSubjectLine,
 						preserveThreadContext: sequence.referencePreviousEmail ?? true,
-					}
+					},
 				);
 
-				const scheduledAt = sequence.nextStepDue || null;
-
-				if (!scheduledAt) {
-					console.log(
-						`No scheduled time for next message in sequence ${sequence.id} for message ${message.id}`
-					);
+				// Validate generated message
+				if (
+					!generatedMessage.subject?.trim() ||
+					!generatedMessage.bodyHtml?.trim()
+				) {
+					console.error(`Generated message for ${message.id} is empty`);
+					// Restore to sent for retry later (temporary error)
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'sent',
+							lastError: 'AI generation returned empty message',
+						},
+					});
 					return {
 						success: false,
 						messageId: message.id,
-						error: 'No scheduled time',
+						error: 'Generated message is empty',
 					};
 				}
 
-				const approvalDeadline = sequence.autoSendDelay
-					? new Date(
+				const approvalDeadline =
+					sequence.autoSendDelay ?
+						new Date(
 							scheduledAt.getTime() +
-								sequence.autoSendDelay * 24 * 60 * 60 * 1000
-					  )
-					: null;
+								sequence.autoSendDelay * 24 * 60 * 60 * 1000,
+						)
+					:	null;
 
 				// Store the next message
 				await prisma.message.create({
@@ -163,22 +242,39 @@ export async function runGenerateNextMessages({ limit }: { limit: number }) {
 				return { success: true, messageId: message.id };
 			} catch (error) {
 				console.error(`Error processing message ${message.id}:`, error);
+
+				// ✅ Restore to sent status for retry (temporary error)
+				try {
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'sent',
+							lastError: (error as Error).message,
+						},
+					});
+				} catch (rollbackError) {
+					console.error(
+						`Failed to rollback message ${message.id}:`,
+						rollbackError,
+					);
+				}
+
 				return {
 					success: false,
 					messageId: message.id,
 					error: (error as Error).message,
 				};
 			}
-		})
+		}),
 	);
 
 	const succeeded = results.filter(
-		(result) => result.status === 'fulfilled' && result.value.success
+		(result) => result.status === 'fulfilled' && result.value?.success === true,
 	).length;
 	const failed = results.length - succeeded;
 
 	console.log(
-		`[${new Date().toISOString()}] Cron: generate-next-messages completed. Succeeded: ${succeeded}, Failed: ${failed}`
+		`[${new Date().toISOString()}] Cron: generate-next-messages completed. Succeeded: ${succeeded}, Failed: ${failed}`,
 	);
 
 	return {

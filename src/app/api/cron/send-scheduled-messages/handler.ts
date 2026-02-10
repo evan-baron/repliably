@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { parseSequenceData } from '@/lib/helpers/sequenceHelpers';
 
 export async function runSendScheduledMessages({ limit }: { limit: number }) {
-	const limitValue = limit || 50;
+	const limitValue = Math.min(Math.max(1, limit || 50), 100); // Ensure limit is between 1 and 100 though the API route should already enforce it will always be 50
 
 	console.log(
 		`[${new Date().toISOString()}] Cron: send-scheduled-messages started`,
@@ -63,13 +63,119 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 		messagesToSend.map(async (message) => {
 			const now = new Date();
 
-			// If message requires approval and is not approved, skip if there's no deadline (wait indefinitely) or if there's a future approvalDeadline
-			if (message.needsApproval && !message.approved) {
-				const shouldSkip =
-					!message.approvalDeadline ||
-					(message.approvalDeadline && now < message.approvalDeadline);
+			try {
+				if (!message.contact || !message.sequence) {
+					console.error(`Message ${message.id} missing contact or sequence`);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'Missing contact or sequence data',
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Missing required data',
+					};
+				}
 
-				if (shouldSkip) {
+				const contact = message.contact;
+				const sequence = message.sequence;
+
+				// Validate sequence still active
+				if (!sequence.active) {
+					console.log(`Message ${message.id} sequence is inactive`);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'cancelled',
+							lastError: 'Sequence deactivated',
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Sequence inactive',
+					};
+				}
+
+				// Validate email format
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (!contact.email || !emailRegex.test(contact.email)) {
+					console.error(
+						`Invalid email for message ${message.id}: ${contact.email}`,
+					);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'Invalid email address',
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Invalid email address',
+					};
+				}
+
+				// Validate subject and content aren't empty
+				if (!message.subject?.trim() || !message.contents?.trim()) {
+					console.error(`Message ${message.id} has empty subject or content`);
+					await prisma.message.update({
+						where: { id: message.id },
+						data: {
+							status: 'failed',
+							lastError: 'Empty subject or content',
+						},
+					});
+					return {
+						success: false,
+						messageId: message.id,
+						error: 'Empty subject or content',
+					};
+				}
+
+				// If message requires approval and is not approved, skip if there's no deadline (wait indefinitely) or if there's a future approvalDeadline
+				if (message.needsApproval && !message.approved) {
+					const shouldSkip =
+						!message.approvalDeadline ||
+						(message.approvalDeadline && now < message.approvalDeadline);
+
+					if (shouldSkip) {
+						await prisma.message.update({
+							where: { id: message.id },
+							data: { status: 'scheduled' },
+						});
+						return {
+							success: false,
+							messageId: message.id,
+							error: 'Approval pending',
+						};
+					}
+				}
+
+				const endOfSequence =
+					sequence.endDate &&
+					sequence.nextStepDue &&
+					sequence.nextStepDue > sequence.endDate;
+				const passedApprovalDeadline =
+					message.approvalDeadline && new Date() > message.approvalDeadline;
+				const newCurrentStep = sequence.currentStep + 1;
+				const { nextStepDueDate } = parseSequenceData(
+					sequence.sequenceType,
+					newCurrentStep,
+					sequence.endDate,
+				);
+
+				// If scheduled but not yet approved, and approval deadline not yet passed, skip sending
+				if (
+					message.status === 'processing' &&
+					message.needsApproval &&
+					!message.approved &&
+					!passedApprovalDeadline
+				) {
 					await prisma.message.update({
 						where: { id: message.id },
 						data: { status: 'scheduled' },
@@ -80,50 +186,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 						error: 'Approval pending',
 					};
 				}
-			}
 
-			const contact = message.contact;
-			const sequence = message.sequence;
-
-			if (!sequence) {
-				await prisma.message.update({
-					where: { id: message.id },
-					data: { status: 'scheduled' },
-				});
-				return {
-					success: false,
-					messageId: message.id,
-					error: 'Sequence not found',
-				};
-			}
-
-			const endOfSequence =
-				sequence.endDate &&
-				sequence.nextStepDue &&
-				sequence.nextStepDue > sequence.endDate;
-			const passedApprovalDeadline =
-				message.approvalDeadline && new Date() > message.approvalDeadline;
-			const newCurrentStep = sequence.currentStep + 1;
-			const { nextStepDueDate } = parseSequenceData(
-				sequence.sequenceType,
-				newCurrentStep,
-				sequence.endDate,
-			);
-
-			// If scheduled but not yet approved, and approval deadline not yet passed, skip sending
-			if (
-				message.status === 'scheduled' &&
-				!message.approved &&
-				!passedApprovalDeadline
-			) {
-				return {
-					success: false,
-					messageId: message.id,
-					error: 'Approval pending',
-				};
-			}
-
-			try {
 				const result = await sendGmail({
 					userId: sequence.ownerId,
 					to: contact.email,
@@ -163,11 +226,24 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 				return { success: true, messageId: message.id };
 			} catch (error) {
 				console.error(`Error sending message ${message.id}:`, error);
-				// restore to scheduled so it can be retried later
+
+				// ✅ Distinguish permanent vs temporary failures
+				const isPermanentError =
+					error instanceof Error &&
+					(error.message.includes('Invalid email') ||
+						error.message.includes('Gmail account not connected') ||
+						error.message.includes('Insufficient Permission') ||
+						error.message.includes('invalid_grant') ||
+						error.message.includes('Token has been expired'));
+
 				await prisma.message.update({
 					where: { id: message.id },
-					data: { status: 'scheduled' },
+					data: {
+						status: isPermanentError ? 'failed' : 'scheduled',
+						lastError: (error as Error).message,
+					},
 				});
+
 				return {
 					success: false,
 					messageId: message.id,
@@ -178,7 +254,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 	);
 
 	const succeeded = results.filter(
-		(res) => res.status === 'fulfilled' && res.value.success,
+		(res) => res.status === 'fulfilled' && res.value?.success,
 	).length;
 	const failed = results.length - succeeded;
 
