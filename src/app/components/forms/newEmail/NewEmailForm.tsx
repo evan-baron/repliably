@@ -184,7 +184,7 @@ const NewEmailForm = ({
 	};
 
 	return (
-		<div className={styles['newemailform-wrapper']}>
+		<div className={styles['new-email-form-wrapper']}>
 			<form
 				onSubmit={handleSubmit(onSubmit, (errors) => {
 					const errorMessages = extractFormErrors(errors);
@@ -238,24 +238,27 @@ const NewEmailForm = ({
 							</div>
 						</div>
 
-						<div className={styles['input-group']}>
-							<div className={styles.input}>
-								<label htmlFor='signatures'>Signature:</label>
-								<select
-									id='signatures'
-									className={styles.select}
-									value={selectedSignatureId || ''}
-									onChange={handleSignatureChange}
-								>
-									<option value={-1}>None</option>
-									{signatures?.map((signature) => (
-										<option key={signature.id} value={signature.id}>
-											{signature.name}
-										</option>
-									))}
-								</select>
+						{signatures && signatures.length > 0 && (
+							<div className={styles['input-group']}>
+								<div className={styles.input}>
+									<label htmlFor='signatures'>Signature:</label>
+									<select
+										id='signatures'
+										className={styles.select}
+										value={selectedSignatureId || ''}
+										onChange={handleSignatureChange}
+										disabled={!signatures || signatures.length === 0}
+									>
+										<option value={-1}>None</option>
+										{signatures?.map((signature) => (
+											<option key={signature.id} value={signature.id}>
+												{signature.name}
+											</option>
+										))}
+									</select>
+								</div>
 							</div>
-						</div>
+						)}
 
 						{/* Email Body - RTE */}
 						<div className={styles['rte-wrapper']}>

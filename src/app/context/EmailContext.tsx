@@ -49,7 +49,7 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 
 	// Reset originalBodyContent when route changes
 	useEffect(() => {
-		setOriginalBodyContent('<p></p>');
+		setOriginalBodyContent('<p></p><p></p>');
 	}, [pathname]);
 
 	useEffect(() => {
