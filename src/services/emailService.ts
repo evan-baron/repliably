@@ -65,6 +65,7 @@ export async function storeSentEmail({
 	};
 
 	const cadenceDurationMapping: { [key: string]: number | null } = {
+		'15': 15,
 		'30': 30,
 		'60': 60,
 		'90': 90,
@@ -73,19 +74,18 @@ export async function storeSentEmail({
 
 	// Helper to determine sendDelay in days
 	const sendDelay =
-		autoSendDelay === 'never' || autoSendDelay === '' || !autoSend
-			? null
-			: autoSendDelay
-			? parseInt(autoSendDelay)
-			: null;
+		autoSendDelay === 'never' || autoSendDelay === '' || !autoSend ? null
+		: autoSendDelay ? parseInt(autoSendDelay)
+		: null;
 
 	// Helper to simplify sequenceDuration calculation
 	const sequenceDuration = cadenceDurationMapping[cadenceDuration];
 
 	// Determine endDate for the sequence
-	const endDate = sequenceDuration
-		? new Date(Date.now() + sequenceDuration * 24 * 60 * 60 * 1000)
-		: null;
+	const endDate =
+		sequenceDuration ?
+			new Date(Date.now() + sequenceDuration * 24 * 60 * 60 * 1000)
+		:	null;
 
 	// If cadenceType is 'none', there will be no follow-up emails
 	if (cadenceType === 'none') {
@@ -121,11 +121,11 @@ export async function storeSentEmail({
 
 	// Helper function to determine the next step due date for new sequence-to-be
 	const nextStepDueDate =
-		cadenceType === '31day'
-			? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-			: new Date(
-					Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000
-			  );
+		cadenceType === '31day' ?
+			new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+		:	new Date(
+				Date.now() + cadenceTypeMapping[cadenceType] * 24 * 60 * 60 * 1000,
+			);
 
 	// Create the new sequence
 	const sequence = await prisma.sequence.create({
@@ -172,7 +172,7 @@ export async function storeSentEmail({
 	]);
 
 	console.log(
-		`Stored sent message ${createdMessage.id} and created sequence ${sequence.id} for contact ${contact.id}`
+		`Stored sent message ${createdMessage.id} and created sequence ${sequence.id} for contact ${contact.id}`,
 	);
 
 	return { createdMessage, updatedContact, newContact };

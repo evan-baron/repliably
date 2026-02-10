@@ -4,6 +4,8 @@ import { storeSentEmail } from '@/services/emailService';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 import { deactivateSequence } from '@/services/sequenceService';
+import { sendEmailSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -15,6 +17,37 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		if (!user) {
+			return NextResponse.json(
+				{ error: 'User not authenticated' },
+				{ status: 401 },
+			);
+		}
+
+		const requestBody = await req.json();
+
+		// Validate input using Zod schema
+		let validatedData;
+		try {
+			validatedData = sendEmailSchema.parse(requestBody);
+		} catch (validationError) {
+			if (validationError instanceof z.ZodError) {
+				const errors = validationError.issues.map((issue) => ({
+					path: issue.path.join('.'),
+					message: issue.message,
+				}));
+				return NextResponse.json(
+					{
+						error: 'Validation failed',
+						details: errors.map((e) => e.message),
+						fields: errors,
+					},
+					{ status: 400 },
+				);
+			}
+			throw validationError;
+		}
+
 		const {
 			to,
 			subject,
@@ -24,24 +57,10 @@ export async function POST(req: NextRequest) {
 			cadenceDuration,
 			body,
 			override,
-			sequenceId,
 			referencePreviousEmail,
 			alterSubjectLine,
 			activeSequenceId,
-		} = await req.json();
-
-		if (
-			!to ||
-			!subject ||
-			!body ||
-			(autoSend === true && !autoSendDelay) ||
-			!cadenceType
-		) {
-			return NextResponse.json(
-				{ error: 'Missing parameters' },
-				{ status: 400 },
-			);
-		}
+		} = validatedData;
 
 		// Helper: send email and update contact
 		const sendAndStoreEmail = async () => {
@@ -65,7 +84,6 @@ export async function POST(req: NextRequest) {
 						cadenceDuration,
 						messageId: result.messageId,
 						threadId: result.threadId,
-						sequenceId: sequenceId ?? null,
 						referencePreviousEmail: referencePreviousEmail,
 						alterSubjectLine: alterSubjectLine,
 					});
@@ -87,7 +105,7 @@ export async function POST(req: NextRequest) {
 		};
 
 		// Handle override: true logic
-		if (override) {
+		if (override && activeSequenceId !== undefined) {
 			await deactivateSequence(activeSequenceId);
 			return await sendAndStoreEmail();
 		}
@@ -108,13 +126,7 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
-		if (!existingSequence) {
-			return await sendAndStoreEmail();
-		}
-
-		const matches = sequenceId && existingSequence.id === sequenceId;
-
-		if (!matches) {
+		if (existingSequence) {
 			return NextResponse.json(
 				{
 					sequenceExists: true,
@@ -140,6 +152,58 @@ export async function POST(req: NextRequest) {
 		return await sendAndStoreEmail();
 	} catch (error: any) {
 		console.error('Email send error:', error);
-		return NextResponse.json({ error: error.message }, { status: 500 });
+
+		// Handle specific Gmail errors
+		if (error instanceof Error) {
+			// Check for OAuth/connection errors
+			if (
+				error.message.includes('Gmail account not connected') ||
+				error.message.includes('Gmail connection expired') ||
+				error.message.includes('invalid_grant') ||
+				error.message.includes('Token has been expired or revoked')
+			) {
+				return NextResponse.json(
+					{
+						error:
+							'Gmail connection issue. Please reconnect your Gmail account in settings.',
+					},
+					{ status: 403 },
+				);
+			}
+
+			// Check for quota/rate limit errors
+			if (
+				error.message.includes('quota') ||
+				error.message.includes('rate limit') ||
+				error.message.includes('User-rate limit exceeded')
+			) {
+				return NextResponse.json(
+					{
+						error: 'Gmail rate limit exceeded. Please try again later.',
+					},
+					{ status: 429 },
+				);
+			}
+
+			// Check for permission errors
+			if (
+				error.message.includes('insufficient permissions') ||
+				error.message.includes('Insufficient Permission')
+			) {
+				return NextResponse.json(
+					{
+						error:
+							'Insufficient Gmail permissions. Please reconnect your Gmail account with full permissions.',
+					},
+					{ status: 403 },
+				);
+			}
+		}
+
+		// Generic error
+		return NextResponse.json(
+			{ error: error.message || 'Failed to send email' },
+			{ status: 500 },
+		);
 	}
 }

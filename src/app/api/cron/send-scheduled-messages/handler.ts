@@ -6,7 +6,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 	const limitValue = limit || 50;
 
 	console.log(
-		`[${new Date().toISOString()}] Cron: send-scheduled-messages started`
+		`[${new Date().toISOString()}] Cron: send-scheduled-messages started`,
 	);
 
 	// Fetching all messages that are scheduled to be sent where scheduledAt is right now or in the past
@@ -107,7 +107,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 			const { nextStepDueDate } = parseSequenceData(
 				sequence.sequenceType,
 				newCurrentStep,
-				sequence.endDate
+				sequence.endDate,
 			);
 
 			// If scheduled but not yet approved, and approval deadline not yet passed, skip sending
@@ -125,6 +125,7 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 
 			try {
 				const result = await sendGmail({
+					userId: sequence.ownerId,
 					to: contact.email,
 					subject: message.subject,
 					html: endOfSequence ? 'Did I lose you?' : message.contents,
@@ -173,16 +174,16 @@ export async function runSendScheduledMessages({ limit }: { limit: number }) {
 					error: (error as Error).message,
 				};
 			}
-		})
+		}),
 	);
 
 	const succeeded = results.filter(
-		(res) => res.status === 'fulfilled' && res.value.success
+		(res) => res.status === 'fulfilled' && res.value.success,
 	).length;
 	const failed = results.length - succeeded;
 
 	console.log(
-		`[${new Date().toISOString()}] Cron: send-scheduled-messages completed. Succeeded: ${succeeded}, Failed: ${failed}`
+		`[${new Date().toISOString()}] Cron: send-scheduled-messages completed. Succeeded: ${succeeded}, Failed: ${failed}`,
 	);
 
 	return {

@@ -40,7 +40,8 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 
 	const initialValues = {
 		defaultRequireApproval: user.defaultRequireApproval ?? false,
-		defaultSequenceDuration: user.defaultSequenceDuration ?? 60,
+		defaultSequenceDuration:
+			!user.defaultSequenceDuration ? -1 : (user.defaultSequenceDuration ?? 60),
 		defaultReferencePrevious: user.defaultReferencePrevious ?? true,
 		defaultAlterSubjectLine: user.defaultAlterSubjectLine ?? false,
 		defaultSendDelay: user.defaultSendDelay ?? 0,
@@ -124,7 +125,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 		{ label: '30 days', value: 30 },
 		{ label: '60 days', value: 60 },
 		{ label: '90 days', value: 90 },
-		{ label: 'Indefinitely', value: 0 },
+		{ label: 'Indefinitely', value: -1 },
 	];
 
 	const defaultSequenceTypeOptions = [
@@ -270,7 +271,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 								Number of days to wait before automatically sending messages
 								without approval.{' '}
 								<span className={styles.important}>
-									Setting to "Never Auto-send" will prevent automatic sending
+									Setting to "Never auto-send" will prevent automatic sending
 									and require manual approval for all messages.
 								</span>
 							</small>
@@ -279,8 +280,12 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 				</section>
 
 				<div className={styles['section-title-wrapper']}>
-					<h3 className={styles['section-title']}>Sequence Type</h3>
+					<h3 className={styles['section-title']}>
+						{/* Follow-up Schedule */}
+						Sequence Type
+					</h3>
 					<p className={styles['section-description']}>
+						{/* Predefined schedules for following up with your contacts. */}
 						Predefined sequence structures for common use cases.
 					</p>
 				</div>

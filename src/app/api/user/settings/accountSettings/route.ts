@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { accountSettingsSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 export async function PUT(request: NextRequest) {
 	try {
@@ -21,69 +23,87 @@ export async function PUT(request: NextRequest) {
 
 		const body = await request.json();
 
-		const { firstName, lastName, timezone } = body.updateData;
+		// Validate input using Zod schema
+		try {
+			// Parse and validate - this will filter out any fields not in the schema
+			const validatedData = accountSettingsSchema.parse(body.updateData);
 
-		// Server-side validation
-		const nameRegex = /^[a-zA-Z\s'-]+$/;
-
-		if (
-			!firstName ||
-			typeof firstName !== 'string' ||
-			firstName.trim().length < 1 ||
-			firstName.length > 50
-		) {
-			return NextResponse.json(
-				{ error: 'Invalid first name' },
-				{ status: 400 },
+			// Remove undefined values (only update fields that were provided)
+			const updateData = Object.fromEntries(
+				Object.entries(validatedData).filter(
+					([_, value]) => value !== undefined,
+				),
 			);
+
+			// Ensure booleans are actual booleans
+			if ('trackEmailOpens' in updateData) {
+				updateData.trackEmailOpens = Boolean(updateData.trackEmailOpens);
+			}
+			if ('trackLinkClicks' in updateData) {
+				updateData.trackLinkClicks = Boolean(updateData.trackLinkClicks);
+			}
+			if ('notificationBounce' in updateData) {
+				updateData.notificationBounce = Boolean(updateData.notificationBounce);
+			}
+			if ('notificationSendFailure' in updateData) {
+				updateData.notificationSendFailure = Boolean(
+					updateData.notificationSendFailure,
+				);
+			}
+			if ('notificationSequenceComplete' in updateData) {
+				updateData.notificationSequenceComplete = Boolean(
+					updateData.notificationSequenceComplete,
+				);
+			}
+			if ('notificationMessageApproval' in updateData) {
+				updateData.notificationMessageApproval = Boolean(
+					updateData.notificationMessageApproval,
+				);
+			}
+			if ('defaultRequireApproval' in updateData) {
+				updateData.defaultRequireApproval = Boolean(
+					updateData.defaultRequireApproval,
+				);
+			}
+			if ('defaultReferencePrevious' in updateData) {
+				updateData.defaultReferencePrevious = Boolean(
+					updateData.defaultReferencePrevious,
+				);
+			}
+			if ('defaultAlterSubjectLine' in updateData) {
+				updateData.defaultAlterSubjectLine = Boolean(
+					updateData.defaultAlterSubjectLine,
+				);
+			}
+
+			if (updateData.defaultSequenceDuration === -1) {
+				updateData.defaultSequenceDuration = null; // Use null to represent "Indefinitely"
+			}
+
+			// Update user with validated and sanitized data
+			const updatedUser = await prisma.user.update({
+				where: { id: user.id },
+				data: updateData,
+			});
+
+			return NextResponse.json({ success: true, user: updatedUser });
+		} catch (validationError) {
+			if (validationError instanceof z.ZodError) {
+				const errors = validationError.issues.map((issue) => ({
+					path: issue.path.join('.'),
+					message: issue.message,
+				}));
+				return NextResponse.json(
+					{
+						error: 'Validation failed',
+						details: errors.map((e) => e.message),
+						fields: errors,
+					},
+					{ status: 400 },
+				);
+			}
+			throw validationError;
 		}
-
-		if (
-			!lastName ||
-			typeof lastName !== 'string' ||
-			lastName.trim().length < 1 ||
-			lastName.length > 50
-		) {
-			return NextResponse.json({ error: 'Invalid last name' }, { status: 400 });
-		}
-
-		if (!nameRegex.test(firstName.trim())) {
-			return NextResponse.json(
-				{ error: 'First name contains invalid characters' },
-				{ status: 400 },
-			);
-		}
-
-		if (!nameRegex.test(lastName.trim())) {
-			return NextResponse.json(
-				{ error: 'Last name contains invalid characters' },
-				{ status: 400 },
-			);
-		}
-
-		// VALIDATE TIMEZONE - whitelist approach
-		const validTimezones = Intl.supportedValuesOf('timeZone');
-		if (
-			!timezone ||
-			typeof timezone !== 'string' ||
-			!validTimezones.includes(timezone)
-		) {
-			return NextResponse.json({ error: 'Invalid timezone' }, { status: 400 });
-		}
-
-		// Sanitize inputs
-		const sanitizedData = {
-			firstName: firstName.trim().replace(/[<>"/;`%]/g, ''),
-			lastName: lastName.trim().replace(/[<>"/;`%]/g, ''),
-			timezone: timezone,
-		};
-
-		const updatedUser = await prisma.user.update({
-			where: { id: user.id },
-			data: sanitizedData,
-		});
-
-		return NextResponse.json({ success: true, user: updatedUser });
 	} catch (error) {
 		console.error('Error updating user:', error);
 		let message = 'Unknown error';
