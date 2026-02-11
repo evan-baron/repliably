@@ -86,6 +86,7 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 	};
 
 	return (
+		// DELETE styles.disabled WHEN FEATURE IS READY
 		<div className={`${styles['settings-form-wrapper']} ${styles.disabled}`}>
 			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 				<h3

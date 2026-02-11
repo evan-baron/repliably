@@ -3,8 +3,13 @@
 	flex-direction: column;
 	gap: 1rem;
 
+	// REMOVE THIS WHEN FEATURE IS READY
 	&.disabled {
 		cursor: not-allowed !important;
+
+		.send-limit {
+			opacity: 0.5;
+		}
 	}
 
 	.form {

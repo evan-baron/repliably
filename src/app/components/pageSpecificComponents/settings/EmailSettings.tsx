@@ -314,7 +314,9 @@ const EmailSettings = ({
 			</section>
 
 			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Sending Preferences</h3>
+				<h3 className={styles['section-title']}>
+					Sending Preferences (Coming soon!)
+				</h3>
 				<SendingPreferencesForm user={user} />
 			</section>
 		</div>

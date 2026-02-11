@@ -83,7 +83,7 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 		:	sendLimitTiers[user.subscriptionTier];
 
 	return (
-		<div className={styles['settings-form-wrapper']}>
+		<div className={`${styles['settings-form-wrapper']} ${styles.disabled}`}>
 			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 				<section className={styles.section}>
 					<div
@@ -93,9 +93,16 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							type='checkbox'
 							id='trackEmailOpens'
 							{...register('trackEmailOpens')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='trackEmailOpens'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='trackEmailOpens'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Track email opens</span>
 							</label>
 							<small className={styles.helpText}>
@@ -111,9 +118,16 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							type='checkbox'
 							id='trackLinkClicks'
 							{...register('trackLinkClicks')}
+							disabled // REMOVE WHEN FEATURE IS READY
 						/>
-						<div className={styles.input}>
-							<label htmlFor='trackLinkClicks'>
+						<div
+							className={styles.input}
+							style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+						>
+							<label
+								htmlFor='trackLinkClicks'
+								className={styles.disabled} // DELETE THIS CLASS WHEN FEATURE IS READY
+							>
 								<span>Track link clicks</span>
 							</label>
 							<small className={styles.helpText}>
