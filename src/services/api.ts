@@ -121,7 +121,7 @@ export const userAPI = {
 			method: 'GET',
 		}),
 	getUserSettings: () =>
-		apiCall('/api/user/settings', {
+		apiCall('/api/user', {
 			method: 'GET',
 		}),
 	updateAccountSettings: (updateData: Partial<UserFromDB>) =>

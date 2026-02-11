@@ -10,6 +10,18 @@ export type UserFromDB = Prisma.UserGetPayload<{
 	};
 }>;
 
-export type UserToClientFromDB = Omit<UserFromDB, 'auth0Id'>;
+export type UserToClientFromDB = Omit<
+	UserFromDB,
+	'auth0Id' | 'gmailRefreshToken'
+>;
 
 export type SignatureFromDB = Prisma.UserSignatureGetPayload<{}>;
+
+export type UserDefaultSettings = {
+	alterSubjectLine: boolean;
+	referencePreviousEmail: boolean;
+	autoSend: boolean;
+	autoSendDelay: string;
+	cadenceDuration: string;
+	followUpCadence: string;
+};

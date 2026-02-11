@@ -30,12 +30,16 @@ export default function SideBarClient({
 				messages: initialMessages,
 			});
 		}
-	}, [initialMessages, queryClient]);
+
+		if (initialEmailConnectionActive) {
+			queryClient.setQueryData(['email-connection-status-get'], {
+				active: initialEmailConnectionActive,
+			});
+		}
+	}, [initialMessages, initialEmailConnectionActive, queryClient]);
 
 	const { data } = useMessagesGetAllPending();
-	const { data: emailConnectionStatus } = useGetEmailConnectionStatus(
-		initialEmailConnectionActive,
-	);
+	const { data: emailConnectionStatus } = useGetEmailConnectionStatus();
 
 	useEffect(() => {
 		if (data?.messages) {
@@ -48,7 +52,17 @@ export default function SideBarClient({
 				messages: initialMessages,
 			});
 		}
-	}, [data, initialMessages, queryClient]);
+
+		if (emailConnectionStatus) {
+			queryClient.setQueryData(['email-connection-status-get'], {
+				active: emailConnectionStatus.active,
+			});
+		} else {
+			queryClient.setQueryData(['email-connection-status-get'], {
+				active: initialEmailConnectionActive,
+			});
+		}
+	}, [data, initialMessages, initialEmailConnectionActive, queryClient]);
 
 	const messages = data?.messages || [];
 	const pendingMessages = messages.filter((message) => message.needsApproval);

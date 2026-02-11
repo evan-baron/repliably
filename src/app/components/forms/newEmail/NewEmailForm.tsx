@@ -14,7 +14,7 @@ import { parseTinyMceContent } from '@/lib/helpers/emailHelpers';
 import styles from './newEmailForm.module.scss';
 
 // Types imports
-import { SignatureFromDB } from '@/types/userTypes';
+import { SignatureFromDB, UserDefaultSettings } from '@/types/userTypes';
 
 // Component imports
 import TinyEditor from '../../tinyEditor/TinyEditor';
@@ -37,9 +37,11 @@ interface EmailFormData {
 const NewEmailForm = ({
 	contactEmail,
 	signatures,
+	defaults,
 }: {
 	contactEmail?: string;
 	signatures?: SignatureFromDB[];
+	defaults?: UserDefaultSettings;
 }) => {
 	const {
 		modalType,
@@ -95,14 +97,10 @@ const NewEmailForm = ({
 			defaultValues: {
 				to: contactEmail || '',
 				subject: '',
-				followUpCadence: '3day',
-				autoSend: false,
-				autoSendDelay: '',
-				cadenceDuration: '30',
-				referencePreviousEmail: true,
-				alterSubjectLine: false,
+				...defaults,
 			},
 		});
+
 	const autoSendChecked = watch('autoSend');
 	const followingUp =
 		watch('followUpCadence') !== 'none' && watch('followUpCadence') !== '';
@@ -126,6 +124,7 @@ const NewEmailForm = ({
 	useEffect(() => {
 		if (!followingUp) {
 			setValue('referencePreviousEmail', false);
+			setValue('alterSubjectLine', false);
 		}
 	}, [followingUp, setValue]);
 
@@ -324,7 +323,6 @@ const NewEmailForm = ({
 											type='checkbox'
 											id='referencePreviousEmail'
 											{...register('referencePreviousEmail')}
-											defaultChecked={true}
 										/>
 									</div>
 								</div>
@@ -340,7 +338,6 @@ const NewEmailForm = ({
 											type='checkbox'
 											id='alterSubjectLine'
 											{...register('alterSubjectLine')}
-											defaultChecked={false}
 										/>
 									</div>
 								</div>

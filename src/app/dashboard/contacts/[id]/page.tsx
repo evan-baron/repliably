@@ -50,6 +50,8 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
 	const { signatures } = user;
 
+	const { emailConnectionActive } = user;
+
 	return (
 		<div className={styles['page-wrapper']}>
 			<ContactDetailsClient
@@ -57,6 +59,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 				initialSequences={sequencesData}
 				initialAllMessages={initialMessages}
 				signatures={signatures}
+				emailConnectionActive={emailConnectionActive}
 			/>
 			<Link
 				href='/dashboard/contacts'

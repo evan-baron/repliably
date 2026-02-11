@@ -2,9 +2,9 @@
 
 // Library imports
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
+import { useGetUserSettings } from '@/hooks/useUserSettings';
 
 // Styles imports
 import styles from './contactPage.module.scss';
@@ -31,23 +31,21 @@ const ContactActivities = ({
 	sequences,
 	allMessages,
 	signatures,
+	emailConnectionActive,
 }: {
 	contact: ContactFromDB;
 	sequences: SequencesResponse;
 	allMessages: MessagesWithActiveSequence[];
 	signatures: SignatureFromDB[];
+	emailConnectionActive: boolean;
 }) => {
 	const { setModalType, setAlertMessage } = useAppContext();
-	const queryClient = useQueryClient();
-	const emailActive = queryClient.getQueryData(['email-connection-status']) as
-		| { active: boolean }
-		| undefined;
 
 	type SelectedType = 'active' | 'previous' | 'email' | 'all';
 	const [selected, setSelected] = useState<SelectedType>('active');
 
 	const handleClick = () => {
-		if (!emailActive?.active) {
+		if (!emailConnectionActive) {
 			setAlertMessage('No email');
 
 			setModalType('alert');
@@ -55,6 +53,8 @@ const ContactActivities = ({
 			setSelected('email');
 		}
 	};
+
+	const { data: { defaults } = {} } = useGetUserSettings();
 
 	interface ActivityContent {
 		[key: string]: {
@@ -91,7 +91,11 @@ const ContactActivities = ({
 		},
 		email: {
 			component: (
-				<NewEmailForm contactEmail={contact.email} signatures={signatures} />
+				<NewEmailForm
+					contactEmail={contact.email}
+					signatures={signatures}
+					defaults={defaults}
+				/>
 			),
 		},
 		all: {

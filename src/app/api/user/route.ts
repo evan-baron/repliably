@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
-		const { auth0Id, ...user } = userFromDB;
+		const { auth0Id, gmailRefreshToken, ...user } = userFromDB;
 
 		return NextResponse.json(user);
 	} catch (error) {

@@ -40,11 +40,13 @@ export default function ContactDetailsClient({
 	initialSequences,
 	initialAllMessages,
 	signatures,
+	emailConnectionActive,
 }: {
 	initialContact: ContactFromDB;
 	initialSequences: SequencesResponse;
 	initialAllMessages: MessagesWithActiveSequence[];
 	signatures: SignatureFromDB[];
+	emailConnectionActive: boolean;
 }) {
 	const queryClient = useQueryClient();
 
@@ -236,6 +238,7 @@ export default function ContactDetailsClient({
 				sequences={sequences}
 				allMessages={allMessages}
 				signatures={signatures}
+				emailConnectionActive={emailConnectionActive}
 			/>
 		</>
 	);
