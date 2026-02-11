@@ -117,9 +117,9 @@ const MasterTable = ({
 							<Fragment key={row.rowId}>
 								<tr
 									className={`
-									${selectedRow === row.rowId ? styles.selected : ''} 
-									${styles.bodyRow} ${row.rowStyling ? styles[row.rowStyling] : ''}
-								`}
+								${selectedRow === row.rowId ? styles.selected : ''} 
+								${styles.bodyRow} ${row.rowStyling ? styles[row.rowStyling] : ''}
+							`}
 									onClick={() => handleClick(row.rowId)}
 								>
 									{row.cellData.map((cell: any, cellIndex: number) => {
@@ -129,11 +129,7 @@ const MasterTable = ({
 										return cell.contentCell ?
 												<td
 													key={`nestedCellMaster-${cellIndex}`}
-													className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-												${styles['content-cell']}
-											`}
+													className={`${styles[cell.size]} ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${styles['content-cell']}`}
 												>
 													<div className={styles['parsed-content']}>
 														<div className={styles['message-preview']}>
@@ -149,12 +145,7 @@ const MasterTable = ({
 												</td>
 											:	<td
 													key={`nestedCellMaster-${cellIndex}`}
-													className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
-												${cell.value === 'N/A' ? styles.transparent : ''}
-											`}
+													className={`${styles[cell.size]} ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${cell.cellOrientation ? styles[cell.cellOrientation] : ''} ${cell.value === 'N/A' ? styles.transparent : ''}`}
 												>
 													{cell.isDate ?
 														new Date(cell.value as string).toLocaleDateString()
@@ -202,24 +193,24 @@ const MasterTable = ({
 											<td
 												key={index}
 												className={`
-													${styles[cell.size]} 
-													${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-													${styles['content-cell']}
-												`}
+												${styles[cell.size]} 
+												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+												${styles['content-cell']}
+											`}
 											>
 												<div className={styles['parsed-content']}>
 													<div
 														className={`
-															${styles['message-preview']} 
-															${
-																(
-																	cell.subjectContentCell &&
-																	row.rowStyling !== 'cancelled'
-																) ?
-																	styles.subject
-																:	''
-															}
-															`}
+														${styles['message-preview']} 
+														${
+															(
+																cell.subjectContentCell &&
+																row.rowStyling !== 'cancelled'
+															) ?
+																styles.subject
+															:	''
+														}
+														`}
 													>
 														{parsedContent[0]}
 													</div>
@@ -241,11 +232,11 @@ const MasterTable = ({
 										:	<td
 												key={index}
 												className={`
-													${styles[cell.size]} 
-													${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-													${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
-													${cell.value === 'N/A' ? styles.transparent : ''}
-												`}
+												${styles[cell.size]} 
+												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
+												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
+												${cell.value === 'N/A' ? styles.transparent : ''}
+											`}
 											>
 												{cell.isDate ?
 													new Date(cell.value as string).toLocaleDateString()

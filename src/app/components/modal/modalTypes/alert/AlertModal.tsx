@@ -1,5 +1,5 @@
 // Library imports
-import React from 'react';
+import Link from 'next/link';
 
 // Hooks imports
 
@@ -17,9 +17,24 @@ const AlertModal = ({
 	message: string;
 	clearAlert: () => void;
 }) => {
+	const noEmailMessage = (
+		<span className={styles.message}>
+			Your email is not currently connected. Please connect your email in your{' '}
+			<Link
+				href='/dashboard/settings?tab=email#email-connection'
+				onClick={clearAlert}
+			>
+				Email Settings
+			</Link>{' '}
+			to create and send emails.
+		</span>
+	);
+
+	let alertMessage = message === 'No email' ? noEmailMessage : message;
+
 	return (
 		<div className={styles['alert-modal']}>
-			<span className={styles.message}>{message}</span>
+			<span className={styles.message}>{alertMessage}</span>
 			<button
 				type='button'
 				className='button delete'

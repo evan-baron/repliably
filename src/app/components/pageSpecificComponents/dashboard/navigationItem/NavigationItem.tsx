@@ -4,12 +4,16 @@ import Link from 'next/link';
 // Styles imports
 import styles from './navigationItem.module.scss';
 
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
+
 interface NavigationItemProps {
 	href: string;
 	label: string;
 	isActive?: boolean;
 	notifications?: boolean;
 	icon?: React.ReactNode;
+	emailConnectionStatus?: boolean;
 }
 
 export default function NavigationItem({
@@ -18,7 +22,19 @@ export default function NavigationItem({
 	isActive = false,
 	notifications = false,
 	icon,
+	emailConnectionStatus = false,
 }: NavigationItemProps) {
+	const { setModalType, setAlertMessage } = useAppContext();
+	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+		if (label === 'New Email' && !emailConnectionStatus) {
+			e.preventDefault();
+
+			setAlertMessage('No email');
+
+			setModalType('alert');
+		}
+	};
+
 	return (
 		<li role='none'>
 			<Link
@@ -30,6 +46,7 @@ export default function NavigationItem({
 				}`}
 				aria-current={isActive ? 'page' : undefined}
 				aria-label={`Navigate to ${label} page`}
+				onClick={handleClick}
 			>
 				<div className={`${styles.linkInner} ${isActive ? styles.active : ''}`}>
 					{icon}

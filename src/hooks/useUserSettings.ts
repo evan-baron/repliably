@@ -41,7 +41,12 @@ export const useUserAccountSettingsUpdate = () => {
 
 		onSettled: () => {
 			// Invalidate the user query to refetch the latest data from the server
-			queryClient.invalidateQueries({ queryKey: ['user-get'] });
+			queryClient.invalidateQueries({
+				predicate: (query) =>
+					['user-get', 'email-connection-status'].includes(
+						query.queryKey[0] as string,
+					),
+			});
 		},
 	});
 };
@@ -72,5 +77,19 @@ export const useDeleteUser = () => {
 		onError: (error) => {
 			console.error('Error deleting user account:', error);
 		},
+	});
+};
+
+export const useGetEmailConnectionStatus = (initialData?: boolean) => {
+	return useQuery<{ active: boolean }>({
+		queryKey: ['email-connection-status'],
+		queryFn: async () => {
+			const { user } = await userAPI.getUser();
+			return { active: user?.emailConnectionActive || false };
+		},
+		initialData: {
+			active: initialData !== undefined ? initialData : false,
+		},
+		staleTime: 1000 * 60 * 15, // 15 minutes
 	});
 };

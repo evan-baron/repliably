@@ -21,7 +21,12 @@ export const useDisconnectEmail = () => {
 		},
 		onSuccess: () => {
 			// Invalidate and refetch user data
-			queryClient.invalidateQueries({ queryKey: ['user-get'] });
+			queryClient.invalidateQueries({
+				predicate: (query) =>
+					['user-get', 'email-connection-status'].includes(
+						query.queryKey[0] as string,
+					),
+			});
 		},
 	});
 };

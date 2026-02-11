@@ -112,6 +112,8 @@ const NestedTable = ({
 								const parsedContent =
 									cell.contentCell && parseEmailContent(cell.value);
 
+								console.log(parsedContent);
+
 								return cell.contentCell ?
 										<td
 											key={`nestedCellNested-${cellIndex}`}
@@ -137,7 +139,7 @@ const NestedTable = ({
 													parsedContent
 														.slice(1)
 														.map((text: string, index: number) => (
-															<span key={index}>{text}</span>
+															<span key={index}>{text || '\u00A0'}</span>
 														))}
 											</div>
 										</td>

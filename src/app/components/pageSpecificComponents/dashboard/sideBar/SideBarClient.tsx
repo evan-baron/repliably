@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
 import { useMessagesGetAllPending } from '@/hooks/useMessages';
+import { useGetEmailConnectionStatus } from '@/hooks/useUserSettings';
 
 // Components imports
 import SideBar from './SideBar';
@@ -15,8 +16,10 @@ import { MessageFromDB, MessagesResponse } from '@/types/messageTypes';
 
 export default function SideBarClient({
 	initialMessages = [],
+	initialEmailConnectionActive = false,
 }: {
 	initialMessages: MessageFromDB[];
+	initialEmailConnectionActive: boolean;
 }) {
 	const queryClient = useQueryClient();
 
@@ -30,6 +33,13 @@ export default function SideBarClient({
 	}, [initialMessages, queryClient]);
 
 	const { data } = useMessagesGetAllPending();
+	const { data: emailConnectionStatus } = useGetEmailConnectionStatus(
+		initialEmailConnectionActive,
+	);
+	console.log(
+		'Email connection status in SideBarClient:',
+		emailConnectionStatus,
+	);
 
 	useEffect(() => {
 		if (data?.messages) {
@@ -48,5 +58,10 @@ export default function SideBarClient({
 	const pendingMessages = messages.filter((message) => message.needsApproval);
 	const hasNotifications = pendingMessages.length > 0;
 
-	return <SideBar notifications={hasNotifications} />;
+	return (
+		<SideBar
+			notifications={hasNotifications}
+			emailConnectionStatus={emailConnectionStatus?.active}
+		/>
+	);
 }

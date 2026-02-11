@@ -2,6 +2,7 @@
 
 // Library imports
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
 
@@ -17,6 +18,7 @@ import PreviousSequences from '@/app/components/sequences/PreviousSequences';
 import AllActivities from '@/app/components/sequences/AllActivities';
 
 // Context imports
+import { useAppContext } from '@/app/context/AppContext';
 
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
@@ -35,8 +37,29 @@ const ContactActivities = ({
 	allMessages: MessagesWithActiveSequence[];
 	signatures: SignatureFromDB[];
 }) => {
+	const { setModalType, setAlertMessage } = useAppContext();
+	const queryClient = useQueryClient();
+	const emailActive = queryClient.getQueryData(['email-connection-status']) as
+		| { active: boolean }
+		| undefined;
+
+	console.log(
+		'Email connection status in ContactActivities:',
+		emailActive?.active,
+	);
+
 	type SelectedType = 'active' | 'previous' | 'email' | 'all';
 	const [selected, setSelected] = useState<SelectedType>('active');
+
+	const handleClick = () => {
+		if (!emailActive?.active) {
+			setAlertMessage('No email');
+
+			setModalType('alert');
+		} else {
+			setSelected('email');
+		}
+	};
 
 	interface ActivityContent {
 		[key: string]: {
@@ -107,7 +130,7 @@ const ContactActivities = ({
 
 				<h2
 					className={selected === 'email' ? styles.selected : ''}
-					onClick={() => setSelected('email')}
+					onClick={handleClick}
 				>
 					New Email
 				</h2>

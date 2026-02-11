@@ -266,7 +266,7 @@ const EmailSettings = ({
 				<p className={styles['section-description']}>Coming soon!</p>
 			</section>
 
-			<section className={styles.section}>
+			<section className={styles.section} id='email-connection'>
 				<h3 className={styles['section-title']}>Email Integration</h3>
 				<p className={styles['section-description']}>
 					Manage your email account connection.{' '}

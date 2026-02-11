@@ -22,9 +22,13 @@ import {
 
 interface SidebarProps {
 	notifications?: boolean;
+	emailConnectionStatus?: boolean;
 }
 
-export default function SideBar({ notifications = false }: SidebarProps) {
+export default function SideBar({
+	notifications = false,
+	emailConnectionStatus = false,
+}: SidebarProps) {
 	// Navigation data
 	const navigationItems = [
 		{ href: '/dashboard/new-email', label: 'New Email' },
@@ -104,6 +108,9 @@ export default function SideBar({ notifications = false }: SidebarProps) {
 							label={item.label}
 							isActive={isActive(item.href)}
 							notifications={notifications && item.label === 'Pending'}
+							emailConnectionStatus={
+								emailConnectionStatus && item.label === 'New Email'
+							}
 							icon={item.icon}
 						/>
 					))}

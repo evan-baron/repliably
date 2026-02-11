@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 // Services imports
 import { getAllPendingMessages } from '@/services/messageService';
 import { findOrCreateUser } from '@/services/userService';
+import { getApiUser } from '@/services/getUserService';
 
 // Styles imports
 import styles from './dashboard.module.scss';
@@ -25,14 +26,24 @@ export default async function DashboardLayout({
 	children: React.ReactNode;
 }) {
 	const session = await auth0.getSession();
-	const user = session?.user;
+	const sessionUser = session?.user;
 
 	// Redirect unauthenticated users to home
+	if (!sessionUser) {
+		redirect('/');
+	}
+
+	await findOrCreateUser(sessionUser);
+
+	const { user } = await getApiUser();
+
 	if (!user) {
 		redirect('/');
 	}
 
-	await findOrCreateUser(user);
+	console.log('user in dashboard layout:', user);
+
+	const { emailConnectionActive } = user;
 
 	const { messages } = await getAllPendingMessages();
 
@@ -43,10 +54,13 @@ export default async function DashboardLayout({
 				role='application'
 				aria-labelledby='app-title'
 			>
-				<TopBar userName={user?.given_name || 'User'} />
+				<TopBar userName={sessionUser?.given_name || 'User'} />
 
 				<div className={styles.mainContent} role='main'>
-					<SideBarClient initialMessages={messages} />
+					<SideBarClient
+						initialMessages={messages}
+						initialEmailConnectionActive={emailConnectionActive}
+					/>
 
 					<main
 						className={styles.dashboardContent}

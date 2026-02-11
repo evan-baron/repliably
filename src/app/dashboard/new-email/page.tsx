@@ -15,7 +15,7 @@ import NewEmailForm from '../../components/forms/newEmail/NewEmailForm';
 const Page = async () => {
 	const { user, error } = await getServerUser();
 
-	if (!user || error) {
+	if (!user || error || !user.emailConnectionActive) {
 		redirect('/');
 	}
 
