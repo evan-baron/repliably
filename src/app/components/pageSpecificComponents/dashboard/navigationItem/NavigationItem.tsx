@@ -25,6 +25,17 @@ export default function NavigationItem({
 	emailConnectionStatus = false,
 }: NavigationItemProps) {
 	const { setModalType, setAlertMessage } = useAppContext();
+
+	const activeLabels = [
+		'New Email',
+		'Dashboard',
+		'Contacts',
+		'Sequences',
+		'Pending',
+		'Replies',
+		'Settings',
+	];
+
 	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 		if (label === 'New Email' && !emailConnectionStatus) {
 			e.preventDefault();
@@ -32,6 +43,10 @@ export default function NavigationItem({
 			setAlertMessage('No email');
 
 			setModalType('alert');
+		}
+
+		if (!activeLabels.includes(label)) {
+			e.preventDefault();
 		}
 	};
 

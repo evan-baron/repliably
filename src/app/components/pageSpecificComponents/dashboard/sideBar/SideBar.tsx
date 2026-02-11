@@ -57,7 +57,6 @@ export default function SideBar({
 			label: 'Replies',
 			icon: <MailOutlineRounded className={styles.icon} />,
 		},
-		// { href: '/dashboard/in-progress', label: 'In Progress' },
 		{
 			href: '/dashboard/templates',
 			label: 'Templates (Coming Soon)',
