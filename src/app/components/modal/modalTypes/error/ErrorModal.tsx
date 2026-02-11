@@ -18,8 +18,17 @@ const ErrorModal = ({
 	clearErrors: () => void;
 }) => {
 	return (
-		<div className={styles['error-modal']}>
-			<ul className={styles.errors}>
+		<div
+			className={styles['error-modal']}
+			role='alertdialog'
+			aria-labelledby='error-title'
+			aria-describedby='error-list'
+			aria-modal='true'
+		>
+			<h2 id='error-title' className='sr-only'>
+				Error
+			</h2>
+			<ul id='error-list' className={styles.errors}>
 				{errors.map((error, index) => (
 					<li key={index} className={styles['error-item']}>
 						{error}
@@ -31,6 +40,7 @@ const ErrorModal = ({
 				className='button delete'
 				style={{ width: '8rem' }}
 				onClick={clearErrors}
+				aria-label='Dismiss error message'
 			>
 				OK
 			</button>

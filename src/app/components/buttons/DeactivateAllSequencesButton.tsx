@@ -23,8 +23,9 @@ const DeactivateAllSequencesButton = () => {
 			type='button'
 			className={styles['deactivate-all-sequences-button']}
 			onClick={handleClick}
+			aria-label='Deactivate all active sequences'
 		>
-			<Close />
+			<Close aria-hidden='true' focusable='false' />
 			<span>Deactivate All Sequences</span>
 		</button>
 	);

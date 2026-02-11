@@ -65,10 +65,16 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 		timezone: user.timezone ? user.timezone : defaultTimezone,
 	};
 
-	const { register, watch, handleSubmit, reset, setValue } =
-		useForm<AccountFormData>({
-			defaultValues: initialValues,
-		});
+	const {
+		register,
+		watch,
+		handleSubmit,
+		reset,
+		setValue,
+		formState: { errors },
+	} = useForm<AccountFormData>({
+		defaultValues: initialValues,
+	});
 
 	// Watch all form fields
 	const formValues = watch();
@@ -145,12 +151,20 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 
 	return (
 		<div className={styles['settings-form-wrapper']}>
-			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+			<form
+				className={styles.form}
+				onSubmit={handleSubmit(onSubmit)}
+				noValidate
+				aria-label='Account settings form'
+			>
 				<div className={styles['input-group']}>
 					<label htmlFor='firstName'>First Name</label>
 					<input
 						type='text'
 						id='firstName'
+						aria-required='true'
+						aria-invalid={errors?.firstName ? 'true' : 'false'}
+						aria-describedby={errors?.firstName ? 'firstName-error' : undefined}
 						{...register('firstName', {
 							required: 'First name is required',
 							minLength: {
@@ -175,6 +189,9 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 					<input
 						type='text'
 						id='lastName'
+						aria-required='true'
+						aria-invalid={errors.lastName ? 'true' : 'false'}
+						aria-describedby={errors.lastName ? 'lastName-error' : undefined}
 						{...register('lastName', {
 							required: 'Last name is required',
 							minLength: {
@@ -205,8 +222,10 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 							value={user.email || ''}
 							placeholder='Enter email address'
 							disabled
+							aria-disabled='true'
+							aria-describedby='email-help'
 						/>
-						<small className={styles.helpText}>
+						<small id='email-help' className={styles.helpText}>
 							Email cannot be changed.{' '}
 							<Link href='/support'>Contact support for assistance.</Link>
 						</small>
@@ -216,14 +235,18 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 				<div className={styles['input-group']}>
 					<label htmlFor='timezone'>Timezone</label>
 					<div className={styles.input}>
-						<select id='timezone' {...register('timezone')}>
+						<select
+							id='timezone'
+							{...register('timezone')}
+							aria-describedby='timezone-help'
+						>
 							{options.map((option) => (
 								<option key={option.value} value={option.value}>
 									{option.label}
 								</option>
 							))}
 						</select>
-						<small className={styles.helpText}>
+						<small id='timezone-help' className={styles.helpText}>
 							Used for scheduling emails and displaying timestamps
 						</small>
 					</div>
@@ -231,9 +254,10 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 
 				<div className={styles['form-ctions']}>
 					<button
-						className={'button save-changes'}
+						className='button save-changes'
 						type='submit'
 						disabled={updatingUser || !hasChanged}
+						aria-disabled={updatingUser || !hasChanged}
 					>
 						Save Changes
 					</button>

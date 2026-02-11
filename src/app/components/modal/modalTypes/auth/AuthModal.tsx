@@ -8,7 +8,15 @@ import ModalActionButton from '@/app/components/buttons/ModalActionButton';
 
 const AuthModal = () => {
 	return (
-		<div className={styles.authModal}>
+		<div
+			className={styles.authModal}
+			role='dialog'
+			aria-labelledby='auth-title'
+			aria-modal='true'
+		>
+			<h2 id='auth-title' className='sr-only'>
+				Authentication Options
+			</h2>
 			<ModalActionButton modalType='register' />
 			<ModalActionButton modalType='login' />
 		</div>

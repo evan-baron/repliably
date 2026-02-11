@@ -107,11 +107,15 @@ const MasterTable = ({
 	return (
 		<table
 			className={`${styles['master-table']} ${inModal ? styles.inModal : ''}`}
+			role='table'
+			aria-label={`${parsedTableType} table`}
+			aria-rowcount={sortedRowData.length + 1}
 		>
 			<TableHeader columnHeaders={columnHeaders} handleSort={handleSort} />
 			<tbody className={styles.tableBody}>
-				{sortedRowData.map((row) => {
+				{sortedRowData.map((row, rowIndex) => {
 					const nestedRowData = row.nestedData?.value ?? null;
+					const isExpanded = selectedRow === row.rowId;
 
 					return nestedRowData ?
 							<Fragment key={row.rowId}>
@@ -121,6 +125,16 @@ const MasterTable = ({
 								${styles.bodyRow} ${row.rowStyling ? styles[row.rowStyling] : ''}
 							`}
 									onClick={() => handleClick(row.rowId)}
+									role='row'
+									aria-expanded={isExpanded}
+									aria-rowindex={rowIndex + 2}
+									tabIndex={0}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											handleClick(row.rowId);
+										}
+									}}
 								>
 									{row.cellData.map((cell: any, cellIndex: number) => {
 										const parsedContent =
@@ -130,6 +144,8 @@ const MasterTable = ({
 												<td
 													key={`nestedCellMaster-${cellIndex}`}
 													className={`${styles[cell.size]} ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${styles['content-cell']}`}
+													role='cell'
+													aria-colindex={cellIndex + 1}
 												>
 													<div className={styles['parsed-content']}>
 														<div className={styles['message-preview']}>
@@ -146,6 +162,8 @@ const MasterTable = ({
 											:	<td
 													key={`nestedCellMaster-${cellIndex}`}
 													className={`${styles[cell.size]} ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${cell.cellOrientation ? styles[cell.cellOrientation] : ''} ${cell.value === 'N/A' ? styles.transparent : ''}`}
+													role='cell'
+													aria-colindex={cellIndex + 1}
 												>
 													{cell.isDate ?
 														new Date(cell.value as string).toLocaleDateString()
@@ -162,13 +180,15 @@ const MasterTable = ({
 												</td>;
 									})}
 								</tr>
-								{selectedRow === row.rowId && (
+								{isExpanded && (
 									<tr
 										className={`${styles['expanded-row']} ${
 											selectedRow === row.rowId ? styles.selected : ''
 										} ${styles.bodyRow}`}
+										role='row'
+										aria-label='Expanded row details'
 									>
-										<td colSpan={tableSize}>
+										<td colSpan={tableSize} role='cell'>
 											<NestedTable
 												inModal={inModal}
 												tableData={nestedRowData}
@@ -184,19 +204,26 @@ const MasterTable = ({
 									row.rowStyling ? styles[row.rowStyling] : ''
 								}`}
 								onClick={() => handleClick(row.rowId)}
+								role='row'
+								aria-rowindex={rowIndex + 2}
+								tabIndex={0}
+								onKeyDown={(e) => {
+									if (e.key === 'Enter' || e.key === ' ') {
+										e.preventDefault();
+										handleClick(row.rowId);
+									}
+								}}
 							>
-								{row.cellData.map((cell: any, index: number) => {
+								{row.cellData.map((cell: any, cellIndex: number) => {
 									const parsedContent =
 										cell.contentCell && parseEmailContent(cell.value);
 
 									return cell.contentCell ?
 											<td
-												key={index}
-												className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-												${styles['content-cell']}
-											`}
+												key={`nestedCellMaster-${cellIndex}`}
+												className={`${styles[cell.size]} ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${styles['content-cell']}`}
+												role='cell'
+												aria-colindex={cellIndex + 1}
 											>
 												<div className={styles['parsed-content']}>
 													<div
@@ -220,19 +247,20 @@ const MasterTable = ({
 															.slice(1)
 															.map((text: string, index: number) => {
 																return (
-																	<div key={index}>{text || '\u00A0'}</div>
+																	<div
+																		key={`nestedCellMaster-${cellIndex}-parsed-${index}`}
+																	>
+																		{text || '\u00A0'}
+																	</div>
 																);
 															})}
 												</div>
 											</td>
 										:	<td
-												key={index}
-												className={`
-												${styles[cell.size]} 
-												${cell.cellStyling ? styles[cell.cellStyling] : ''} 
-												${cell.cellOrientation ? styles[cell.cellOrientation] : ''}
-												${cell.value === 'N/A' ? styles.transparent : ''}
-											`}
+												key={`nestedCellMaster-${cellIndex}`}
+												className={`${styles[cell.size]}  ${cell.cellStyling ? styles[cell.cellStyling] : ''} ${cell.cellOrientation ? styles[cell.cellOrientation] : ''} ${cell.value === 'N/A' ? styles.transparent : ''}`}
+												role='cell'
+												aria-colindex={cellIndex + 1}
 											>
 												{cell.isDate ?
 													new Date(cell.value as string).toLocaleDateString()

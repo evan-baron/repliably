@@ -38,8 +38,17 @@ const DeleteContactModal = ({
 	};
 
 	return (
-		<div className={styles['deletecontactmodal-wrapper']}>
-			<p className={styles.message}>
+		<div
+			className={styles['deletecontactmodal-wrapper']}
+			role='alertdialog'
+			aria-labelledby='delete-contact-title'
+			aria-describedby='delete-contact-message'
+			aria-modal='true'
+		>
+			<h2 id='delete-contact-title' className='sr-only'>
+				Delete Contact
+			</h2>
+			<p id='delete-contact-message' className={styles.message}>
 				Permanently delete contact:{' '}
 				<span style={{ fontWeight: '500' }}>
 					{selectedContact.firstName} {selectedContact.lastName}
@@ -52,8 +61,9 @@ const DeleteContactModal = ({
 					className={'button delete'}
 					onClick={handleDelete}
 					disabled={deleting}
+					aria-disabled={deleting}
 				>
-					Delete
+					{deleting ? 'Deleting...' : 'Delete'}
 				</button>
 				<ModalBackButton modalRedirect={null} title='Cancel' />
 			</div>

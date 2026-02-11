@@ -144,18 +144,28 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	} as const;
 
 	return (
-		<div className={styles.modalScreen}>
+		<div
+			className={styles.modalScreen}
+			role='presentation'
+			onClick={handleClose}
+			aria-hidden='false'
+		>
 			<div
 				className={`${styles.modalContainer} ${currentModalType === 'deleteAccount' ? styles.danger : ''}`}
 				style={{ maxWidth: modalContent[currentModalType].width }}
+				role='document'
+				onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
 			>
 				<div
 					className={styles.modalContent}
-					onClick={(e) => e.stopPropagation()}
+					onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
 				>
 					{modalContent[currentModalType].title && (
-						<div className={styles.modalHeader}>
+						<div
+							className={`${styles.modalHeader} ${currentModalType === 'searchContacts' ? styles.center : ''}`}
+						>
 							<h2
+								id='modal-title'
 								className={
 									modalContent[currentModalType].title === 'Action Required:' ?
 										styles.alert

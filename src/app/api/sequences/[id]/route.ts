@@ -4,7 +4,7 @@ import { getApiUser } from '@/services/getUserService';
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		// 1. Check authentication
@@ -12,7 +12,7 @@ export async function GET(
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 		const { id } = await params;
@@ -33,14 +33,14 @@ export async function GET(
 		console.error('Error fetching sequences for contact:', error);
 		return NextResponse.json(
 			{ error: error.message || 'Failed to fetch sequences' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		// 1. Check authentication
@@ -48,7 +48,7 @@ export async function PUT(
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 		const { id } = await params;
@@ -57,13 +57,12 @@ export async function PUT(
 			where: { ownerId: user.id, id: sequenceId },
 			data: { active: false, endDate: new Date() },
 		});
-		const updatedMessages = await prisma.message.updateMany({
+		const deletedMessages = await prisma.message.deleteMany({
 			where: {
 				sequenceId: sequenceId,
 				ownerId: user.id,
 				status: { in: ['pending', 'scheduled'] },
 			},
-			data: { status: 'cancelled', needsFollowUp: false },
 		});
 		const updatedContact = await prisma.contact.update({
 			where: { id: updatedSequence.contactId },
@@ -71,14 +70,14 @@ export async function PUT(
 		});
 		return NextResponse.json({
 			updatedSequence,
-			updatedMessages,
+			deletedMessages,
 			updatedContact,
 		});
 	} catch (error: any) {
 		console.error('Error updating sequence:', error);
 		return NextResponse.json(
 			{ error: error.message || 'Failed to update sequence' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

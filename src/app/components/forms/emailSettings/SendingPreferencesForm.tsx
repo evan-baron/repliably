@@ -3,6 +3,7 @@
 // Library imports
 import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import Link from 'next/link';
 
 // Hooks imports
 import { useUserAccountSettingsUpdate } from '@/hooks/useUserSettings';
@@ -33,10 +34,16 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 		trackLinkClicks: user.trackLinkClicks,
 	};
 
-	const { register, watch, handleSubmit, reset, setValue } =
-		useForm<SendingPreferencesFormData>({
-			defaultValues: initialValues,
-		});
+	const {
+		register,
+		watch,
+		handleSubmit,
+		reset,
+		setValue,
+		formState: { errors },
+	} = useForm<SendingPreferencesFormData>({
+		defaultValues: initialValues,
+	});
 
 	// Watch all form fields
 	const formValues = watch();
@@ -84,16 +91,26 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 
 	return (
 		<div className={`${styles['settings-form-wrapper']} ${styles.disabled}`}>
-			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+			<form
+				className={styles.form}
+				onSubmit={handleSubmit(onSubmit)}
+				noValidate
+				aria-label='Sending preferences form'
+			>
 				<section className={styles.section}>
+					<h3 id='tracking-section' className='sr-only'>
+						Email Tracking Options
+					</h3>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
 							id='trackEmailOpens'
+							aria-describedby='trackEmailOpens-help'
 							{...register('trackEmailOpens')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true'
 						/>
 						<div
 							className={styles.input}
@@ -105,7 +122,7 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Track email opens</span>
 							</label>
-							<small className={styles.helpText}>
+							<small id='trackEmailOpens-help' className={styles.helpText}>
 								Add tracking pixel to outbound emails
 							</small>
 						</div>
@@ -119,6 +136,8 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							id='trackLinkClicks'
 							{...register('trackLinkClicks')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true'
+							aria-describedby='trackLinkClicks-help'
 						/>
 						<div
 							className={styles.input}
@@ -130,13 +149,17 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Track link clicks</span>
 							</label>
-							<small className={styles.helpText}>
+							<small id='trackLinkClicks-help' className={styles.helpText}>
 								Monitor when recipients click links in your emails
 							</small>
 						</div>
 					</div>
 
-					<div className={styles['send-limit']}>
+					<div
+						className={styles['send-limit']}
+						role='status'
+						aria-live='polite'
+					>
 						<div className={styles.info}>
 							<p>Daily Send Limit:</p>
 							<p className={styles.limit}>
@@ -151,12 +174,19 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 							:	'Your current plan allows unlimited outbound emails. Thank you for being an elite subscriber!'
 							}{' '}
 							{user.subscriptionTier !== 'elite' ?
-								<span
+								<Link
 									className={styles.upgrade}
-									onClick={() => setActiveTab('billing')}
+									href='/dashboard/settings?tab=billing'
+									onClick={(e) => {
+										e.preventDefault();
+									}} // REMOVE ONCLICK WHEN FEATURE IS READY
+									style={{ cursor: 'not-allowed' }} // DELETE THIS LINE WHEN FEATURE IS READY
+									aria-disabled='true'
+									tabIndex={-1}
+									// DELETE aria-disabled and tabIndex when feature is ready
 								>
 									Upgrade your plan to increase this limit.
-								</span>
+								</Link>
 							:	<span className={styles.important}>
 									<br />
 									Note: Standard email providers enforce a maximum of 500 emails
@@ -169,9 +199,10 @@ const SendingPreferencesForm = ({ user }: { user: UserToClientFromDB }) => {
 
 				<div className={styles['form-actions']}>
 					<button
-						className={'button save-changes'}
+						className='button save-changes'
 						type='submit'
 						disabled={!hasChanged || updatingUser}
+						aria-disabled={!hasChanged || updatingUser}
 					>
 						{updatingUser ? 'Saving...' : 'Save Changes'}
 					</button>

@@ -20,13 +20,16 @@ const EditContactButton = ({ contact }: { contact: ContactFromDB }) => {
 		setModalType('editContact');
 	};
 
+	const contactName = contact.firstName + ' ' + contact.lastName;
+
 	return (
 		<button
 			type='button'
 			className={styles['edit-contact-button']}
 			onClick={handleClick}
+			aria-label={`Edit contact ${contactName}`}
 		>
-			<Edit />
+			<Edit aria-hidden='true' focusable='false' />
 			<span>Edit Contact</span>
 		</button>
 	);

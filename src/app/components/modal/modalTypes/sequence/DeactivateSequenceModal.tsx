@@ -50,8 +50,17 @@ const DeactivateSequenceModal = ({
 	};
 
 	return (
-		<div className={styles['deletecontactmodal-wrapper']}>
-			<p className={styles.message}>
+		<div
+			className={styles['deletecontactmodal-wrapper']}
+			role='alertdialog'
+			aria-labelledby='deactivate-sequence-title'
+			aria-describedby='deactivate-sequence-message'
+			aria-modal='true'
+		>
+			<h2 id='deactivate-sequence-title' className='sr-only'>
+				Deactivate Sequence
+			</h2>
+			<p id='deactivate-sequence-message' className={styles.message}>
 				{allSequences ?
 					'Permanently deactivate all sequences?'
 				:	'Permanently deactivate this sequence?'}
@@ -62,8 +71,9 @@ const DeactivateSequenceModal = ({
 					className={'button delete'}
 					onClick={handleDelete}
 					disabled={deactivating || deactivatingAll}
+					aria-disabled={deactivating || deactivatingAll}
 				>
-					Deactivate
+					{deactivating || deactivatingAll ? 'Deactivating...' : 'Deactivate'}
 				</button>
 				<ModalBackButton modalRedirect={null} title='Cancel' />
 			</div>

@@ -14,9 +14,9 @@ const ModalActionButton = ({ modalType }: { modalType: string }) => {
 
 	return (
 		<button
+			type='button'
 			onClick={handleClick}
 			className={`button ${modalType}`}
-			role='button'
 			aria-label={`Open ${buttonLabel} modal`}
 		>
 			{buttonLabel}

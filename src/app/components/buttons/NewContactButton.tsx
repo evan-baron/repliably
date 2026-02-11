@@ -21,8 +21,9 @@ const NewContactButton = () => {
 			type='button'
 			className={styles['new-contact-button']}
 			onClick={handleClick}
+			aria-label='Create new contact'
 		>
-			<Add />
+			<Add aria-hidden='true' focusable='false' />
 			<span>New Contact</span>
 		</button>
 	);

@@ -24,7 +24,7 @@ const TableHeader = ({
 }) => {
 	return (
 		<thead className={styles.tableHeader}>
-			<tr className={styles.headerRow}>
+			<tr className={styles.headerRow} role='row'>
 				{columnHeaders.map((header, index) => (
 					<th
 						key={index}
@@ -36,15 +36,35 @@ const TableHeader = ({
 								handleSort(header.label);
 							}
 						}}
+						role='columnheader'
+						aria-sort={header.sortable ? 'none' : undefined}
+						scope='col'
+						tabIndex={header.sortable ? 0 : undefined}
+						onKeyDown={
+							header.sortable ?
+								(e) => {
+									if (e.key === 'Enter' || e.key === ' ') {
+										e.preventDefault();
+										handleSort(header.label);
+									}
+								}
+							:	undefined
+						}
 					>
-						{header.sortable ? (
-							<span className={styles.sort}>
-								{header.label}
-								<SwapVert fontSize='small' />
-							</span>
-						) : (
-							header.label
-						)}
+						{header.sortable ?
+							<button
+								type='button'
+								className={styles.sort}
+								aria-label={`Sort by ${header.label}`}
+							>
+								<span>{header.label}</span>
+								<SwapVert
+									fontSize='small'
+									aria-hidden='true'
+									focusable='false'
+								/>
+							</button>
+						:	header.label}
 					</th>
 				))}
 			</tr>

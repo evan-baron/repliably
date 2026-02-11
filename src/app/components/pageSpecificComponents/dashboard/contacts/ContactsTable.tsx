@@ -25,11 +25,11 @@ const ContactsTable = ({
 	contacts: ContactFromDB[];
 	onRowClick?: (contactId: number) => void;
 	columns: {
-		active: boolean;
+		active?: boolean;
 		reasonForEmail: boolean;
 		importance: boolean;
 		lastActivity: boolean;
-		verified: boolean;
+		verified?: boolean;
 		linkedIn: boolean;
 		phone: boolean;
 		replied: boolean;

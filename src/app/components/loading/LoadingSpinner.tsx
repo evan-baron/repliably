@@ -31,13 +31,21 @@ function LoadingSpinner({ message = 'Loading' }: { message?: string }) {
 	}
 
 	return (
-		<div className={styles.loadingcontainer}>
+		<div
+			className={styles.loadingcontainer}
+			role='status'
+			aria-live='polite'
+			aria-busy='true'
+		>
 			<div className={styles.container}>
 				<h2 className={styles.h2}>
 					{loadingMessage || message}
-					<div className={styles.elipses}>{loadingText}</div>
+					<span className={styles.elipses} aria-hidden='true'>
+						{loadingText}
+					</span>
+					<span className='sr-only'>Please wait</span>
 				</h2>
-				<div className={styles.spinner}>
+				<div className={styles.spinner} aria-hidden='true'>
 					<div className={styles['loading-spinner']}></div>
 				</div>
 			</div>

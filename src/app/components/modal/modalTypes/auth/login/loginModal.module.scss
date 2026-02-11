@@ -25,23 +25,28 @@
 			text-decoration: none;
 			color: var(--text-primary);
 
-			&:hover {
+			&:hover:not(:disabled) {
 				border-color: var(--border-primary);
 				background: var(--background-subtle);
 				transform: translateY(-1px);
 				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 			}
 
-			&.google:hover {
+			&.google:hover:not(:disabled) {
 				border-color: #4285f4;
 			}
 
-			&.apple:hover {
+			&.apple:hover:not(:disabled) {
 				border-color: #000;
 			}
 
-			&.microsoft:hover {
+			&.microsoft:hover:not(:disabled) {
 				border-color: #0078d4;
+			}
+
+			&:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
 			}
 		}
 	}
@@ -147,6 +152,11 @@
 		font-size: 0.875rem;
 		color: var(--text-secondary);
 
+		&.disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
 		p {
 			margin: 0.5rem 0;
 		}
@@ -159,7 +169,7 @@
 			cursor: pointer;
 			font-size: inherit;
 
-			&:hover {
+			&:hover:not(:disabled) {
 				color: var(--color-secondary);
 			}
 		}

@@ -18,10 +18,10 @@ const ModalBackButton = ({
 
 	return (
 		<button
+			type='button'
 			onClick={handleClick}
 			className='button back'
-			role='button'
-			aria-label={`Open ${title} modal`}
+			aria-label={`Go back to ${title}`}
 		>
 			{title}
 		</button>

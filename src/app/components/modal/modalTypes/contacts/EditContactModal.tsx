@@ -85,10 +85,20 @@ const EditContactModal = ({
 	};
 
 	return (
-		<div className={styles['newcontact-modal-wrapper']}>
+		<div
+			className={styles['newcontact-modal-wrapper']}
+			role='dialog'
+			aria-labelledby='edit-contact-title'
+			aria-modal='true'
+		>
+			<h2 id='edit-contact-title' className='sr-only'>
+				Edit Contact
+			</h2>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				className={styles['contact-form']}
+				noValidate
+				aria-label='Edit contact form'
 			>
 				{/* Name Fields */}
 				<div className={styles['form-row']}>
@@ -105,9 +115,18 @@ const EditContactModal = ({
 								},
 							})}
 							className={errors.firstName ? styles.error : ''}
+							aria-required='true'
+							aria-invalid={errors.firstName ? 'true' : 'false'}
+							aria-describedby={
+								errors.firstName ? 'firstName-error' : undefined
+							}
 						/>
 						{errors.firstName && (
-							<span className={styles['error-message']}>
+							<span
+								id='firstName-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.firstName.message}
 							</span>
 						)}
@@ -126,9 +145,16 @@ const EditContactModal = ({
 								},
 							})}
 							className={errors.lastName ? styles.error : ''}
+							aria-required='true'
+							aria-invalid={errors.lastName ? 'true' : 'false'}
+							aria-describedby={errors.lastName ? 'lastName-error' : undefined}
 						/>
 						{errors.lastName && (
-							<span className={styles['error-message']}>
+							<span
+								id='lastName-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.lastName.message}
 							</span>
 						)}
@@ -163,9 +189,16 @@ const EditContactModal = ({
 								},
 							})}
 							className={errors.email ? styles.error : ''}
+							aria-required='true'
+							aria-invalid={errors.email ? 'true' : 'false'}
+							aria-describedby={errors.email ? 'email-error' : undefined}
 						/>
 						{errors.email && (
-							<span className={styles['error-message']}>
+							<span
+								id='email-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.email.message}
 							</span>
 						)}
@@ -202,9 +235,15 @@ const EditContactModal = ({
 							})}
 							placeholder='https://'
 							className={errors.linkedIn ? styles.error : ''}
+							aria-invalid={errors.linkedIn ? 'true' : 'false'}
+							aria-describedby={errors.linkedIn ? 'linkedIn-error' : undefined}
 						/>
 						{errors.linkedIn && (
-							<span className={styles['error-message']}>
+							<span
+								id='linkedIn-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.linkedIn.message}
 							</span>
 						)}
@@ -231,10 +270,18 @@ const EditContactModal = ({
 						id='reasonForEmail'
 						{...register('reasonForEmail')}
 						className={errors.reasonForEmail ? styles.error : ''}
-						placeholder='ex: Junior Engineer'
+						placeholder='ex: Applied for Junior Engineer role'
+						aria-invalid={errors.reasonForEmail ? 'true' : 'false'}
+						aria-describedby={
+							errors.reasonForEmail ? 'reasonForEmail-error' : undefined
+						}
 					/>
 					{errors.reasonForEmail && (
-						<span className={styles['error-message']}>
+						<span
+							id='reasonForEmail-error'
+							className={styles['error-message']}
+							role='alert'
+						>
 							{errors.reasonForEmail.message}
 						</span>
 					)}
@@ -246,6 +293,7 @@ const EditContactModal = ({
 						type='submit'
 						className={`${styles['save-button']} button contact`}
 						disabled={updating || duplicateContact}
+						aria-disabled={updating || duplicateContact}
 					>
 						{updating ? 'Saving...' : 'Save Changes'}
 					</button>
@@ -255,6 +303,7 @@ const EditContactModal = ({
 						onClick={handleCancel}
 						className={`${styles['cancel-button']} button`}
 						disabled={updating || duplicateContact}
+						aria-disabled={updating || duplicateContact}
 					>
 						Cancel
 					</button>
@@ -266,7 +315,11 @@ const EditContactModal = ({
 						<p className={styles['error-message']}>
 							One of your contacts is already using this email.
 						</p>
-						<button type='button' onClick={() => setDuplicateContact(false)}>
+						<button
+							type='button'
+							onClick={() => setDuplicateContact(false)}
+							aria-disabled={updating || duplicateContact}
+						>
 							Ok
 						</button>
 					</div>

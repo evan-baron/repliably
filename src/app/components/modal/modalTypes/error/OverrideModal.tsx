@@ -30,9 +30,15 @@ const OverrideModal = () => {
 	};
 
 	return (
-		<div className={styles['error-modal']}>
-			<div className={styles.message}>
-				<h2>
+		<div
+			className={styles['error-modal']}
+			role='alertdialog'
+			aria-labelledby='override-title'
+			aria-describedby='override-message'
+			aria-modal='true'
+		>
+			<div id='override-message' className={styles.message}>
+				<h2 id='override-title'>
 					An existing email sequence conflicts with the one you're trying to
 					send.
 				</h2>
@@ -48,6 +54,7 @@ const OverrideModal = () => {
 					className='button override'
 					onClick={handleOverride}
 					disabled={sending}
+					aria-disabled={sending}
 				>
 					Override
 				</button>
@@ -58,6 +65,8 @@ const OverrideModal = () => {
 						clearEmailContext();
 						setModalType(null);
 					}}
+					disabled={sending}
+					aria-disabled={sending}
 				>
 					Cancel
 				</button>

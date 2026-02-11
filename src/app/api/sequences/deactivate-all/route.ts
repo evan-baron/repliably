@@ -9,7 +9,7 @@ export async function PUT(request: NextRequest) {
 		if (error) {
 			return NextResponse.json(
 				{ error: error.error },
-				{ status: error.status }
+				{ status: error.status },
 			);
 		}
 
@@ -32,17 +32,16 @@ export async function PUT(request: NextRequest) {
 			data: { active: false, endDate: new Date() },
 		});
 
-		const updatedMessages = await prisma.message.updateMany({
+		const deletedMessages = await prisma.message.deleteMany({
 			where: {
 				ownerId: user.id,
 				sequenceId: { in: sequenceIds },
 				status: { in: ['pending', 'scheduled'] },
 			},
-			data: { status: 'cancelled', needsFollowUp: false },
 		});
 
 		const contactIds = Array.from(
-			new Set(activeSequences.map((s) => s.contactId).filter(Boolean))
+			new Set(activeSequences.map((s) => s.contactId).filter(Boolean)),
 		) as number[];
 
 		const updatedContacts = await prisma.contact.updateMany({
@@ -52,14 +51,14 @@ export async function PUT(request: NextRequest) {
 
 		return NextResponse.json({
 			updatedSequences,
-			updatedMessages,
+			deletedMessages,
 			updatedContacts,
 		});
 	} catch (error: any) {
 		console.error('Error updating sequences:', error);
 		return NextResponse.json(
 			{ error: error.message || 'Failed to deactivate all sequences' },
-			{ status: 500 }
+			{ status: 500 },
 		);
 	}
 }

@@ -167,22 +167,33 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 
 	return (
 		<div className={styles['settings-form-wrapper']}>
-			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-				<h3 className={styles['section-title']}>Automation</h3>
-				<section className={styles.section}>
+			<form
+				className={styles.form}
+				onSubmit={handleSubmit(onSubmit)}
+				noValidate
+				aria-label='Sequence default settings form'
+			>
+				<h3 className={styles['section-title']} id='automation-section'>
+					Automation
+				</h3>
+				<section
+					className={styles.section}
+					aria-labelledby='automation-section'
+				>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
 							id='defaultRequireApproval'
+							aria-describedby='defaultRequireApproval-help'
 							{...register('defaultRequireApproval')}
 						/>
 						<div className={styles.input}>
 							<label htmlFor='defaultRequireApproval'>
 								<span>Require approval for auto-generated messages</span>
 							</label>
-							<small>
+							<small id='defaultRequireApproval-help'>
 								Messages will need manual approval before sending (recommended)
 							</small>
 						</div>
@@ -195,6 +206,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 						<div className={styles.input}>
 							<select
 								id='defaultSequenceDuration'
+								aria-describedby='defaultSequenceDuration-help'
 								{...register('defaultSequenceDuration')}
 							>
 								{sequenceDurationOptions.map((option) => (
@@ -203,7 +215,10 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 									</option>
 								))}
 							</select>
-							<small className={styles.helpText}>
+							<small
+								id='defaultSequenceDuration-help'
+								className={styles.helpText}
+							>
 								Maximum duration for a sequence before automatic termination
 							</small>
 						</div>
@@ -218,13 +233,17 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 						<input
 							type='checkbox'
 							id='defaultReferencePrevious'
+							aria-describedby='defaultReferencePrevious-help'
 							{...register('defaultReferencePrevious')}
 						/>
 						<div className={styles.input}>
 							<label htmlFor='defaultReferencePrevious'>
 								<span>Reference previous emails in follow-ups</span>
 							</label>
-							<small>
+							<small
+								id='defaultReferencePrevious-help'
+								className={styles.helpText}
+							>
 								AI will use context from previous messages when generating
 								follow-ups
 							</small>
@@ -237,13 +256,17 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 						<input
 							type='checkbox'
 							id='defaultAlterSubjectLine'
+							aria-describedby='defaultAlterSubjectLine-help'
 							{...register('defaultAlterSubjectLine')}
 						/>
 						<div className={styles.input}>
 							<label htmlFor='defaultAlterSubjectLine'>
 								<span>Allow AI to alter subject lines</span>
 							</label>
-							<small>
+							<small
+								id='defaultAlterSubjectLine-help'
+								className={styles.helpText}
+							>
 								AI can modify subject lines for follow-ups (e.g., add "Re:" or
 								"Follow-up:")
 							</small>
@@ -251,15 +274,22 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 					</div>
 				</section>
 
-				<h3 className={styles['section-title']}>Approval Workflow</h3>
-				<section className={styles.section}>
+				<h3 className={styles['section-title']} id='approval-workflow-section'>
+					Approval Workflow
+				</h3>
+				<section
+					className={styles.section}
+					aria-labelledby='approval-workflow-section'
+				>
 					<div className={styles['input-group']}>
 						<label htmlFor='approvalDeadline'>Approval deadline (days)</label>
 						<div className={styles.input}>
 							<select
 								id='defaultSendDelay'
+								aria-describedby='defaultSendDelay-help'
 								{...register('defaultSendDelay')}
 								disabled={!defaultRequireApproval}
+								aria-disabled={!defaultRequireApproval}
 							>
 								{approvalDeadlineOptions.map((option) => (
 									<option key={option.value} value={option.value}>
@@ -267,7 +297,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 									</option>
 								))}
 							</select>
-							<small className={styles.helpText}>
+							<small id='defaultSendDelay-help' className={styles.helpText}>
 								Number of days to wait before automatically sending messages
 								without approval.{' '}
 								<span className={styles.important}>
@@ -280,7 +310,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 				</section>
 
 				<div className={styles['section-title-wrapper']}>
-					<h3 className={styles['section-title']}>
+					<h3 className={styles['section-title']} id='sequence-type-section'>
 						{/* Follow-up Schedule */}
 						Sequence Type
 					</h3>
@@ -289,8 +319,15 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 						Predefined sequence structures for common use cases.
 					</p>
 				</div>
-				<section className={styles.section}>
-					<div className={styles['tile-grid']}>
+				<section
+					className={styles.section}
+					aria-labelledby='sequence-type-section'
+				>
+					<fieldset
+						className={styles['tile-grid']}
+						aria-label='Sequence type options'
+					>
+						<legend className='sr-only'>Choose a default sequence type</legend>
 						{defaultSequenceTypeOptions.map((option, index) => (
 							<div
 								key={index}
@@ -303,12 +340,19 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 										type='radio'
 										id={`defaultSequenceType-${option.value}`}
 										value={option.value}
+										aria-describedby={`sequenceType-${option.value}-description`}
 										{...register('defaultSequenceType')}
 									/>
+									<span
+										id={`sequenceType-${option.value}-description`}
+										className='sr-only'
+									>
+										{option.description}
+									</span>
 								</label>
 							</div>
 						))}
-					</div>
+					</fieldset>
 				</section>
 
 				<div className={styles['form-actions']}>
@@ -316,6 +360,7 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 						className={'button save-changes'}
 						type='submit'
 						disabled={!hasChanged || updatingUser}
+						aria-disabled={!hasChanged || updatingUser}
 					>
 						{updatingUser ? 'Saving...' : 'Save Changes'}
 					</button>

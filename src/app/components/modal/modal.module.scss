@@ -95,6 +95,10 @@
 				padding-bottom: 1rem;
 				text-align: center;
 
+				&.center {
+					justify-content: center;
+				}
+
 				h2 {
 					margin: 0;
 					font-size: 1.5rem;

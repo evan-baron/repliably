@@ -17,15 +17,7 @@ import { UserToClientFromDB } from '@/types/userTypes';
 import { useAppContext } from '@/app/context/AppContext';
 
 const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
-	const {
-		modalType,
-		setModalType,
-		selectedContact,
-		setSelectedContact,
-		setErrors,
-		setLoading,
-		setLoadingMessage,
-	} = useAppContext();
+	const { setLoading, setLoadingMessage } = useAppContext();
 	const { mutateAsync: updateUser, isPending: updatingUser } =
 		useUserAccountSettingsUpdate();
 
@@ -88,22 +80,33 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 	return (
 		// DELETE styles.disabled WHEN FEATURE IS READY
 		<div className={`${styles['settings-form-wrapper']} ${styles.disabled}`}>
-			<form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+			<form
+				className={styles.form}
+				onSubmit={handleSubmit(onSubmit)}
+				noValidate
+				aria-label='Notification preferences form'
+			>
 				<h3
 					className={styles['section-title']}
 					style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+					id='contact-activity-section'
 				>
 					Contact Activity
 				</h3>
-				<section className={styles.section}>
+				<section
+					className={styles.section}
+					aria-labelledby='contact-activity-section'
+				>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
 							id='notificationBounce'
+							aria-describedby='notificationBounce-help'
 							{...register('notificationBounce')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true' // REMOVE WHEN FEATURE IS READY
 						/>
 						<div
 							className={styles.input}
@@ -115,7 +118,7 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Bounce Alerts</span>
 							</label>
-							<small className={styles.helpText}>
+							<small id='notificationBounce-help' className={styles.helpText}>
 								Get notified when an email bounces
 							</small>
 						</div>
@@ -127,8 +130,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 						<input
 							type='checkbox'
 							id='notificationSendFailure'
+							aria-describedby='notificationSendFailure-help'
 							{...register('notificationSendFailure')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true' // REMOVE WHEN FEATURE IS READY
 						/>
 						<div
 							className={styles.input}
@@ -140,7 +145,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Send Failure</span>
 							</label>
-							<small className={styles.helpText}>
+							<small
+								id='notificationSendFailure-help'
+								className={styles.helpText}
+							>
 								Get notified when a message fails to send
 							</small>
 						</div>
@@ -150,18 +158,24 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 				<h3
 					className={styles['section-title']}
 					style={{ opacity: '.5' }} // DELETE THIS LINE WHEN FEATURE IS READY
+					id='sequence-activity-section'
 				>
 					Sequence Activity
 				</h3>
-				<section className={styles.section}>
+				<section
+					className={styles.section}
+					aria-labelledby='sequence-activity-section'
+				>
 					<div
 						className={`${styles['input-group']} ${styles['checkbox-group']}`}
 					>
 						<input
 							type='checkbox'
 							id='notificationSequenceComplete'
+							aria-describedby='notificationSequenceComplete-help'
 							{...register('notificationSequenceComplete')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true' // REMOVE WHEN FEATURE IS READY
 						/>
 						<div
 							className={styles.input}
@@ -173,7 +187,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Sequence Completion</span>
 							</label>
-							<small className={styles.helpText}>
+							<small
+								id='notificationSequenceComplete-help'
+								className={styles.helpText}
+							>
 								Get notified when a sequence completes
 							</small>
 						</div>
@@ -185,8 +202,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 						<input
 							type='checkbox'
 							id='notificationMessageApproval'
+							aria-describedby='notificationMessageApproval-help'
 							{...register('notificationMessageApproval')}
 							disabled // REMOVE WHEN FEATURE IS READY
+							aria-disabled='true' // REMOVE WHEN FEATURE IS READY
 						/>
 						<div
 							className={styles.input}
@@ -198,7 +217,10 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 							>
 								<span>Message Approval</span>
 							</label>
-							<small className={styles.helpText}>
+							<small
+								id='notificationMessageApproval-help'
+								className={styles.helpText}
+							>
 								Get notified when a message requires approval
 							</small>
 						</div>
@@ -210,6 +232,7 @@ const NotificationsForm = ({ user }: { user: UserToClientFromDB }) => {
 						className={'button save-changes'}
 						type='submit'
 						disabled // REMOVE WHEN FEATURE IS READY AND REPLACE WITH BELOW LINE
+						aria-disabled='true' // REMOVE WHEN FEATURE IS READY
 						// disabled={updatingUser || !hasChanged}
 					>
 						{updatingUser ? 'Saving...' : 'Save Changes'}

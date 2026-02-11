@@ -92,21 +92,36 @@ const NestedTable = ({
 		);
 
 	const { columnHeaders } = tableData;
+	const parsedTableType = parseTableType(tableType);
 
 	return (
 		<table
 			className={`${styles['nested-table']} ${inModal ? styles.inModal : ''}`}
+			role='table'
+			aria-label={`Nested ${parsedTableType} details`}
+			aria-rowcount={sortedRowData.length + 1}
 		>
 			<TableHeader columnHeaders={columnHeaders} handleSort={handleSort} />
 			<tbody className={styles.tableBody}>
-				{sortedRowData.map((row, index) => {
+				{sortedRowData.map((row, rowIndex) => {
+					const isExpanded = selectedRow === row.rowId;
+
 					return (
 						<tr
-							key={`nestedRowNested-${index}`}
+							key={`nestedRowNested-${rowIndex}`}
 							className={`${styles.bodyRow} ${
 								row.rowStyling ? styles[row.rowStyling] : ''
 							}`}
 							onClick={() => handleClick(row.rowId)}
+							role='row'
+							aria-rowindex={rowIndex + 2}
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleClick(row.rowId);
+								}
+							}}
 						>
 							{row.cellData.map((cell: any, cellIndex: number) => {
 								const parsedContent =
@@ -118,9 +133,11 @@ const NestedTable = ({
 											className={`${styles[cell.size]} ${
 												cell.cellStyling ? styles[cell.cellStyling] : ''
 											} ${styles['content-cell']}`}
+											role='cell'
+											aria-colindex={cellIndex + 1}
 										>
 											<div className={styles['parsed-content']}>
-												<span
+												<div
 													className={`${styles['message-preview']} ${
 														(
 															cell.subjectContentCell &&
@@ -131,13 +148,13 @@ const NestedTable = ({
 													}`}
 												>
 													{parsedContent[0]}
-												</span>
-												{selectedRow === row.rowId &&
+												</div>
+												{isExpanded &&
 													parsedContent.length > 1 &&
 													parsedContent
 														.slice(1)
 														.map((text: string, index: number) => (
-															<span key={index}>{text || '\u00A0'}</span>
+															<div key={index}>{text || '\u00A0'}</div>
 														))}
 											</div>
 										</td>
@@ -148,6 +165,8 @@ const NestedTable = ({
 											} ${
 												cell.cellOrientation ? styles[cell.cellOrientation] : ''
 											}`}
+											role='cell'
+											aria-colindex={cellIndex + 1}
 										>
 											{cell.value}
 										</td>;

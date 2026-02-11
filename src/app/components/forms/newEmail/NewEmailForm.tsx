@@ -190,10 +190,15 @@ const NewEmailForm = ({
 					setErrors(errorMessages);
 					setModalType('error');
 				})}
+				noValidate
+				aria-label='New email form'
 			>
 				<div className={styles['form-email-wrapper']}>
-					<section className={styles['form-email']}>
-						{!contactEmail && <h2>Email:</h2>}
+					<section
+						className={styles['form-email']}
+						aria-labelledby='email-section'
+					>
+						{!contactEmail && <h2 id='email-section'>Email:</h2>}
 
 						{/* To Field */}
 						{!contactEmail && (
@@ -203,6 +208,8 @@ const NewEmailForm = ({
 									<input
 										type='email'
 										id='to'
+										aria-required='true'
+										aria-describedby='to-help'
 										{...register('to', {
 											required: "A 'To:' email address is required",
 											pattern: {
@@ -216,9 +223,15 @@ const NewEmailForm = ({
 										className={styles['contact-select']}
 										data-tooltip='Select from contacts'
 										onClick={() => setModalType('searchContacts')}
+										aria-label='Select recipient from contacts'
+										title='Select from contacts'
 									>
 										...
 									</button>
+									<span id='to-help' className='sr-only'>
+										Enter recipient email address or click button to select from
+										contacts
+									</span>
 								</div>
 							</div>
 						)}
@@ -230,10 +243,15 @@ const NewEmailForm = ({
 								<input
 									type='text'
 									id='subject'
+									aria-required='true'
+									aria-describedby='subject-help'
 									{...register('subject', {
 										required: 'A subject line is required',
 									})}
 								/>
+								<span id='subject-help' className='sr-only'>
+									Enter the subject line for your email
+								</span>
 							</div>
 						</div>
 
@@ -247,6 +265,8 @@ const NewEmailForm = ({
 										value={selectedSignatureId || ''}
 										onChange={handleSignatureChange}
 										disabled={!signatures || signatures.length === 0}
+										aria-disabled={!signatures || signatures.length === 0}
+										aria-describedby='signatures-help'
 									>
 										<option value={-1}>None</option>
 										{signatures?.map((signature) => (
@@ -255,12 +275,19 @@ const NewEmailForm = ({
 											</option>
 										))}
 									</select>
+									<span id='signatures-help' className='sr-only'>
+										Choose a signature to append to your email
+									</span>
 								</div>
 							</div>
 						)}
 
 						{/* Email Body - RTE */}
-						<div className={styles['rte-wrapper']}>
+						<div
+							className={styles['rte-wrapper']}
+							role='region'
+							aria-label='Email body editor'
+						>
 							<TinyEditor
 								initialValue={initialEditorContent ? initialEditorContent : ''}
 								setEditorContent={setEditorContent}
@@ -268,8 +295,11 @@ const NewEmailForm = ({
 						</div>
 					</section>
 
-					<section className={styles['form-settings']}>
-						<h2>Automation Settings:</h2>
+					<section
+						className={styles['form-settings']}
+						aria-labelledby='automation-section'
+					>
+						<h2 id='automation-section'>Automation Settings:</h2>
 						{/* Follow-up Cadence */}
 						<div className={styles['input-group']}>
 							<div className={styles.input}>
@@ -277,6 +307,8 @@ const NewEmailForm = ({
 								<select
 									className={styles.select}
 									id='followUpCadence'
+									aria-required='true'
+									aria-describedby='followUpCadence-help'
 									{...register('followUpCadence', {
 										required: 'Please select a follow-up cadence',
 									})}
@@ -288,6 +320,9 @@ const NewEmailForm = ({
 									<option value='monthly'>Every 4 weeks on {today}</option>
 									<option value='none'>No Follow-up</option>
 								</select>
+								<span id='followUpCadence-help' className='sr-only'>
+									Select the frequency for follow-up emails
+								</span>
 							</div>
 						</div>
 
@@ -299,6 +334,7 @@ const NewEmailForm = ({
 									<select
 										className={styles.select}
 										id='cadenceDuration'
+										aria-describedby='cadenceDuration-help'
 										{...register('cadenceDuration')}
 									>
 										<option value='30'>30 Days</option>
@@ -306,6 +342,9 @@ const NewEmailForm = ({
 										<option value='90'>90 Days</option>
 										<option value='indefinite'>Indefinite</option>
 									</select>
+									<small id='cadenceDuration-help' className='sr-only'>
+										How long should the follow-up sequence continue
+									</small>
 								</div>
 							</div>
 						)}
@@ -322,8 +361,12 @@ const NewEmailForm = ({
 											className={styles.checkbox}
 											type='checkbox'
 											id='referencePreviousEmail'
+											aria-describedby='referencePreviousEmail-help'
 											{...register('referencePreviousEmail')}
 										/>
+										<small id='referencePreviousEmail-help' className='sr-only'>
+											Reference previous emails in follow-up
+										</small>
 									</div>
 								</div>
 
@@ -337,8 +380,12 @@ const NewEmailForm = ({
 											className={styles.checkbox}
 											type='checkbox'
 											id='alterSubjectLine'
+											aria-describedby='alterSubjectLine-help'
 											{...register('alterSubjectLine')}
 										/>
+										<small id='alterSubjectLine-help' className='sr-only'>
+											Allow AI to modify the subject line for better engagement
+										</small>
 									</div>
 								</div>
 
@@ -352,8 +399,12 @@ const NewEmailForm = ({
 											className={styles.checkbox}
 											type='checkbox'
 											id='autoSend'
+											aria-describedby='autoSend-help'
 											{...register('autoSend')}
 										/>
+										<small id='autoSend-help' className='sr-only'>
+											Require manual approval before sending follow-ups
+										</small>
 									</div>
 								</div>
 
@@ -367,6 +418,8 @@ const NewEmailForm = ({
 											<select
 												className={styles.select}
 												id='autoSendDelay'
+												aria-required='true'
+												aria-describedby='autoSendDelay-help'
 												{...register('autoSendDelay', {
 													validate: (value) =>
 														!autoSendChecked || value !== '' ?
@@ -379,6 +432,9 @@ const NewEmailForm = ({
 												<option value='2'>2 Days</option>
 												<option value='never'>Never</option>
 											</select>
+											<small id='autoSendDelay-help' className='sr-only'>
+												Automatically send after this period if not reviewed
+											</small>
 										</div>
 									</div>
 								)}
@@ -390,6 +446,7 @@ const NewEmailForm = ({
 							className={'button send-email'}
 							type='submit'
 							disabled={sending}
+							aria-disabled={sending}
 						>
 							{sending ? 'Sending...' : 'Send Email'}
 						</button>

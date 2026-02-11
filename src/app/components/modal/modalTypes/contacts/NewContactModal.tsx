@@ -67,7 +67,7 @@ const NewContactModal = () => {
 						acc[fieldName] = data[fieldName as keyof ContactFormData];
 						return acc;
 					},
-					{} as Record<string, string>
+					{} as Record<string, string>,
 				);
 
 				const updateData = {
@@ -123,10 +123,17 @@ const NewContactModal = () => {
 	};
 
 	return (
-		<div className={styles['newcontact-modal-wrapper']}>
+		<div
+			className={styles['newcontact-modal-wrapper']}
+			role='dialog'
+			aria-labelledby='edit-contact-title'
+			aria-modal='true'
+		>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				className={styles['contact-form']}
+				noValidate
+				aria-label='Edit contact form'
 			>
 				{/* Name Fields */}
 				<div className={styles['form-row']}>
@@ -143,13 +150,22 @@ const NewContactModal = () => {
 								},
 							})}
 							className={`${errors.firstName ? styles.error : ''} ${
-								isFieldDifferent('firstName', touchedFields.firstName)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('firstName', touchedFields.firstName) ?
+									styles['field-updated']
+								:	''
 							}`}
+							aria-required='true'
+							aria-invalid={errors.firstName ? 'true' : 'false'}
+							aria-describedby={
+								errors.firstName ? 'firstName-error' : undefined
+							}
 						/>
 						{errors.firstName && (
-							<span className={styles['error-message']}>
+							<span
+								id='firstName-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.firstName.message}
 							</span>
 						)}
@@ -168,13 +184,20 @@ const NewContactModal = () => {
 								},
 							})}
 							className={`${errors.lastName ? styles.error : ''} ${
-								isFieldDifferent('lastName', touchedFields.lastName)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('lastName', touchedFields.lastName) ?
+									styles['field-updated']
+								:	''
 							}`}
+							aria-required='true'
+							aria-invalid={errors.lastName ? 'true' : 'false'}
+							aria-describedby={errors.lastName ? 'lastName-error' : undefined}
 						/>
 						{errors.lastName && (
-							<span className={styles['error-message']}>
+							<span
+								id='lastName-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.lastName.message}
 							</span>
 						)}
@@ -190,9 +213,9 @@ const NewContactModal = () => {
 							id='company'
 							{...register('company')}
 							className={`${
-								isFieldDifferent('company', touchedFields.company)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('company', touchedFields.company) ?
+									styles['field-updated']
+								:	''
 							}`}
 						/>
 					</div>
@@ -204,9 +227,9 @@ const NewContactModal = () => {
 							id='title'
 							{...register('title')}
 							className={`${
-								isFieldDifferent('title', touchedFields.title)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('title', touchedFields.title) ?
+									styles['field-updated']
+								:	''
 							}`}
 						/>
 					</div>
@@ -227,13 +250,20 @@ const NewContactModal = () => {
 								},
 							})}
 							className={`${errors.email ? styles.error : ''} ${
-								isFieldDifferent('email', touchedFields.email)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('email', touchedFields.email) ?
+									styles['field-updated']
+								:	''
 							}`}
+							aria-required='true'
+							aria-invalid={errors.email ? 'true' : 'false'}
+							aria-describedby={errors.email ? 'email-error' : undefined}
 						/>
 						{errors.email && (
-							<span className={styles['error-message']}>
+							<span
+								id='email-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.email.message}
 							</span>
 						)}
@@ -246,9 +276,9 @@ const NewContactModal = () => {
 							id='phone'
 							{...register('phone')}
 							className={`${
-								isFieldDifferent('phone', touchedFields.phone)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('phone', touchedFields.phone) ?
+									styles['field-updated']
+								:	''
 							}`}
 						/>
 					</div>
@@ -279,13 +309,19 @@ const NewContactModal = () => {
 							})}
 							placeholder='https://'
 							className={`${errors.linkedIn ? styles.error : ''} ${
-								isFieldDifferent('linkedIn', touchedFields.linkedIn)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('linkedIn', touchedFields.linkedIn) ?
+									styles['field-updated']
+								:	''
 							}`}
+							aria-invalid={errors.linkedIn ? 'true' : 'false'}
+							aria-describedby={errors.linkedIn ? 'linkedIn-error' : undefined}
 						/>
 						{errors.linkedIn && (
-							<span className={styles['error-message']}>
+							<span
+								id='linkedIn-error'
+								className={styles['error-message']}
+								role='alert'
+							>
 								{errors.linkedIn.message}
 							</span>
 						)}
@@ -297,9 +333,9 @@ const NewContactModal = () => {
 							id='importance'
 							{...register('importance')}
 							className={`${
-								isFieldDifferent('importance', touchedFields.importance)
-									? styles['field-updated']
-									: ''
+								isFieldDifferent('importance', touchedFields.importance) ?
+									styles['field-updated']
+								:	''
 							}`}
 						>
 							<option value=''>Select importance...</option>
@@ -320,14 +356,22 @@ const NewContactModal = () => {
 						id='reasonForEmail'
 						{...register('reasonForEmail')}
 						className={`${errors.reasonForEmail ? styles.error : ''} ${
-							isFieldDifferent('reasonForEmail', touchedFields.reasonForEmail)
-								? styles['field-updated']
-								: ''
+							isFieldDifferent('reasonForEmail', touchedFields.reasonForEmail) ?
+								styles['field-updated']
+							:	''
 						}`}
 						placeholder='ex: Applied for Junior Engineer Role'
+						aria-invalid={errors.reasonForEmail ? 'true' : 'false'}
+						aria-describedby={
+							errors.reasonForEmail ? 'reasonForEmail-error' : undefined
+						}
 					/>
 					{errors.reasonForEmail && (
-						<span className={styles['error-message']}>
+						<span
+							id='reasonForEmail-error'
+							className={styles['error-message']}
+							role='alert'
+						>
 							{errors.reasonForEmail.message}
 						</span>
 					)}
@@ -338,20 +382,24 @@ const NewContactModal = () => {
 					<button
 						type='submit'
 						className={`${styles['save-button']} button contact`}
+						disabled={updating}
+						aria-disabled={updating}
 					>
-						{isUpdateMode
-							? updating
-								? 'Updating...'
-								: 'Update Contact'
-							: saving
-							? 'Saving...'
-							: 'Save Contact'}
+						{isUpdateMode ?
+							updating ?
+								'Updating...'
+							:	'Update Contact'
+						: saving ?
+							'Saving...'
+						:	'Save Contact'}
 					</button>
 					<button
 						type='button'
 						name='cancel'
 						onClick={handleCancel}
 						className={`${styles['cancel-button']} button`}
+						disabled={updating}
+						aria-disabled={updating}
 					>
 						Cancel
 					</button>

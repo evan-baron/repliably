@@ -33,13 +33,21 @@ const AlertModal = ({
 	let alertMessage = message === 'No email' ? noEmailMessage : message;
 
 	return (
-		<div className={styles['alert-modal']}>
-			<span className={styles.message}>{alertMessage}</span>
+		<div
+			className={styles['alert-modal']}
+			role='alertdialog'
+			aria-labelledby='alert-message'
+			aria-modal='true'
+		>
+			<p id='alert-message' className={styles.message}>
+				{alertMessage}
+			</p>
 			<button
 				type='button'
 				className='button delete'
 				style={{ width: '8rem' }}
 				onClick={clearAlert}
+				aria-label='Dismiss alert'
 			>
 				OK
 			</button>

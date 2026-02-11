@@ -20,13 +20,16 @@ const DeleteContactButton = ({ contact }: { contact: ContactFromDB }) => {
 		setModalType('deleteContact');
 	};
 
+	const contactName = contact.firstName + ' ' + contact.lastName;
+
 	return (
 		<button
 			type='button'
 			className={styles['delete-contact-button']}
 			onClick={handleClick}
+			aria-label={`Delete contact ${contactName}`}
 		>
-			<DeleteForever />
+			<DeleteForever aria-hidden='true' focusable='false' />
 			<span>Delete Contact</span>
 		</button>
 	);

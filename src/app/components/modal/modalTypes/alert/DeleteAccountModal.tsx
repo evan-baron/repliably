@@ -37,8 +37,17 @@ const DeleteAccountModal = () => {
 	};
 
 	return (
-		<div className={styles['delete-account-modal']}>
-			<p className={styles['confirm-delete']}>
+		<div
+			className={styles['delete-account-modal']}
+			role='dialog'
+			aria-labelledby='delete-account-title'
+			aria-describedby='delete-account-description'
+			aria-modal='true'
+		>
+			<h2 id='delete-account-title' className='sr-only'>
+				Delete Account
+			</h2>
+			<p id='delete-account-description' className={styles['confirm-delete']}>
 				<span className={styles.important}>Warning:</span> Deleting your account
 				will remove <span className={styles.strong}>ALL</span> related contact
 				and email data. This action{' '}
@@ -53,6 +62,9 @@ const DeleteAccountModal = () => {
 				</span>
 				" in the box below:
 			</p>
+			<label htmlFor='delete' className='sr-only'>
+				Type "{confirmDeleteText}" to confirm account deletion
+			</label>
 			<input
 				type='text'
 				id='delete'
@@ -63,13 +75,24 @@ const DeleteAccountModal = () => {
 				onChange={(e) => setTypedDeleteText(e.target.value)}
 				value={typedDeleteText}
 				spellCheck={false}
+				aria-required='true'
+				aria-invalid={
+					typedDeleteText.length > 0 && typedDeleteText !== confirmDeleteText
+				}
+				aria-describedby='delete-help'
 			/>
+			<span id='delete-help' className='sr-only'>
+				You must type the exact phrase to enable the delete button
+			</span>
 			<div className={styles.buttons}>
 				<button
 					type='button'
 					className={'button delete-account'}
 					disabled={!typedDeleteText || typedDeleteText !== confirmDeleteText}
 					onClick={handleDelete}
+					aria-disabled={
+						!typedDeleteText || typedDeleteText !== confirmDeleteText
+					}
 				>
 					Delete Account
 				</button>
@@ -81,6 +104,8 @@ const DeleteAccountModal = () => {
 						setTypedDeleteText('');
 						setModalType(null);
 					}}
+					disabled={deletingUser}
+					aria-disabled={deletingUser}
 				>
 					Cancel
 				</button>

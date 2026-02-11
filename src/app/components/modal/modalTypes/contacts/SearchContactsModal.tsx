@@ -36,18 +36,35 @@ const SearchContactsModal = () => {
 	};
 
 	return (
-		<div className={styles['searchcontactsmodal-wrapper']}>
+		<div
+			className={styles['searchcontactsmodal-wrapper']}
+			role='dialog'
+			aria-labelledby='search-contacts-title'
+			aria-modal='true'
+		>
+			<h2 id='search-contacts-title' className='sr-only'>
+				Search Contacts
+			</h2>
 			<div className={styles.controls}>
 				<SearchBar placeholder='Search contacts...' />
 				<button
 					className={styles.refreshButton}
 					type='button'
 					onClick={() => refetch()}
+					aria-label='Refresh contacts list'
 				>
-					<Refresh className={styles.icon} />
+					<Refresh
+						className={styles.icon}
+						aria-hidden='true'
+						focusable='false'
+					/>
 				</button>
 			</div>
-			{error && <p style={{ color: 'red' }}>Error: {error.message}</p>}
+			{error && (
+				<p role='alert' style={{ color: 'red' }}>
+					Error: {error.message}
+				</p>
+			)}
 			<ContactsTable
 				inModal={true}
 				contacts={contacts}
