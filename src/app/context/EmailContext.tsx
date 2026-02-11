@@ -78,7 +78,7 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				} = body;
 
 				if (!contactId) {
-					console.log(
+					console.error(
 						'No contactId returned from follow-up generation. Nothing to invalidate.',
 					);
 					return;

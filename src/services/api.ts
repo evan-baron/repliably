@@ -120,10 +120,6 @@ export const userAPI = {
 		apiCall('/api/user', {
 			method: 'GET',
 		}),
-	getUserSettings: () =>
-		apiCall('/api/user', {
-			method: 'GET',
-		}),
 	updateAccountSettings: (updateData: Partial<UserFromDB>) =>
 		apiCall('/api/user/settings/accountSettings', {
 			method: 'PUT',
