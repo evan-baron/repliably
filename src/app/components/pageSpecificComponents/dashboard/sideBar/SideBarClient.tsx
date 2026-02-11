@@ -36,10 +36,6 @@ export default function SideBarClient({
 	const { data: emailConnectionStatus } = useGetEmailConnectionStatus(
 		initialEmailConnectionActive,
 	);
-	console.log(
-		'Email connection status in SideBarClient:',
-		emailConnectionStatus,
-	);
 
 	useEffect(() => {
 		if (data?.messages) {

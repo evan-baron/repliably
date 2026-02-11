@@ -41,7 +41,7 @@ const AllActivities = ({
 				message.status === 'cancelled' ? 'N/A'
 				: message.sentAt ? message.sentAt
 				: `Scheduled for ${new Date(
-						message.scheduledAt!
+						message.scheduledAt!,
 					).toLocaleDateString()}`;
 
 			return {
@@ -60,7 +60,7 @@ const AllActivities = ({
 							: null,
 					},
 					{
-						value: '<p>' + message.subject + '</p>' + message.contents,
+						value: '<div>' + message.subject + '</div>' + message.contents,
 						size: columnHeaders[2].size,
 						contentCell: true,
 						subjectContentCell: true,

@@ -63,7 +63,7 @@ const PreviousSequences = ({
 						message.status === 'cancelled' ? 'N/A'
 						: message.sentAt ? new Date(message.sentAt).toLocaleDateString()
 						: `Scheduled for ${new Date(
-								message.scheduledAt!
+								message.scheduledAt!,
 							).toLocaleDateString()}`;
 
 					return {
@@ -92,7 +92,7 @@ const PreviousSequences = ({
 				};
 
 				return [sequence.id, nestedTable] as const;
-			})
+			}),
 		);
 	}, [sequences, nestedMessagesHeaders]);
 
@@ -104,10 +104,10 @@ const PreviousSequences = ({
 				const sequenceStartDate = new Date(sequence.createdAt);
 				const sequenceDuration = Math.ceil(
 					(sequenceCompletionDate.getTime() - sequenceStartDate.getTime()) /
-						(1000 * 60 * 60 * 24)
+						(1000 * 60 * 60 * 24),
 				);
 				const messagesSent = sequence.messages.filter(
-					(message) => message.status === 'sent'
+					(message) => message.status === 'sent',
 				).length;
 
 				const cellData = [
@@ -120,7 +120,7 @@ const PreviousSequences = ({
 					{
 						value: sequenceType(
 							sequence.sequenceType,
-							new Date(sequence.createdAt)
+							new Date(sequence.createdAt),
 						),
 						size:
 							contact ? contactColumnHeaders[2].size : columnHeaders[1].size,
@@ -186,8 +186,6 @@ const PreviousSequences = ({
 				return valB - valA;
 			}),
 	};
-
-	console.log(tableData);
 
 	return (
 		<MasterTable

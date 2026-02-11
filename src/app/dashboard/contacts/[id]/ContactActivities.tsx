@@ -43,11 +43,6 @@ const ContactActivities = ({
 		| { active: boolean }
 		| undefined;
 
-	console.log(
-		'Email connection status in ContactActivities:',
-		emailActive?.active,
-	);
-
 	type SelectedType = 'active' | 'previous' | 'email' | 'all';
 	const [selected, setSelected] = useState<SelectedType>('active');
 

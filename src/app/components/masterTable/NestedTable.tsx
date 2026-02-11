@@ -112,8 +112,6 @@ const NestedTable = ({
 								const parsedContent =
 									cell.contentCell && parseEmailContent(cell.value);
 
-								console.log(parsedContent);
-
 								return cell.contentCell ?
 										<td
 											key={`nestedCellNested-${cellIndex}`}

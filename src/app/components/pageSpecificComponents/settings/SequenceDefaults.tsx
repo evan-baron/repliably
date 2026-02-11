@@ -13,34 +13,6 @@ import { UserToClientFromDB } from '@/types/userTypes';
 import SequenceDefaultsForm from '../../forms/sequenceDefaultSettings/SequenceDefaultsForm';
 
 const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
-	const [formData, setFormData] = useState({
-		autoSend: false,
-		autoSendDelay: 3,
-		sequenceDuration: 30,
-		referencePreviousEmail: true,
-		alterSubjectLine: false,
-		needsApproval: true,
-		approvalDeadlineHours: 24,
-	});
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// TODO: Implement save functionality
-		console.log('Saving sequence defaults:', formData);
-	};
-
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		const { name, value, type } = e.target;
-		const checked = (e.target as HTMLInputElement).checked;
-
-		setFormData((prev) => ({
-			...prev,
-			[name]: type === 'checkbox' ? checked : value,
-		}));
-	};
-
 	return (
 		<div className={styles['settings-container']}>
 			<section className={styles.section}>

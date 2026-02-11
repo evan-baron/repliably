@@ -219,10 +219,6 @@ const MasterTable = ({
 														parsedContent
 															.slice(1)
 															.map((text: string, index: number) => {
-																console.log(
-																	'Rendering additional parsed content:',
-																	text,
-																);
 																return (
 																	<div key={index}>{text || '\u00A0'}</div>
 																);

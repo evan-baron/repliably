@@ -41,8 +41,6 @@ export default async function DashboardLayout({
 		redirect('/');
 	}
 
-	console.log('user in dashboard layout:', user);
-
 	const { emailConnectionActive } = user;
 
 	const { messages } = await getAllPendingMessages();
