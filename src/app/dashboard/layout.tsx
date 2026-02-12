@@ -47,11 +47,7 @@ export default async function DashboardLayout({
 
 	return (
 		<EmailContextProvider>
-			<div
-				className={styles.dashboardLayout}
-				role='application'
-				aria-labelledby='app-title'
-			>
+			<div className={styles.dashboardLayout}>
 				<TopBar userName={sessionUser?.given_name || 'User'} />
 
 				<div className={styles.mainContent} role='main'>
@@ -60,15 +56,7 @@ export default async function DashboardLayout({
 						initialEmailConnectionActive={emailConnectionActive}
 					/>
 
-					<main
-						className={styles.dashboardContent}
-						role='main'
-						aria-label='Dashboard main content'
-						id='main-content'
-						tabIndex={-1}
-					>
-						{children}
-					</main>
+					<main className={styles.dashboardContent}>{children}</main>
 				</div>
 			</div>
 			<Modal />

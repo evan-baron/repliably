@@ -52,7 +52,7 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 						message.status === 'cancelled' ? 'N/A'
 						: message.sentAt ? new Date(message.sentAt).toLocaleDateString()
 						: `Scheduled for ${new Date(
-								message.scheduledAt!
+								message.scheduledAt!,
 							).toLocaleDateString()}`;
 
 					return {
@@ -81,7 +81,7 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 				};
 
 				return [sequence.id, nestedTable] as const;
-			})
+			}),
 		);
 	}, [sequences, nestedMessagesHeaders]);
 
@@ -89,14 +89,22 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 		columnHeaders: columnHeaders,
 		rowData: sequences
 			.map((sequence) => {
-				const sequenceCompletionDate = new Date(sequence.endDate!);
+				const endDate = sequence.endDate ? new Date(sequence.endDate) : null;
+				const sequenceCompletionDate = endDate ? endDate : new Date();
 				const sequenceStartDate = new Date(sequence.createdAt);
-				const sequenceDuration = Math.ceil(
-					(sequenceCompletionDate.getTime() - sequenceStartDate.getTime()) /
-						(1000 * 60 * 60 * 24)
-				);
+
+				const sequenceDuration =
+					endDate ?
+						Math.ceil(
+							(sequenceCompletionDate.getTime() - sequenceStartDate.getTime()) /
+								(1000 * 60 * 60 * 24),
+						)
+					:	Math.ceil(
+							(new Date().getTime() - sequenceStartDate.getTime()) /
+								(1000 * 60 * 60 * 24),
+						);
 				const messagesSent = sequence.messages.filter(
-					(message) => message.status === 'sent'
+					(message) => message.status === 'sent',
 				).length;
 
 				const cellData = [
@@ -115,7 +123,7 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 					{
 						value: sequenceType(
 							sequence.sequenceType,
-							new Date(sequence.createdAt)
+							new Date(sequence.createdAt),
 						),
 						size: columnHeaders[2].size,
 						cellOrientation: 'right' as CellOrientation,
@@ -140,7 +148,7 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 						value: sequence.endDate ? sequence.endDate : 'N/A',
 						size: columnHeaders[6].size,
 						cellOrientation: 'right' as CellOrientation,
-						isDate: true,
+						isDate: endDate ? true : false,
 					},
 					{
 						value: sequence.emailReplies.length > 0 ? 'Yes' : 'No',

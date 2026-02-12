@@ -114,17 +114,20 @@ const SettingsClient = ({
 
 	return (
 		<div className={styles.settingsContainer}>
-			<nav className={styles.nav}>
+			<nav className={styles.nav} aria-label='Settings sections'>
 				{tabs.map((tab, index) => (
 					<Fragment key={index}>
-						<h2
+						<button
+							key={tab.id}
+							type='button'
 							className={`${styles.tabButton} ${
 								activeTab === tab.id ? styles.selected : ''
 							}`}
 							onClick={() => handleClick(tab.id)}
+							aria-current={activeTab === tab.id ? 'page' : undefined}
 						>
 							{tab.label}
-						</h2>
+						</button>
 						{index < tabs.length - 1 && <div className={styles.divider}></div>}
 					</Fragment>
 				))}

@@ -12,6 +12,7 @@ import styles from './newEmail.module.scss';
 
 // Components imports
 import NewEmailForm from '../../components/forms/newEmail/NewEmailForm';
+import PageTemplate from '@/app/components/pageSpecificComponents/PageTemplate';
 
 const Page = async () => {
 	const { user, error } = await getServerUser();
@@ -34,23 +35,15 @@ const Page = async () => {
 	};
 
 	return (
-		<div className={styles['page-wrapper']}>
-			<section className={styles['header-section']}>
-				<h1 className={styles.welcomeTitle} id='email-title'>
-					New Email
-				</h1>
-				<p className={styles.welcomeSubtitle} aria-describedby='email-title'>
-					Write a new email or use a template to get started.
-				</p>
-			</section>
-
-			<section className={styles['email-form-section']}>
-				<NewEmailForm
-					signatures={signatures}
-					defaults={defaults || defaultSettings}
-				/>
-			</section>
-		</div>
+		<PageTemplate
+			title='New Email'
+			description='Write a new email or use a template to get started.'
+		>
+			<NewEmailForm
+				signatures={signatures}
+				defaults={defaults || defaultSettings}
+			/>
+		</PageTemplate>
 	);
 };
 

@@ -50,6 +50,8 @@ export default function NavigationItem({
 		}
 	};
 
+	const displayLabel = label === 'Pending' ? 'Pending Emails' : label;
+
 	return (
 		<li role='none'>
 			<Link
@@ -60,13 +62,21 @@ export default function NavigationItem({
 					notifications ? styles.notification : ''
 				}`}
 				aria-current={isActive ? 'page' : undefined}
-				aria-label={`Navigate to ${label} page`}
+				aria-label={
+					notifications ? `${displayLabel} - has notifications` : displayLabel
+				}
 				onClick={handleClick}
 			>
-				<div className={`${styles.linkInner} ${isActive ? styles.active : ''}`}>
+				<div
+					className={`${styles.linkInner} ${isActive ? styles.active : ''}`}
+					aria-hidden='true'
+				>
 					{icon}
-					{label === 'Pending' ? 'Pending Emails' : label}
+					{displayLabel}
 				</div>
+				{notifications && (
+					<span className='sr-only'>You have new notifications</span>
+				)}
 			</Link>
 		</li>
 	);

@@ -104,37 +104,74 @@ const ContactActivities = ({
 	};
 
 	return (
-		<section className={styles['activities-wrapper']}>
-			<div className={styles.nav}>
-				<h2
-					className={selected === 'active' ? styles.selected : ''}
-					onClick={() => setSelected('active')}
-				>
-					Active Sequence
-				</h2>
+		<section
+			className={styles['activities-wrapper']}
+			aria-labelledby='activities-title'
+		>
+			<h2 id='activities-title' className='sr-only'>
+				Contact Activities
+			</h2>
+			<nav className={styles.nav}>
+				<ul role='tablist'>
+					<li role='presentation'>
+						<button
+							role='tab'
+							aria-selected={selected === 'active'}
+							aria-controls='activity-panel'
+							id='tab-active'
+							className={selected === 'active' ? styles.selected : ''}
+							onClick={() => setSelected('active')}
+						>
+							Active Sequence
+						</button>
+					</li>
 
-				<h2
-					className={selected === 'previous' ? styles.selected : ''}
-					onClick={() => setSelected('previous')}
-				>
-					Previous Sequences
-				</h2>
+					<li role='presentation'>
+						<button
+							role='tab'
+							aria-selected={selected === 'previous'}
+							aria-controls='activity-panel'
+							id='tab-previous'
+							className={selected === 'previous' ? styles.selected : ''}
+							onClick={() => setSelected('previous')}
+						>
+							Previous Sequences
+						</button>
+					</li>
 
-				<h2
-					className={selected === 'all' ? styles.selected : ''}
-					onClick={() => setSelected('all')}
-				>
-					All Activities {/* Email History */}
-				</h2>
+					<li role='presentation'>
+						<button
+							role='tab'
+							aria-selected={selected === 'all'}
+							aria-controls='activity-panel'
+							id='tab-all'
+							className={selected === 'all' ? styles.selected : ''}
+							onClick={() => setSelected('all')}
+						>
+							All Activities
+						</button>
+					</li>
 
-				<h2
-					className={selected === 'email' ? styles.selected : ''}
-					onClick={handleClick}
-				>
-					New Email
-				</h2>
-			</div>
-			<div className={styles.content}>
+					<li role='presentation'>
+						<button
+							role='tab'
+							aria-selected={selected === 'email'}
+							aria-controls='activity-panel'
+							id='tab-email'
+							className={selected === 'email' ? styles.selected : ''}
+							onClick={handleClick}
+						>
+							New Email
+						</button>
+					</li>
+				</ul>
+			</nav>
+			<div
+				className={styles.content}
+				id='activity-panel'
+				role='tabpanel'
+				aria-labelledby={`tab-${selected}`}
+			>
 				{activityContent[selected].component}
 			</div>
 		</section>

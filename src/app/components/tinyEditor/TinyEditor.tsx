@@ -15,6 +15,7 @@ const TinyEditor = ({
 	maxLength,
 	initialValue,
 	setEditorContent,
+	editorId = 'tiny-editor',
 }: {
 	height?: number;
 	width?: number;
@@ -22,6 +23,7 @@ const TinyEditor = ({
 	maxLength?: number;
 	initialValue?: string;
 	setEditorContent: (content: string) => void;
+	editorId?: string;
 }) => {
 	const editorRef = useRef<TinyMCEEditor | null>(null);
 
@@ -46,7 +48,7 @@ const TinyEditor = ({
 	return (
 		<div className={styles.editorContainer}>
 			<Editor
-				id='tiny-editor'
+				id={editorId}
 				apiKey='smh31v60fpm15ps7kl66wjz9tj2hiw8z2mha2fk414vegawf'
 				value={value}
 				onInit={(_evt, editor) => {
@@ -90,6 +92,16 @@ const TinyEditor = ({
 					maxlength: 4500,
 				}}
 			/>
+			{maxLength && (
+				<div
+					id={`${editorId}-char-count`}
+					className='sr-only'
+					aria-live='polite'
+					aria-atomic='true'
+				>
+					{value ? `${value.length} of ${maxLength} characters used` : ''}
+				</div>
+			)}
 		</div>
 	);
 };

@@ -15,13 +15,18 @@ import SequenceDefaultsForm from '../../forms/sequenceDefaultSettings/SequenceDe
 const SequenceDefaults = ({ user }: { user: UserToClientFromDB }) => {
 	return (
 		<div className={styles['settings-container']}>
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Default Sequence Settings</h3>
+			<section
+				className={styles.section}
+				aria-labelledby='sequence-defaults-title'
+			>
+				<h3 id='sequence-defaults-title' className={styles['section-title']}>
+					Default Sequence Settings
+				</h3>
 				<p className={styles['section-description']}>
 					Configure default settings for new sequences.{' '}
-					<span className={styles.important}>
+					<strong className={styles.important}>
 						These can be overridden when creating individual sequences.
-					</span>
+					</strong>
 				</p>
 
 				<SequenceDefaultsForm user={user} />

@@ -15,20 +15,20 @@ export default async function Home() {
 	}
 
 	return (
-		<div
+		<main
 			className={styles['home-container']}
 			role='main'
 			aria-label='Login page'
+			aria-labelledby='login-heading'
 		>
 			<div className='main-card-wrapper'>
-				<section
-					className='action-card'
-					aria-labelledby='login-heading'
-					role='region'
-				>
+				<section className='action-card' aria-labelledby='login-heading'>
+					<h1 id='login-heading' className='sr-only'>
+						Login
+					</h1>
 					<Modal backupModalType='auth' />
 				</section>
 			</div>
-		</div>
+		</main>
 	);
 }

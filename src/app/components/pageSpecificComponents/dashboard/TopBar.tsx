@@ -22,12 +22,12 @@ export default function TopBar({ userName }: TopBarProps) {
 				aria-label='Application header'
 			>
 				<div className={styles.topBarContent}>
-					<Link href='/' className={styles.logo} aria-label='Go to homepage'>
-						<h1
-							className={styles.appTitle}
-							id='app-title'
-							aria-label='Repliably - Main application title'
-						>
+					<Link
+						href='/'
+						className={styles.logo}
+						aria-label='Repliably - Go to homepage'
+					>
+						<h1 className={styles.appTitle}>
 							{/* Repl<span>ai</span>All */}
 							Repliably
 						</h1>
@@ -35,17 +35,8 @@ export default function TopBar({ userName }: TopBarProps) {
 							<MailOutlineRounded className={styles.icon} />
 						</div>
 					</Link>
-					<div
-						className={styles.userSection}
-						role='region'
-						aria-label='User account section'
-					>
-						<span
-							className={styles.welcomeText}
-							aria-label={`Welcome message for ${userName}`}
-						>
-							Welcome, {userName}
-						</span>
+					<div className={styles.userSection}>
+						<p className={styles.welcomeText}>Welcome, {userName}</p>
 						<LogoutButton />
 					</div>
 				</div>

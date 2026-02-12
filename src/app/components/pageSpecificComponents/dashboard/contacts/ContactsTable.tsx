@@ -81,90 +81,299 @@ const ContactsTable = ({
 	return (
 		<table
 			className={`${styles['contacts-table']} ${inModal ? styles.inModal : ''}`}
+			role='table'
+			aria-label='Contacts table'
+			aria-rowcount={sortedContacts.length + 1}
 		>
 			<thead>
-				<tr>
+				<tr role='row'>
 					{columns.active && (
-						<th className={styles.sm} onClick={() => handleSort('active')}>
-							<span className={styles.sort}>
-								Active
-								<SwapVert fontSize='small' />
-							</span>
+						<th
+							className={styles.sm}
+							onClick={() => handleSort('active')}
+							role='columnheader'
+							aria-sort={
+								sortBy === 'active' ?
+									sortOrder === 'asc' ?
+										'ascending'
+									:	'descending'
+								:	'none'
+							}
+							scope='col'
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleSort('active');
+								}
+							}}
+						>
+							<button
+								type='button'
+								className={styles.sort}
+								aria-label='Sort by active status'
+							>
+								<span>Active</span>
+								<SwapVert
+									fontSize='small'
+									aria-hidden='true'
+									focusable='false'
+								/>
+							</button>
 						</th>
 					)}
-					<th className={styles.sm} onClick={() => handleSort('firstName')}>
-						<span className={styles.sort}>
-							First
-							<SwapVert fontSize='small' />
-						</span>
+					<th
+						className={styles.sm}
+						onClick={() => handleSort('firstName')}
+						role='columnheader'
+						aria-sort={
+							sortBy === 'firstName' ?
+								sortOrder === 'asc' ?
+									'ascending'
+								:	'descending'
+							:	'none'
+						}
+						scope='col'
+						tabIndex={0}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								handleSort('firstName');
+							}
+						}}
+					>
+						<button
+							type='button'
+							className={styles.sort}
+							aria-label='Sort by first name'
+						>
+							<span>First</span>
+							<SwapVert fontSize='small' aria-hidden='true' focusable='false' />
+						</button>
 					</th>
-					<th className={styles.sm} onClick={() => handleSort('lastName')}>
-						<span className={styles.sort}>
-							Last
-							<SwapVert fontSize='small' />
-						</span>
+					<th
+						className={styles.sm}
+						onClick={() => handleSort('lastName')}
+						role='columnheader'
+						aria-sort={
+							sortBy === 'lastName' ?
+								sortOrder === 'asc' ?
+									'ascending'
+								:	'descending'
+							:	'none'
+						}
+						scope='col'
+						tabIndex={0}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								handleSort('lastName');
+							}
+						}}
+					>
+						<button
+							type='button'
+							className={styles.sort}
+							aria-label='Sort by last name'
+						>
+							<span>Last</span>
+							<SwapVert fontSize='small' aria-hidden='true' focusable='false' />
+						</button>
 					</th>
-					<th className={styles.lrg} onClick={() => handleSort('company')}>
-						<span className={styles.sort}>
-							Company
-							<SwapVert fontSize='small' />
-						</span>
+					<th
+						className={styles.lrg}
+						onClick={() => handleSort('company')}
+						role='columnheader'
+						aria-sort={
+							sortBy === 'company' ?
+								sortOrder === 'asc' ?
+									'ascending'
+								:	'descending'
+							:	'none'
+						}
+						scope='col'
+						tabIndex={0}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								handleSort('company');
+							}
+						}}
+					>
+						<button
+							type='button'
+							className={styles.sort}
+							aria-label='Sort by company'
+						>
+							<span>Company</span>
+							<SwapVert fontSize='small' aria-hidden='true' focusable='false' />
+						</button>
 					</th>
-					<th className={styles.md}>Title</th>
+					<th className={styles.md} role='columnheader' scope='col'>
+						Title
+					</th>
 					{columns.importance && (
-						<th className={styles.sm} onClick={() => handleSort('importance')}>
-							<span className={styles.sort}>
-								Priority <SwapVert fontSize='small' />
-							</span>
+						<th
+							className={styles.sm}
+							onClick={() => handleSort('importance')}
+							role='columnheader'
+							aria-sort={
+								sortBy === 'importance' ?
+									sortOrder === 'asc' ?
+										'ascending'
+									:	'descending'
+								:	'none'
+							}
+							scope='col'
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleSort('importance');
+								}
+							}}
+						>
+							<button
+								type='button'
+								className={styles.sort}
+								aria-label='Sort by priority'
+							>
+								<span>Priority</span>
+								<SwapVert
+									fontSize='small'
+									aria-hidden='true'
+									focusable='false'
+								/>
+							</button>
 						</th>
 					)}
-					{columns.phone && <th className={styles.md}>Phone</th>}
-					<th className={styles.lrg}>Email</th>
-					{columns.linkedIn && <th className={styles.md}>LinkedIn</th>}
-					{columns.verified && <th className={styles.sm}>Email Verified</th>}
+					{columns.phone && (
+						<th className={styles.md} role='columnheader' scope='col'>
+							Phone
+						</th>
+					)}
+					<th className={styles.lrg} role='columnheader' scope='col'>
+						Email
+					</th>
+					{columns.linkedIn && (
+						<th className={styles.md} role='columnheader' scope='col'>
+							LinkedIn
+						</th>
+					)}
+					{columns.verified && (
+						<th className={styles.sm} role='columnheader' scope='col'>
+							Email Verified
+						</th>
+					)}
 					{columns.lastActivity && (
 						<th
 							className={styles.md}
 							onClick={() => handleSort('lastActivity')}
+							role='columnheader'
+							aria-sort={
+								sortBy === 'lastActivity' ?
+									sortOrder === 'asc' ?
+										'ascending'
+									:	'descending'
+								:	'none'
+							}
+							scope='col'
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleSort('lastActivity');
+								}
+							}}
 						>
-							<span className={styles.sort}>
-								Last Contacted <SwapVert fontSize='small' />
-							</span>
+							<button
+								type='button'
+								className={styles.sort}
+								aria-label='Sort by last contacted date'
+							>
+								<span>Last Contacted</span>
+								<SwapVert
+									fontSize='small'
+									aria-hidden='true'
+									focusable='false'
+								/>
+							</button>
 						</th>
 					)}
 					{columns.replied && (
-						<th className={styles.sm} onClick={() => handleSort('replied')}>
-							<span className={styles.sort}>
-								Replied <SwapVert fontSize='small' />
-							</span>
+						<th
+							className={styles.sm}
+							onClick={() => handleSort('replied')}
+							role='columnheader'
+							aria-sort={
+								sortBy === 'replied' ?
+									sortOrder === 'asc' ?
+										'ascending'
+									:	'descending'
+								:	'none'
+							}
+							scope='col'
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleSort('replied');
+								}
+							}}
+						>
+							<button
+								type='button'
+								className={styles.sort}
+								aria-label='Sort by replied'
+							>
+								<span>Replied</span>
+								<SwapVert
+									fontSize='small'
+									aria-hidden='true'
+									focusable='false'
+								/>
+							</button>
 						</th>
 					)}
 					{columns.reasonForEmail && (
-						<th className={styles.lrg}>Reason For Reaching Out:</th>
+						<th className={styles.lrg} role='columnheader' scope='col'>
+							Reason For Reaching Out:
+						</th>
 					)}
 				</tr>
 			</thead>
 			<tbody>
-				{sortedContacts.map((contact) => {
+				{sortedContacts.map((contact, rowIndex) => {
 					return (
 						<tr
 							key={contact.id ?? contact.email}
 							onClick={() => handleClick(contact)}
 							className={contact.validEmail === false ? styles.invalid : ''}
+							role='row'
+							aria-rowindex={rowIndex + 2}
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleClick(contact);
+								}
+							}}
 						>
 							{columns.active && (
-								<td className={styles.sm}>{contact.active ? 'Yes' : 'No'}</td>
+								<td className={styles.sm} role='cell'>
+									{contact.active ? 'Yes' : 'No'}
+								</td>
 							)}
-							<td className={styles.sm}>
+							<td className={styles.sm} role='cell'>
 								{contact.firstName ? contact.firstName : '-'}
 							</td>
-							<td className={styles.sm}>
+							<td className={styles.sm} role='cell'>
 								{contact.lastName ? contact.lastName : '-'}
 							</td>
-							<td className={styles.lrg}>
+							<td className={styles.lrg} role='cell'>
 								{contact.company ? contact.company : '-'}
 							</td>
-							<td className={styles.md}>
+							<td className={styles.md} role='cell'>
 								{contact.title ? contact.title : '-'}
 							</td>
 							{columns.importance && (
@@ -172,6 +381,7 @@ const ContactsTable = ({
 									className={`${styles.sm} ${
 										contact.importance ? styles.right : ''
 									}`}
+									role='cell'
 								>
 									{contact.importance ? contact.importance : '-'}
 								</td>
@@ -181,13 +391,16 @@ const ContactsTable = ({
 									className={`${styles.md} ${
 										contact.phone ? styles.right : ''
 									}`}
+									role='cell'
 								>
 									{contact.phone ? contact.phone : '-'}
 								</td>
 							)}
-							<td className={styles.lrg}>{contact.email}</td>
+							<td className={styles.lrg} role='cell'>
+								{contact.email}
+							</td>
 							{columns.linkedIn && (
-								<td className={styles.md}>
+								<td className={styles.md} role='cell'>
 									{contact.linkedIn ? contact.linkedIn : '-'}
 								</td>
 							)}
@@ -202,6 +415,7 @@ const ContactsTable = ({
 									: ''
 								}
 								`}
+									role='cell'
 								>
 									{contact.validEmail === null ?
 										'-'
@@ -211,19 +425,19 @@ const ContactsTable = ({
 								</td>
 							)}
 							{columns.lastActivity && (
-								<td className={`${styles.md} ${styles.right}`}>
+								<td className={`${styles.md} ${styles.right}`} role='cell'>
 									{contact.lastActivity ?
 										new Date(contact.lastActivity).toLocaleDateString()
 									:	''}
 								</td>
 							)}
 							{columns.replied && (
-								<td className={`${styles.sm} ${styles.right}`}>
+								<td className={`${styles.sm} ${styles.right}`} role='cell'>
 									{contact.replied ? 'Yes' : 'No'}
 								</td>
 							)}
 							{columns.reasonForEmail && (
-								<td className={styles.lrg}>
+								<td className={styles.lrg} role='cell'>
 									{contact.reasonForEmail ? contact.reasonForEmail : '-'}
 								</td>
 							)}

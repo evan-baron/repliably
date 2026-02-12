@@ -118,10 +118,13 @@ export default function ContactDetailsClient({
 
 	return (
 		<>
-			<section className={styles['header-section']}>
+			<section
+				className={styles['header-section']}
+				aria-labelledby='contact-name'
+			>
 				<div className={styles['details-wrapper']}>
 					<div className={styles['header-details']}>
-						<h1 className={styles.name}>
+						<h1 id='contact-name' className={styles.name}>
 							{contact.firstName ? contact.firstName : 'Name Needed'}{' '}
 							{contact.lastName ? contact.lastName : ''}
 						</h1>
@@ -131,49 +134,43 @@ export default function ContactDetailsClient({
 
 					<div className={styles['contact-details']}>
 						{(contact.company || contact.title || contact.importance) && (
-							<div className={styles['company-info']}>
+							<dl className={styles['company-info']}>
 								{contact.company && (
 									<div className={styles['info-row']}>
-										<span>Company:</span>
-										<span
-											className={styles.value}
-											style={{ fontWeight: '600' }}
-										>
+										<dt>Company:</dt>
+										<dd className={styles.value} style={{ fontWeight: '600' }}>
 											{contact?.company || 'N/A'}
-										</span>
+										</dd>
 									</div>
 								)}
 								{contact.title && (
 									<div className={styles['info-row']}>
-										<span>Title:</span>
-										<span
-											className={styles.value}
-											style={{ fontWeight: '600' }}
-										>
+										<dt>Title:</dt>
+										<dd className={styles.value} style={{ fontWeight: '600' }}>
 											{contact?.title || 'N/A'}
-										</span>
+										</dd>
 									</div>
 								)}
 								{contact.importance && (
 									<div className={styles['info-row']}>
-										<span>Priority:</span>
-										<span style={{ fontWeight: '600' }}>
+										<dt>Priority:</dt>
+										<dd style={{ fontWeight: '600' }}>
 											{contact?.importance ?
 												importance[contact.importance]
 											:	'N/A'}
-										</span>
+										</dd>
 									</div>
 								)}
-							</div>
+							</dl>
 						)}
-						<div className={styles['personal-info']}>
+						<dl className={styles['personal-info']}>
 							<div
 								className={`${styles['info-row']} ${contact?.validEmail === false ? styles.invalid : ''}`}
 							>
-								<span className={styles.label}>
+								<dt className={styles.label}>
 									<MailOutline className={styles.icon} />
-								</span>
-								<span className={styles.value}>{contact?.email || 'N/A'}</span>
+								</dt>
+								<dd className={styles.value}>{contact?.email || 'N/A'}</dd>
 								{contact.validEmail !== null &&
 									(contact.validEmail ?
 										<Check
@@ -189,48 +186,48 @@ export default function ContactDetailsClient({
 							</div>
 							{contact.phone && (
 								<div className={styles['info-row']}>
-									<span className={styles.label}>
+									<dt className={styles.label}>
 										<Phone className={styles.icon} />
-									</span>
-									<span className={styles.value}>
-										{contact?.phone || 'N/A'}
-									</span>
+									</dt>
+									<dd className={styles.value}>{contact?.phone || 'N/A'}</dd>
 								</div>
 							)}
 							{contact?.linkedIn && (
 								<div className={styles['info-row']}>
-									<span className={styles.label}>
+									<dt className={styles.label}>
 										<LinkedIn className={styles.icon} />
-									</span>
-									<a
-										href={contact?.linkedIn || ''}
-										className={styles.value}
-										target='_blank'
-										rel='noopener noreferrer'
-									>
-										{contact?.linkedIn || 'N/A'}
-									</a>
+									</dt>
+									<dd className={styles.value}>
+										<a
+											href={contact?.linkedIn || ''}
+											className={styles.value}
+											target='_blank'
+											rel='noopener noreferrer'
+										>
+											{contact?.linkedIn || 'N/A'}
+										</a>
+									</dd>
 								</div>
 							)}
-						</div>
+						</dl>
 					</div>
 
-					<div className={styles['application-details']}>
+					<dl className={styles['application-details']}>
 						{contact.reasonForEmail && (
 							<div className={styles['info-row']}>
-								<span className={styles.label}>Reason for Contacting:</span>
-								<span className={styles.value} style={{ fontWeight: '600' }}>
+								<dt className={styles.label}>Reason for Contacting:</dt>
+								<dd className={styles.value} style={{ fontWeight: '600' }}>
 									{contact?.reasonForEmail || 'N/A'}
-								</span>
+								</dd>
 							</div>
 						)}
 						<div className={styles['info-row']}>
-							<span className={styles.label}>Active Sequence:</span>
-							<span className={styles.value} style={{ fontWeight: '600' }}>
+							<dt className={styles.label}>Active Sequence:</dt>
+							<dd className={styles.value} style={{ fontWeight: '600' }}>
 								{contact?.active ? 'Yes' : 'No'}
-							</span>
+							</dd>
 						</div>
-					</div>
+					</dl>
 				</div>
 			</section>
 			<ContactActivities

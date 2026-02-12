@@ -89,17 +89,9 @@ export default function SideBar({
 	};
 
 	return (
-		<aside
-			className={styles.sideBar}
-			aria-label='Main navigation'
-			role='complementary'
-		>
-			<nav
-				className={styles.navigation}
-				aria-label='Dashboard navigation menu'
-				role='navigation'
-			>
-				<ul className={styles.navList} role='list'>
+		<aside className={styles.sideBar} aria-label='Main navigation'>
+			<nav className={styles.navigation}>
+				<ul className={styles.navList}>
 					{navigationItems.map((item, index) => (
 						<NavigationItem
 							key={index}

@@ -12,14 +12,10 @@ const PageTemplate = async ({
 }) => {
 	return (
 		<div className={styles['page-wrapper']}>
-			<section className={styles['header-section']}>
-				<h1 className={styles.welcomeTitle} id='contacts-title'>
-					{title}
-				</h1>
-				<p className={styles.welcomeSubtitle} aria-describedby='contacts-title'>
-					{description}
-				</p>
-			</section>
+			<header className={styles['header-section']}>
+				<h1 className={styles.welcomeTitle}>{title}</h1>
+				<p className={styles.welcomeSubtitle}>{description}</p>
+			</header>
 			<section className={styles['page-content']}>{children}</section>
 		</div>
 	);

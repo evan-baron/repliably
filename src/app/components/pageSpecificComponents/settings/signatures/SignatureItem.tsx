@@ -34,42 +34,66 @@ const SignatureItem = ({
 	handleDeleteSignature: (id: number) => void;
 }) => {
 	return (
-		<div className={styles['signature-item']}>
+		<li
+			className={styles['signature-item']}
+			aria-labelledby={`signature-${id}-name`}
+		>
 			<div className={styles['signature-info']}>
 				<div className={styles.name}>
-					{isDefault && <span className={styles.default}>Default</span>}
-					<h4>{name}</h4>
+					{isDefault && (
+						<span className={styles.default} aria-label='Default signature'>
+							Default
+						</span>
+					)}
+					<h4 id={`signature-${id}-name`}>{name}</h4>
 				</div>
 
-				<pre className={styles.preview}>
+				<pre
+					className={styles.preview}
+					aria-label={`Signature preview for ${name}`}
+				>
 					{parsedSignature.map((line, index) => (
 						<span key={`parse-${index}`}>{line || '\u00A0'}</span>
 					))}
 				</pre>
 			</div>
-			<div className={styles['signature-actions']}>
+			<div
+				className={styles['signature-actions']}
+				role='group'
+				aria-label={`Actions for ${name} signature`}
+			>
 				<button
+					type='button'
 					className={styles['mini-button']}
 					onClick={() => handleEdit(id)}
+					aria-label={`Edit ${name} signature`}
 				>
 					Edit
 				</button>
 
 				<button
+					type='button'
 					className={`${styles['mini-button']} ${styles['default-button']}`}
 					onClick={() => handleChangeDefault(id, !isDefault)}
+					aria-label={
+						isDefault ?
+							`Remove ${name} as default signature`
+						:	`Set ${name} as default signature`
+					}
 				>
 					{!isDefault ? 'Set Default' : 'Remove Default'}
 				</button>
 
 				<button
+					type='button'
 					className={styles['mini-button']}
 					onClick={() => handleDeleteSignature(id)}
+					aria-label={`Delete ${name} signature`}
 				>
 					Delete
 				</button>
 			</div>
-		</div>
+		</li>
 	);
 };
 

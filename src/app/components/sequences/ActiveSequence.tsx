@@ -21,47 +21,67 @@ const ActiveSequence = ({ sequence }: { sequence: SequenceFromDB }) => {
 		:	'N/A';
 
 	return (
-		<div className={styles['active-sequence-table']}>
-			<div className={styles['header-details']}>
+		<article
+			className={styles['active-sequence-table']}
+			aria-labelledby={`sequence-${sequence.id}-title`}
+		>
+			<header className={styles['header-details']}>
 				<div className={styles['sequence-info']}>
-					<div className={styles.title}>
+					<h3 id={`sequence-${sequence.id}-title`} className={styles.title}>
 						<span className={styles.label}>Name:</span>
 						<span className={styles.value}>{sequence.title}</span>
-					</div>
+					</h3>
 					<div className={styles.title}>
 						<span className={styles.label}>Sequence Type:</span>
 						<span className={styles.value}>
 							{sequenceType(
 								sequence.sequenceType,
-								new Date(sequence.createdAt)
+								new Date(sequence.createdAt),
 							)}
 						</span>
 					</div>
 					<div className={styles.title}>
 						<span className={styles.label}>Next Step Due:</span>
-						<span className={styles.value}>{nextStepDue}</span>
+						<span className={styles.value}>
+							{nextStepDue === 'N/A' ?
+								nextStepDue
+							:	<time dateTime={new Date(sequence.nextStepDue!).toISOString()}>
+									{nextStepDue}
+								</time>
+							}
+						</span>
 					</div>
 				</div>
 				<div className={styles['dates-info']}>
-					<div className={styles['info-row']}>
-						<span className={styles.label}>Start Date:</span>
-						<span className={styles.value}>{startDate}</span>
-					</div>
-
-					{endDate && (
+					<dl className={styles['info-list']}>
 						<div className={styles['info-row']}>
-							<span className={styles.label}>End Date:</span>
-							<span className={styles.value}>{endDate}</span>
+							<dt className={styles.label}>Start Date:</dt>
+							<dd className={styles.value}>
+								<time dateTime={new Date(sequence.createdAt).toISOString()}>
+									{startDate}
+								</time>
+							</dd>
 						</div>
-					)}
+
+						{endDate && (
+							<div className={styles['info-row']}>
+								<dt className={styles.label}>End Date:</dt>
+								<dd className={styles.value}>
+									<time dateTime={new Date(sequence.endDate!).toISOString()}>
+										{endDate}
+									</time>
+								</dd>
+							</div>
+						)}
+					</dl>
 					<DeactivateSequenceButton sequenceId={sequence.id} />
 				</div>
-			</div>
+			</header>
 
 			<div className={styles['sequence-details']}>
 				<ActiveSequenceTable sequence={sequence} />
 			</div>
-		</div>
+		</article>
 	);
 };
 

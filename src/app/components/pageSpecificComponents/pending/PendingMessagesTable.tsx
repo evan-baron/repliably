@@ -116,32 +116,65 @@ const PendingMessagesTable = ({
 
 	if (!messages.length) {
 		return (
-			<div className={styles.activity}>
+			<div className={styles.activity} role='status'>
 				<p>No pending emails</p>
 			</div>
 		);
 	}
 
 	return (
-		<table className={styles.table}>
+		<table
+			className={styles.table}
+			role='table'
+			aria-label='Pending messages table'
+			aria-rowcount={sortedMessages.length + 1}
+		>
 			<thead className={styles.tableHeader}>
-				<tr>
-					<th className={styles.md}>Contact Name</th>
-					<th className={styles.lrg}>Email</th>
-					<th className={styles.sm}>Status</th>
-					<th className={styles.sm} onClick={() => handleSort()}>
-						<span className={styles.sort}>
-							Scheduled Date
-							<SwapVert fontSize='small' />
-						</span>
+				<tr role='row'>
+					<th className={styles.md} role='columnheader' scope='col'>
+						Contact Name
 					</th>
-					<th colSpan={2} className={`${styles.sm} ${styles.center}`}>
+					<th className={styles.lrg} role='columnheader' scope='col'>
+						Email
+					</th>
+					<th className={styles.sm} role='columnheader' scope='col'>
+						Status
+					</th>
+					<th
+						className={styles.sm}
+						onClick={() => handleSort()}
+						role='columnheader'
+						aria-sort={sortOrder === 'asc' ? 'ascending' : 'descending'}
+						scope='col'
+						tabIndex={0}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								handleSort();
+							}
+						}}
+					>
+						<button
+							type='button'
+							className={styles.sort}
+							aria-label='Sort by scheduled date'
+						>
+							<span>Scheduled Date</span>
+							<SwapVert fontSize='small' aria-hidden='true' focusable='false' />
+						</button>
+					</th>
+					<th
+						colSpan={2}
+						className={`${styles.sm} ${styles.center}`}
+						role='columnheader'
+						scope='col'
+					>
 						Actions
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				{sortedMessages.map((message) => {
+				{sortedMessages.map((message, rowIndex) => {
 					const messageDateDay =
 						message.scheduledAt && new Date(message.scheduledAt);
 					const passedScheduledAt =
@@ -170,9 +203,24 @@ const PendingMessagesTable = ({
 							className={`${nested ? styles.nested : ''} ${
 								selectedMessage === message.id ? styles.selectedMessage : ''
 							} ${isEditing ? styles.editing : ''}`}
+							role='row'
+							aria-rowindex={rowIndex + 2}
+							aria-expanded={selectedMessage === message.id}
+							tabIndex={0}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleClick(message.id);
+								}
+							}}
 						>
-							<td className={styles.md}>{contactName}</td>
-							<td className={`${styles.lrg} ${styles['content-cell']}`}>
+							<td className={styles.md} role='cell'>
+								{contactName}
+							</td>
+							<td
+								className={`${styles.lrg} ${styles['content-cell']}`}
+								role='cell'
+							>
 								{isEditing && selectedMessage === message.id ?
 									<div className={styles['rte-wrapper']}>
 										{/* Subject Field */}
@@ -184,6 +232,7 @@ const PendingMessagesTable = ({
 													id='subject'
 													defaultValue={message.subject}
 													onChange={(e) => handleChange(e)}
+													aria-label={`Edit subject for message to ${contactName}`}
 												/>
 											</div>
 										</div>
@@ -193,17 +242,30 @@ const PendingMessagesTable = ({
 											height={300}
 											initialValue={message.contents}
 											setEditorContent={setEditorContent}
+											editorId={`edit-message-${message.id}-editor`}
+											aria-label={`Edit content for message to ${contactName}`}
 										/>
 										<div className={styles.buttons}>
 											<button
+												type='button'
 												className={styles.button}
 												onClick={handleSaveAndApprove}
+												aria-label={
+													messageNeedsApproval ?
+														`Save and approve message to ${contactName}`
+													:	`Save changes to message for ${contactName}`
+												}
 											>
 												{messageNeedsApproval ?
 													'Save and Approve'
 												:	'Save Changes'}
 											</button>
-											<button className={styles.button} onClick={handleCancel}>
+											<button
+												type='button'
+												className={styles.button}
+												onClick={handleCancel}
+												aria-label={`Cancel editing message for ${contactName}`}
+											>
 												Cancel
 											</button>
 										</div>
@@ -234,6 +296,7 @@ const PendingMessagesTable = ({
 									: message.status === 'scheduled' ? styles.approved
 									: ''
 								}`}
+								role='cell'
 							>
 								{messageStatus}
 							</td>
@@ -241,8 +304,11 @@ const PendingMessagesTable = ({
 								className={`${styles.sm} ${styles.right} ${
 									passedScheduledAt ? styles.important : ''
 								}`}
+								role='cell'
 							>
-								{messageDateDay!.toLocaleDateString()}
+								<time dateTime={messageDateDay!.toISOString()}>
+									{messageDateDay!.toLocaleDateString()}
+								</time>
 							</td>
 							<td
 								colSpan={2}
@@ -257,24 +323,31 @@ const PendingMessagesTable = ({
 											'.25rem'
 										:	'0',
 								}}
+								role='cell'
 							>
 								<div className={styles.buttons}>
 									<button
+										type='button'
 										className={`${styles.action} ${
 											isEditing ? styles.disabled : ''
 										}`}
 										onClick={(e) => handleEdit(e, message.id)}
 										disabled={isEditing}
+										aria-disabled={isEditing}
+										aria-label={`Edit message to ${contactName}`}
 									>
 										<Edit className={styles.icon} />
 										Edit
 									</button>
 									<button
+										type='button'
 										className={`${styles.action} ${
 											isEditing || !messageNeedsApproval ? styles.disabled : ''
 										}`}
 										disabled={isEditing || !messageNeedsApproval}
+										aria-disabled={isEditing || !messageNeedsApproval}
 										onClick={() => handleApprove(message.id)}
+										aria-label={`Approve message to ${contactName}`}
 									>
 										Approve
 									</button>

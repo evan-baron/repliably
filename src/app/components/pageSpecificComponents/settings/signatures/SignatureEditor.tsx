@@ -43,7 +43,12 @@ const SignatureEditor = ({
 						value={name}
 						onChange={handleChange}
 						maxLength={50}
+						aria-required='true'
+						aria-describedby='signatureName-help'
 					/>
+					<span id='signatureName-help' className='sr-only'>
+						Maximum 50 characters
+					</span>
 				</div>
 				<TinyEditor
 					height={200}
@@ -52,13 +57,26 @@ const SignatureEditor = ({
 					maxLength={500}
 					initialValue={initialValue ?? ''}
 					setEditorContent={setEditorContent}
+					editorId='signature-editor'
+					aria-label='Signature content editor'
 				/>
 			</div>
 			<div className={styles['new-signature-actions']}>
-				<button className={'button signature-save'} onClick={handleSave}>
+				<button
+					type='button'
+					className={'button signature-save'}
+					onClick={handleSave}
+					aria-label={
+						initialValue ? 'Save signature changes' : 'Save new signature'
+					}
+				>
 					Save Signature
 				</button>
-				<button className={'button settings-button'} onClick={handleCancel}>
+				<button
+					type='button'
+					className={'button settings-button'}
+					onClick={handleCancel}
+				>
 					Cancel
 				</button>
 			</div>

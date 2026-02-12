@@ -25,12 +25,20 @@ const PreviewTile = ({
 	href,
 }: PreviewTileProps) => {
 	return (
-		<div className={styles.tileWrapper}>
+		<article
+			className={styles.tileWrapper}
+			aria-labelledby={`${title.toLowerCase().replace(/\s+/g, '-')}-title`}
+		>
 			<Link href={href || '/dashboard'} className={styles.tileHeader}>
-				<h2 className={styles.tileTitle}>{title}</h2>
+				<h2
+					id={`${title.toLowerCase().replace(/\s+/g, '-')}-title`}
+					className={styles.tileTitle}
+				>
+					{title}
+				</h2>
 			</Link>
-			{children}
-		</div>
+			<div className={styles.tileContent}>{children}</div>
+		</article>
 	);
 };
 

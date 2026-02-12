@@ -74,36 +74,24 @@ const SequencesClient = ({
 			<DeactivateAllSequencesButton />
 
 			<div className={styles.content}>
-				<nav className={styles.nav}>
-					<h2
-						role='button'
+				<nav className={styles.nav} aria-label='Sequence tabs'>
+					<button
+						type='button'
 						className={selected === 'active' ? styles.selected : ''}
 						onClick={() => setSelected('active')}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								setSelected('active');
-							}
-						}}
-						aria-pressed={selected === 'active'}
+						aria-current={selected === 'active' ? 'page' : undefined}
 					>
 						Active Sequences
-					</h2>
+					</button>
 
-					<h2
-						role='button'
+					<button
+						type='button'
 						className={selected === 'previous' ? styles.selected : ''}
 						onClick={() => setSelected('previous')}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								setSelected('previous');
-							}
-						}}
-						aria-pressed={selected === 'previous'}
+						aria-current={selected === 'previous' ? 'page' : undefined}
 					>
 						Previous Sequences
-					</h2>
+					</button>
 				</nav>
 				{sequenceContent[selected].component}
 			</div>

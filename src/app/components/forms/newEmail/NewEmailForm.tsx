@@ -291,7 +291,12 @@ const NewEmailForm = ({
 							<TinyEditor
 								initialValue={initialEditorContent ? initialEditorContent : ''}
 								setEditorContent={setEditorContent}
+								editorId={'new-email-editor'}
+								aria-describedby='editor-help'
 							/>
+							<span id='editor-help' className='sr-only'>
+								Compose the body of your email using the rich text editor
+							</span>
 						</div>
 					</section>
 

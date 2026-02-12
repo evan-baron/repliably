@@ -43,7 +43,7 @@ export default function ContactsClient({
 	};
 
 	return (
-		<div className={styles.client}>
+		<div className={styles.client} role='group' aria-label='Contact actions'>
 			<div className={styles['client-actions']}>
 				<SearchBar
 					placeholder='Search contacts...'

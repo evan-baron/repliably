@@ -8,15 +8,10 @@ import PreviewTile from '../components/pageSpecificComponents/dashboard/previewT
 
 const Dashboard = () => {
 	return (
-		<div
-			className={styles.dashboardHome}
-			role='region'
-			aria-labelledby='dashboard-title'
-		>
+		<div className={styles.dashboardHome} aria-labelledby='dashboard-title'>
 			<section
 				className={styles.welcomeSection}
 				aria-labelledby='dashboard-title'
-				role='region'
 			>
 				<h1 className={styles.welcomeTitle} id='dashboard-title'>
 					Dashboard Overview
@@ -47,7 +42,6 @@ const Dashboard = () => {
 			<section
 				className={styles.recentActivity}
 				aria-labelledby='recent-activity-title'
-				role='region'
 			>
 				<h2 className={styles.sectionTitle} id='recent-activity-title'>
 					Recent Activity

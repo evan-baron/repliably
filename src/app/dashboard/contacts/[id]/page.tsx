@@ -52,6 +52,9 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
 	const { emailConnectionActive } = user;
 
+	const contactName =
+		`${contact.firstName || ''} ${contact.lastName || ''}`.trim() || 'Contact';
+
 	return (
 		<div className={styles['page-wrapper']}>
 			<ContactDetailsClient
@@ -64,9 +67,9 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 			<Link
 				href='/dashboard/contacts'
 				className={styles['close-button']}
-				aria-label='Close contact'
+				aria-label={`Close ${contactName} details and return to contacts`}
 			>
-				<Close className={styles.icon} />
+				<Close className={styles.icon} aria-hidden='true' />
 			</Link>
 		</div>
 	);

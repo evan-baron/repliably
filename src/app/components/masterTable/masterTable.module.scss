@@ -31,6 +31,7 @@
 				font-weight: 600;
 
 				.sort {
+					width: 100%;
 					display: flex;
 					align-items: center;
 					justify-content: space-between;
@@ -40,6 +41,8 @@
 					margin: 0;
 					padding: 0;
 					font: inherit;
+					font-weight: inherit;
+					color: inherit;
 					cursor: pointer;
 				}
 

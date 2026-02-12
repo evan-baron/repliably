@@ -15,8 +15,8 @@ import NotificationsForm from '../../forms/notificationsSettings/NotificationsFo
 const NotificationSettings = ({ user }: { user: UserToClientFromDB }) => {
 	return (
 		<div className={styles['settings-container']}>
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>
+			<section className={styles.section} aria-labelledby='notifications-title'>
+				<h3 id='notifications-title' className={styles['section-title']}>
 					Email Notifications (Coming soon!)
 				</h3>
 				<p

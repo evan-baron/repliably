@@ -60,15 +60,23 @@ const SearchBar = ({
 	};
 
 	return (
-		<div className={`${styles['searchbar-wrapper']} ${className}`}>
+		<div
+			className={`${styles['searchbar-wrapper']} ${className}`}
+			role='search'
+		>
 			<div className={styles['search-container']}>
+				<label htmlFor='search-input' className='sr-only'>
+					{placeholder}
+				</label>
 				<input
-					type='text'
+					type='search'
+					id='search-input'
 					value={currentValue}
 					onChange={handleInputChange}
 					onKeyDown={handleKeyDown}
 					placeholder={placeholder}
 					disabled={disabled}
+					aria-disabled={disabled}
 					className={styles['search-input']}
 				/>
 				{showSearchButton && (
@@ -76,9 +84,11 @@ const SearchBar = ({
 						type='button'
 						onClick={handleSearch}
 						disabled={disabled}
+						aria-disabled={disabled}
+						aria-label='Search'
 						className={styles['search-button']}
 					>
-						<Search />
+						<Search aria-hidden='true' />
 					</button>
 				)}
 			</div>

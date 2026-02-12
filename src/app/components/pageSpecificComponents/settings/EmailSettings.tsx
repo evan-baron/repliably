@@ -190,8 +190,10 @@ const EmailSettings = ({
 
 	return (
 		<div className={styles['settings-container']}>
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Email Signatures</h3>
+			<section className={styles.section} aria-labelledby='signatures-title'>
+				<h3 id='signatures-title' className={styles['section-title']}>
+					Email Signatures
+				</h3>
 				<p className={styles['section-description']}>
 					Manage your email signatures.{' '}
 					<span className={styles.important}>
@@ -221,7 +223,11 @@ const EmailSettings = ({
 					</div>
 				)}
 				{user.signatures?.length > 0 && (
-					<div className={styles['signature-list']}>
+					<ul
+						className={styles['signature-list']}
+						role='list'
+						aria-label='Your saved signatures'
+					>
 						{user.signatures.map((signature, index) => {
 							const parsedSignature = parseEmailContent(
 								parseTinyMceContent(signature.content),
@@ -248,11 +254,12 @@ const EmailSettings = ({
 										handleDeleteSignature={handleDeleteSignature}
 									/>;
 						})}
-					</div>
+					</ul>
 				)}
 
 				{!addingNewSignature && (
 					<button
+						type='button'
 						className={'button settings-button'}
 						onClick={handleAddSignature}
 					>
@@ -261,13 +268,21 @@ const EmailSettings = ({
 				)}
 			</section>
 
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>Email Templates</h3>
+			<section className={styles.section} aria-labelledby='templates-title'>
+				<h3 id='templates-title' className={styles['section-title']}>
+					Email Templates
+				</h3>
 				<p className={styles['section-description']}>Coming soon!</p>
 			</section>
 
-			<section className={styles.section} id='email-connection'>
-				<h3 className={styles['section-title']}>Email Integration</h3>
+			<section
+				className={styles.section}
+				id='email-connection'
+				aria-labelledby='integration-title'
+			>
+				<h3 id='integration-title' className={styles['section-title']}>
+					Email Integration
+				</h3>
 				<p className={styles['section-description']}>
 					Manage your email account connection.{' '}
 					<small>
@@ -279,22 +294,32 @@ const EmailSettings = ({
 				<div className={styles.options}>
 					<div className={styles.item}>
 						<div className={styles.info}>
-							<h4>Connection Status</h4>
-							<p>
+							<h4 id='connection-status-title'>Connection Status</h4>
+							<p aria-labelledby='connection-status-title'>
 								<span
 									className={`${styles['status-dot']} ${user.emailConnectionActive ? styles.active : styles.inactive}`}
+									role='img'
+									aria-label={
+										user.emailConnectionActive ? 'Connected' : 'Not connected'
+									}
 								/>
 								{user.emailConnectionActive ?
 									'Connected to Gmail'
 								:	'Not connected'}
 							</p>
-							<small>
-								{user.emailConnectedAt ?
-									`Last synced: ${new Date(user.emailConnectedAt).toLocaleString()}`
-								:	''}
-							</small>
+							{user.emailConnectedAt && (
+								<small>
+									Last synced:{' '}
+									<time
+										dateTime={new Date(user.emailConnectedAt).toISOString()}
+									>
+										{new Date(user.emailConnectedAt).toLocaleString()}
+									</time>
+								</small>
+							)}
 						</div>
 						<button
+							type='button'
 							className={'button settings-button'}
 							onClick={
 								user.emailConnectionActive ?
@@ -302,9 +327,17 @@ const EmailSettings = ({
 								:	handleConnectEmail
 							}
 							disabled={isConnecting}
+							aria-disabled={isConnecting || isDisconnecting}
+							aria-label={
+								user.emailConnectionActive ?
+									'Disconnect Gmail account'
+								:	'Connect Gmail account'
+							}
 						>
 							{isConnecting ?
 								'Connecting...'
+							: isDisconnecting ?
+								'Disconnecting...'
 							: user.emailConnectionActive ?
 								'Disconnect'
 							:	'Connect'}
@@ -313,8 +346,8 @@ const EmailSettings = ({
 				</div>
 			</section>
 
-			<section className={styles.section}>
-				<h3 className={styles['section-title']}>
+			<section className={styles.section} aria-labelledby='preferences-title'>
+				<h3 id='preferences-title' className={styles['section-title']}>
 					Sending Preferences (Coming soon!)
 				</h3>
 				<SendingPreferencesForm user={user} />
