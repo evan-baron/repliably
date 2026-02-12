@@ -123,6 +123,18 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang='en'>
+			<head>
+				<meta
+					name='google-site-verification'
+					content='blZZaTve9mPeKsgVj96k--eIypYf76168hGT4mz5Hk4'
+				/>
+				<script
+					type='application/ld+json'
+					dangerouslySetInnerHTML={{
+						__html: JSON.stringify(structuredData),
+					}}
+				/>
+			</head>
 			<body>
 				<AppProviders>
 					<div id='root' role='application'>
