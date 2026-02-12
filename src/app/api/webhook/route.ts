@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { prisma } from '@/lib/prisma';
+import { getApiUser } from '@/services/getUserService';
+import { decrypt } from '@/lib/encryption';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
@@ -14,7 +16,7 @@ export async function POST(req: NextRequest) {
 
 		// Decode the Pub/Sub message
 		const message = JSON.parse(
-			Buffer.from(body.message.data, 'base64').toString()
+			Buffer.from(body.message.data, 'base64').toString(),
 		);
 
 		console.log('Decoded message:', message);
@@ -30,12 +32,26 @@ export async function POST(req: NextRequest) {
 }
 
 async function checkForNewEmails(historyId: string) {
+	const { user, error: authError } = await getApiUser();
+	if (authError || !user) {
+		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+	}
+
+	if (!user.emailConnectionActive || !user.gmailRefreshToken) {
+		throw new Error(
+			'Gmail account not connected. Please connect your Gmail account in settings.',
+		);
+	}
+
+	// Decrypt the refresh token
+	const refreshToken = decrypt(user.gmailRefreshToken);
+
 	const oAuth2Client = new google.auth.OAuth2(
 		CLIENT_ID,
 		CLIENT_SECRET,
-		REDIRECT_URI
+		REDIRECT_URI,
 	);
-	oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+	oAuth2Client.setCredentials({ refresh_token: refreshToken });
 	const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
 	try {
@@ -106,7 +122,7 @@ async function processMessage(gmail: any, messageId: string) {
 			// Validate that the reply is from the same contact we sent to
 			if (senderEmail !== sentMessage.contact.email) {
 				console.log(
-					'Reply from different email than original contact, skipping'
+					'Reply from different email than original contact, skipping',
 				);
 				return;
 			}
@@ -118,7 +134,7 @@ async function processMessage(gmail: any, messageId: string) {
 			let bodyContent = '';
 			if (message.data.payload.parts) {
 				const textPart = message.data.payload.parts.find(
-					(part: any) => part.mimeType === 'text/plain'
+					(part: any) => part.mimeType === 'text/plain',
 				);
 				if (textPart?.body?.data) {
 					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
@@ -126,7 +142,7 @@ async function processMessage(gmail: any, messageId: string) {
 			} else if (message.data.payload.body?.data) {
 				bodyContent = Buffer.from(
 					message.data.payload.body.data,
-					'base64'
+					'base64',
 				).toString();
 			}
 
@@ -163,7 +179,7 @@ async function processMessage(gmail: any, messageId: string) {
 				'Reply processed from:',
 				senderEmail,
 				'for contact:',
-				sentMessage.contact.email
+				sentMessage.contact.email,
 			);
 		}
 	} catch (error) {
