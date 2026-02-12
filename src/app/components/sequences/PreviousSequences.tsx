@@ -158,7 +158,9 @@ const PreviousSequences = ({
 						[
 							{
 								value:
-									sequence.contact.firstName + ' ' + sequence.contact.lastName,
+									sequence.contact.firstName && sequence.contact.lastName ?
+										sequence.contact.firstName + ' ' + sequence.contact.lastName
+									:	'Unknown Contact',
 								size: contactColumnHeaders[0].size,
 								cellStyling: 'link' as CellStyling,
 								isLink: true,

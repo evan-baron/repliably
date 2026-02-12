@@ -20,8 +20,8 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 		{ label: 'Contact', size: 'sm', sortable: true },
 		{ label: 'Sequence Name', size: 'md' },
 		{ label: 'Sequence Type', size: 'sm' },
-		{ label: 'Duration (Days)', size: 'sm' },
-		{ label: 'Messages Sent', size: 'sm' },
+		{ label: 'Duration (Days)', size: 'sm', sortable: true },
+		{ label: 'Messages Sent', size: 'sm', sortable: true },
 		{ label: 'Start Date', size: 'sm', sortable: true },
 		{ label: 'End Date', size: 'sm', sortable: true },
 		{ label: 'Replied', size: 'sm', sortable: true },
@@ -107,9 +107,17 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 					(message) => message.status === 'sent',
 				).length;
 
+				const contactName =
+					sequence.contact.firstName && sequence.contact.lastName ?
+						sequence.contact.firstName + ' ' + sequence.contact.lastName
+					:	'Unknown Contact';
+
+				console.log('Sequence:', sequence);
+				console.log('Contact Name:', contactName);
+
 				const cellData = [
 					{
-						value: sequence.contact.firstName + ' ' + sequence.contact.lastName,
+						value: contactName,
 						size: columnHeaders[0].size,
 						cellStyling: 'link' as CellStyling,
 						isLink: true,
