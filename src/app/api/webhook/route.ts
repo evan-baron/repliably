@@ -43,15 +43,15 @@ export async function POST(req: NextRequest) {
 		);
 		console.log('Decoded message:', message);
 
-		const { emailAddress, historyId } = message;
+		const { emailAddress } = message;
 
 		// Find user by email address
 		const user = await prisma.user.findUnique({
 			where: { email: emailAddress },
-			select: { id: true, gmailRefreshToken: true },
+			select: { id: true, gmailRefreshToken: true, gmailHistoryId: true },
 		});
 
-		const { id, gmailRefreshToken } = user || {};
+		const { id, gmailRefreshToken, gmailHistoryId } = user || {};
 
 		if (!id) {
 			console.error('No user found for email:', emailAddress);
@@ -66,8 +66,16 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		if (!gmailHistoryId) {
+			console.error('User does not have a Gmail history ID:', emailAddress);
+			return NextResponse.json(
+				{ error: 'Gmail history ID not found' },
+				{ status: 404 },
+			);
+		}
+
 		// Check for new emails
-		await checkForNewEmails(historyId, gmailRefreshToken);
+		await checkForNewEmails(gmailHistoryId, gmailRefreshToken);
 
 		return NextResponse.json({ success: true });
 	} catch (error: any) {
