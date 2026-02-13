@@ -159,6 +159,16 @@ export const userAPI = {
 		apiCall(`/api/user/settings/emailSettings/signature/${signatureId}`, {
 			method: 'DELETE',
 		}),
+	setupWatchNotifications: () =>
+		apiCall('/api/setupGmailNotifications', {
+			method: 'POST',
+			body: JSON.stringify({}),
+		}),
+	stopWatchNotifications: () =>
+		apiCall('/api/auth/google/stop', {
+			method: 'POST',
+			body: JSON.stringify({}),
+		}),
 };
 
 // Waitlist API functions

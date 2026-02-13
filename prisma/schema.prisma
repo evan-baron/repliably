@@ -37,6 +37,9 @@ model User {
   emailConnectionActive        Boolean          @default(false)
   emailTokenExpiresAt          DateTime?
   gmailRefreshToken            String?
+  gmailWatchAllowed            Boolean          @default(true)
+  gmailWatchExpiration         DateTime?
+  gmailHistoryId               String?
   contacts                     Contact[]
   emailReplies                 EmailReply[]
   messages                     Message[]

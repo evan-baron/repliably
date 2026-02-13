@@ -1,11 +1,11 @@
 import { google } from 'googleapis';
 import { getApiUser } from '@/services/getUserService';
 import { decrypt } from '@/lib/encryption';
+import { prisma } from '@/lib/prisma';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT_ID!;
 
 export async function setupGmailNotifications() {
@@ -41,8 +41,18 @@ export async function setupGmailNotifications() {
 			},
 		});
 
-		console.log('Gmail notifications setup:', result.data);
-		return result.data;
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				gmailWatchExpiration:
+					result.data.expiration ?
+						new Date(Number(result.data.expiration))
+					:	null,
+				gmailHistoryId: result.data.historyId,
+			},
+		});
+
+		return result;
 	} catch (error) {
 		console.error('Error setting up Gmail notifications:', error);
 		throw error;

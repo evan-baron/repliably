@@ -17,6 +17,10 @@ import {
 	useUpdateSignature,
 } from '@/hooks/useUserSignatures';
 import { useDisconnectEmail } from '@/hooks/useDisconnectEmail';
+import {
+	useSetupGmailNotifications,
+	useStopGmailNotifications,
+} from '@/hooks/useUserSettings';
 
 // Styles imports
 import styles from './settings.module.scss';
@@ -46,6 +50,8 @@ const EmailSettings = ({
 	const { mutateAsync: updateSignature } = useUpdateSignature();
 	const { mutateAsync: disconnectEmail, isPending: isDisconnecting } =
 		useDisconnectEmail();
+	const { mutateAsync: setupGmailNotifications } = useSetupGmailNotifications();
+	const { mutateAsync: stopGmailNotifications } = useStopGmailNotifications();
 	const [addingNewSignature, setAddingNewSignature] = useState(false);
 	const [editorContent, setEditorContent] = useState<string>('');
 	const [signatureName, setSignatureName] = useState<string>('');
@@ -58,6 +64,9 @@ const EmailSettings = ({
 		if (emailStatus === 'connected') {
 			setModalType('alert');
 			setAlertMessage('Email connected successfully!');
+
+			// Connect to gmail watcher immediately to start receiving notifications (instead of waiting for next sync)
+			setupGmailNotifications();
 		} else if (errorStatus) {
 			let errorMessage = 'An error occurred while connecting email.';
 			if (errorStatus === 'access_denied') {
@@ -185,6 +194,32 @@ const EmailSettings = ({
 		} catch (error) {
 			setModalType('error');
 			setErrors(['Failed to disconnect from Email']);
+		}
+	};
+
+	const handleStartWatching = async () => {
+		const result = await setupGmailNotifications();
+		const { success } = result;
+
+		if (success) {
+			setModalType('alert');
+			setAlertMessage('Gmail watch notifications setup successfully!');
+		} else {
+			setModalType('error');
+			setErrors(['Failed to setup Gmail watch notifications']);
+		}
+	};
+
+	const handleStopWatching = async () => {
+		const result = await stopGmailNotifications();
+		const { success } = result;
+
+		if (success) {
+			setModalType('alert');
+			setAlertMessage('Gmail watch notifications stopped successfully!');
+		} else {
+			setModalType('error');
+			setErrors(['Failed to stop Gmail watch notifications']);
 		}
 	};
 
@@ -341,6 +376,52 @@ const EmailSettings = ({
 							: user.emailConnectionActive ?
 								'Disconnect'
 							:	'Connect'}
+						</button>
+					</div>
+				</div>
+				<div className={styles.options}>
+					<div className={styles.item}>
+						<div className={styles.info}>
+							<h4 id='connection-status-title'>Watching Status</h4>
+
+							<p aria-labelledby='connection-status-title'>
+								<span
+									className={`${styles['status-dot']} ${user.gmailWatchAllowed ? styles.active : styles.inactive}`}
+									role='img'
+									aria-label={
+										user.gmailWatchAllowed ? 'Watching' : 'Not watching'
+									}
+								/>
+								{user.gmailWatchAllowed ? 'Watching' : 'Not watching'}
+							</p>
+							<small>
+								Watching allows Repliably to monitor your inbox for new replies
+								from your contacts.
+							</small>
+						</div>
+						<button
+							type='button'
+							className={'button settings-button'}
+							onClick={() =>
+								user.gmailWatchAllowed ? handleStopWatching() : (
+									handleStartWatching()
+								)
+							}
+							disabled={isConnecting}
+							aria-disabled={isConnecting || isDisconnecting}
+							aria-label={
+								user.gmailWatchAllowed ?
+									'Stop watching Gmail'
+								:	'Start watching Gmail'
+							}
+						>
+							{isConnecting ?
+								'Connecting...'
+							: isDisconnecting ?
+								'Disconnecting...'
+							: user.gmailWatchAllowed ?
+								'Stop watching'
+							:	'Start watching'}
 						</button>
 					</div>
 				</div>

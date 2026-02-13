@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
 		const searchParams = request.nextUrl.searchParams;
 		const code = searchParams.get('code');
 		const error = searchParams.get('error');
-		const state = searchParams.get('state'); // We'll use this to verify the request
 
 		// Handle user denial
 		if (error) {

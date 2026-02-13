@@ -41,12 +41,14 @@ export default function ContactDetailsClient({
 	initialAllMessages,
 	signatures,
 	emailConnectionActive,
+	gmailWatchAllowed,
 }: {
 	initialContact: ContactFromDB;
 	initialSequences: SequencesResponse;
 	initialAllMessages: MessagesWithActiveSequence[];
 	signatures: SignatureFromDB[];
 	emailConnectionActive: boolean;
+	gmailWatchAllowed: boolean;
 }) {
 	const queryClient = useQueryClient();
 
@@ -236,6 +238,7 @@ export default function ContactDetailsClient({
 				allMessages={allMessages}
 				signatures={signatures}
 				emailConnectionActive={emailConnectionActive}
+				gmailWatchAllowed={gmailWatchAllowed}
 			/>
 		</>
 	);

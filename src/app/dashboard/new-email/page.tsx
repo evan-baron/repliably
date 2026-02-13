@@ -21,7 +21,7 @@ const Page = async () => {
 		redirect('/');
 	}
 
-	const { signatures } = user;
+	const { signatures, gmailWatchAllowed } = user;
 
 	const { defaults } = await getUserSettings();
 
@@ -42,6 +42,7 @@ const Page = async () => {
 			<NewEmailForm
 				signatures={signatures}
 				defaults={defaults || defaultSettings}
+				gmailWatchAllowed={gmailWatchAllowed}
 			/>
 		</PageTemplate>
 	);

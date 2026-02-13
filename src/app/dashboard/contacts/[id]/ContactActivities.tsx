@@ -32,12 +32,14 @@ const ContactActivities = ({
 	allMessages,
 	signatures,
 	emailConnectionActive,
+	gmailWatchAllowed,
 }: {
 	contact: ContactFromDB;
 	sequences: SequencesResponse;
 	allMessages: MessagesWithActiveSequence[];
 	signatures: SignatureFromDB[];
 	emailConnectionActive: boolean;
+	gmailWatchAllowed: boolean;
 }) => {
 	const { setModalType, setAlertMessage } = useAppContext();
 
@@ -95,6 +97,7 @@ const ContactActivities = ({
 					contactEmail={contact.email}
 					signatures={signatures}
 					defaults={defaults}
+					gmailWatchAllowed={gmailWatchAllowed}
 				/>
 			),
 		},

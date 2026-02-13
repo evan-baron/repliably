@@ -134,3 +134,31 @@ export const useGetEmailConnectionStatus = () => {
 		},
 	});
 };
+
+export const useSetupGmailNotifications = () => {
+	return useMutation({
+		mutationFn: async () => {
+			return await userAPI.setupWatchNotifications();
+		},
+		onSuccess: () => {
+			console.log('Gmail notifications setup successfully');
+		},
+		onError: (error) => {
+			console.error('Error setting up Gmail notifications:', error);
+		},
+	});
+};
+
+export const useStopGmailNotifications = () => {
+	return useMutation({
+		mutationFn: async () => {
+			return await userAPI.setupWatchNotifications();
+		},
+		onSuccess: () => {
+			console.log('Gmail notifications stopped successfully');
+		},
+		onError: (error) => {
+			console.error('Error stopping Gmail notifications:', error);
+		},
+	});
+};

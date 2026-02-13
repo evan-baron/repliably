@@ -38,10 +38,12 @@ const NewEmailForm = ({
 	contactEmail,
 	signatures,
 	defaults,
+	gmailWatchAllowed,
 }: {
 	contactEmail?: string;
 	signatures?: SignatureFromDB[];
 	defaults?: UserDefaultSettings;
+	gmailWatchAllowed: boolean;
 }) => {
 	const {
 		modalType,
@@ -51,6 +53,7 @@ const NewEmailForm = ({
 		setErrors,
 		setLoading,
 		setLoadingMessage,
+		setAlertMessage,
 	} = useAppContext();
 	const {
 		resetForm,
@@ -110,6 +113,13 @@ const NewEmailForm = ({
 			.map((error) => error?.message)
 			.filter(Boolean) as string[];
 	};
+
+	useEffect(() => {
+		if (!gmailWatchAllowed) {
+			setModalType('alert');
+			setAlertMessage('No watch');
+		}
+	}, [gmailWatchAllowed]);
 
 	useEffect(() => {
 		if (selectedContact?.email && modalType !== 'newContactFromNewEmail') {

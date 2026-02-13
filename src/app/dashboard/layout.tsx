@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { getAllPendingMessages } from '@/services/messageService';
 import { findOrCreateUser } from '@/services/userService';
 import { getApiUser } from '@/services/getUserService';
+import { setupGmailNotifications } from '@/lib/setupGmailNotifications';
 
 // Styles imports
 import styles from './dashboard.module.scss';
@@ -41,7 +42,20 @@ export default async function DashboardLayout({
 		redirect('/');
 	}
 
-	const { emailConnectionActive } = user;
+	const { emailConnectionActive, gmailWatchExpiration, gmailWatchAllowed } =
+		user;
+
+	const needsGmailWatchRenewal =
+		!gmailWatchExpiration ||
+		new Date(gmailWatchExpiration).getTime() < Date.now() + 24 * 60 * 60 * 1000;
+
+	if (emailConnectionActive && gmailWatchAllowed && needsGmailWatchRenewal) {
+		try {
+			await setupGmailNotifications();
+		} catch (error) {
+			console.error('Error renewing Gmail watch:', error);
+		}
+	}
 
 	const { messages } = await getAllPendingMessages();
 

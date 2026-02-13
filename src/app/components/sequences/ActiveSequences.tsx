@@ -112,9 +112,6 @@ const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
 						sequence.contact.firstName + ' ' + sequence.contact.lastName
 					:	'Unknown Contact';
 
-				console.log('Sequence:', sequence);
-				console.log('Contact Name:', contactName);
-
 				const cellData = [
 					{
 						value: contactName,

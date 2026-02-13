@@ -48,7 +48,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 		redirect('/');
 	}
 
-	const { signatures } = user;
+	const { signatures, gmailWatchAllowed } = user;
 
 	const { emailConnectionActive } = user;
 
@@ -63,6 +63,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 				initialAllMessages={initialMessages}
 				signatures={signatures}
 				emailConnectionActive={emailConnectionActive}
+				gmailWatchAllowed={gmailWatchAllowed}
 			/>
 			<Link
 				href='/dashboard/contacts'
