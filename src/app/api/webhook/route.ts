@@ -104,6 +104,8 @@ async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 			historyTypes: ['messageAdded'], // Only new messages
 		});
 
+		console.log('History response:', historyResponse.data);
+
 		if (historyResponse.data.history) {
 			for (const historyItem of historyResponse.data.history) {
 				if (historyItem.messagesAdded) {

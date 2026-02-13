@@ -22,6 +22,7 @@ export async function checkForReplies(gmail: any) {
 
 // Process a single Gmail message by ID (ONLY WORKS IF SENT FROM GMAIL API)
 export async function processMessage(gmail: any, messageId: string) {
+	console.log('processing message with ID:', messageId);
 	try {
 		const message = await gmail.users.messages.get({
 			userId: 'me',
