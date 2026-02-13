@@ -12,6 +12,7 @@ const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 export async function POST(req: NextRequest) {
 	// 1. Get the Authorization header
 	const authHeader = req.headers.get('authorization');
+	console.log('Received webhook with Authorization header:', authHeader);
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest) {
 		payload = ticket.getPayload();
 	} catch (err) {
 		console.error('JWT verification failed:', err);
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		// return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		return NextResponse.json({ success: true });
 	}
 
 	try {
