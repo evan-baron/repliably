@@ -6,8 +6,6 @@ import AppProviders from './AppProviders';
 import './reset.css';
 import './globals.scss';
 
-// Component imports
-
 export const metadata: Metadata = {
 	metadataBase: new URL('https://www.repliably.com'),
 	title: 'Repliably | Email Automation for the Modern Job Seeker',

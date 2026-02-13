@@ -91,7 +91,12 @@ export const sendEmailSchema = z.object({
 	activeSequenceId: z.number().int().positive().optional(),
 });
 
+export const waitlistEmailSchema = z.object({
+	email: z.email('Invalid email address'),
+});
+
 // Types
 export type AccountSettingsInput = z.infer<typeof accountSettingsSchema>;
 export type SignatureInput = z.infer<typeof signatureSchema>;
 export type EmailSendInput = z.infer<typeof sendEmailSchema>;
+export type WaitlistEmailInput = z.infer<typeof waitlistEmailSchema>;

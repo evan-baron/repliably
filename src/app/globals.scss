@@ -9,8 +9,15 @@
 	--text-secondary: #4a5568;
 	--text-muted: hsl(216, 15%, 52%);
 	--text-light-muted: hsl(216, 15%, 72%);
+	--text-shadow: 0.25rem 0.25rem 0.5rem hsla(0, 0%, 25%, 0.125);
 
 	/* 30% - Cyan/Teal/Green gradients (brightened) */
+	--gradient-welcome: linear-gradient(
+		135deg,
+		hsl(188, 86%, 40%) 0%,
+		hsl(187, 92%, 56%) 50%,
+		hsl(156, 72%, 54%) 100%
+	);
 	--gradient-primary: linear-gradient(
 		135deg,
 		#22d3ee 0%,
@@ -90,6 +97,7 @@
 	/* Border radius */
 	--border-radius: 0.5rem;
 	--border-radius-sm: 0.25rem;
+	--border-radius-md: 0.5rem;
 	--border-radius-lg: 1rem;
 	--border-radius-xl: 1.5rem;
 

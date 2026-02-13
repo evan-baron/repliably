@@ -160,3 +160,12 @@ export const userAPI = {
 			method: 'DELETE',
 		}),
 };
+
+// Waitlist API functions
+export const waitlistAPI = {
+	joinWaitlist: (email: string) =>
+		apiCall('/api/waitlist', {
+			method: 'POST',
+			body: JSON.stringify({ email }),
+		}),
+};

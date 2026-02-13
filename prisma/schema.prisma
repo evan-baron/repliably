@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -14,195 +8,197 @@ datasource db {
 }
 
 model User {
-  id                               Int                @id @default(autoincrement())
-  auth0Id                          String?            @unique
-  email                            String             @unique
-  firstName                        String?
-  lastName                         String?
-  timezone                         String?            // e.g. "America/Denver"
-  role                             String?            // admin, user, etc.
-  lastSynced                       DateTime?
-  createdAt                        DateTime           @default(now())
-  updatedAt                        DateTime           @updatedAt
-  trackEmailOpens                  Boolean            @default(true)
-  trackLinkClicks                  Boolean            @default(true)
-  defaultRequireApproval           Boolean            @default(false)
-  defaultSequenceDuration          Int?
-  defaultReferencePrevious         Boolean            @default(true)
-  defaultAlterSubjectLine          Boolean            @default(false)
-  defaultSendDelay                 Int?
-  defaultSequenceType              Int                @default(3)
-  notificationBounce               Boolean            @default(true)
-  notificationSendFailure          Boolean            @default(true)
-  notificationSequenceComplete     Boolean            @default(true)
-  notificationMessageApproval      Boolean            @default(true)
-  subscriptionTier                 SubscriptionTier   @default(free)
-  active                           Boolean            @default(true)
-  gmailRefreshToken                String?            @db.Text
-  connectedEmail                   String?
-  emailConnectedAt                 DateTime?
-  emailConnectionActive            Boolean            @default(false)
-  emailTokenExpiresAt              DateTime?
-  contacts                         Contact[]
-  sequences                        Sequence[]
-  messages                         Message[]
-  templates                        Template[]
-  signatures                       UserSignature[]
-  emailReplies                     EmailReply[]
+  id                           Int              @id @default(autoincrement())
+  auth0Id                      String?          @unique
+  email                        String           @unique
+  firstName                    String?
+  lastName                     String?
+  timezone                     String?
+  role                         String?
+  lastSynced                   DateTime?
+  createdAt                    DateTime         @default(now())
+  updatedAt                    DateTime         @updatedAt
+  defaultAlterSubjectLine      Boolean          @default(false)
+  defaultReferencePrevious     Boolean          @default(true)
+  defaultRequireApproval       Boolean          @default(false)
+  defaultSendDelay             Int?
+  defaultSequenceDuration      Int?
+  defaultSequenceType          Int              @default(3)
+  notificationBounce           Boolean          @default(true)
+  notificationMessageApproval  Boolean          @default(true)
+  notificationSendFailure      Boolean          @default(true)
+  notificationSequenceComplete Boolean          @default(true)
+  trackEmailOpens              Boolean          @default(true)
+  trackLinkClicks              Boolean          @default(true)
+  subscriptionTier             SubscriptionTier @default(free)
+  active                       Boolean          @default(true)
+  connectedEmail               String?
+  emailConnectedAt             DateTime?
+  emailConnectionActive        Boolean          @default(false)
+  emailTokenExpiresAt          DateTime?
+  gmailRefreshToken            String?
+  contacts                     Contact[]
+  emailReplies                 EmailReply[]
+  messages                     Message[]
+  sequences                    Sequence[]
+  templates                    Template[]
+  signatures                   UserSignature[]
 }
 
 model Contact {
-  id             Int       @id @default(autoincrement())
-  ownerId        Int
-  owner          User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  id             Int          @id @default(autoincrement())
   email          String
   firstName      String?
   lastName       String?
   company        String?
-  title          String?
   phone          String?
-  linkedIn       String?
-  importance     Int?
-  reasonForEmail String?   // e.g. "Junior Engineer"
-  active         Boolean   @default(false )
+  reasonForEmail String?
+  active         Boolean      @default(false)
   lastActivity   DateTime?
-  replied        Boolean   @default(false)
-  validEmail     Boolean? 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  autoCreated    Boolean   @default(false)
-
-  messages       Message[]
-  sequences      Sequence[]  @relation("ContactSequences")
+  replied        Boolean      @default(false)
+  validEmail     Boolean?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  autoCreated    Boolean      @default(false)
+  ownerId        Int
+  importance     Int?
+  linkedIn       String?
+  title          String?
+  owner          User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   emailReplies   EmailReply[]
+  messages       Message[]
+  sequences      Sequence[]   @relation("ContactSequences")
 }
 
 model Message {
-  id                        Int           @id @default(autoincrement())
-  contactId                 Int
-  contact                   Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  ownerId                   Int
-  owner                     User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  sequenceId                Int?
-  sequence                  Sequence?     @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
-  templateId                Int?
-  template                  Template?     @relation(fields: [templateId], references: [id], name: "TemplateMessages")
-  subject                   String
-  contents                  String        @db.VarChar(5000)
-  direction                 String        // "outbound" or "inbound"
-  createdAt                 DateTime      @default(now())
-  messageId                 String?       // Gmail message ID
-  threadId                  String?       // Gmail thread ID  
-  inReplyTo                 String?       // Reference to original message messageId
-  hasReply                  Boolean       @default(false)
-  replyDate                 DateTime?     // Date when contact replied
-  needsApproval             Boolean?  
-  approved                  Boolean?    
-  approvalDeadline          DateTime?   
-  scheduledAt               DateTime?
-  status                    MessageStatus @default(scheduled)
-  sendAttempts              Int           @default(0)
-  sentAt                    DateTime?     
-  lastError                 String?
-  needsFollowUp             Boolean       @default(false)
-  nextMessageGenerated      Boolean       @default(false)
+  id                   Int           @id @default(autoincrement())
+  contactId            Int
+  ownerId              Int
+  sequenceId           Int?
+  templateId           Int?
+  subject              String
+  contents             String        @db.VarChar(5000)
+  direction            String
+  hasReply             Boolean       @default(false)
+  inReplyTo            String?
+  messageId            String?
+  replyDate            DateTime?
+  threadId             String?
+  needsApproval        Boolean?
+  lastError            String?
+  scheduledAt          DateTime?
+  sendAttempts         Int           @default(0)
+  sentAt               DateTime?
+  status               MessageStatus @default(scheduled)
+  createdAt            DateTime      @default(now())
+  approvalDeadline     DateTime?
+  approved             Boolean?
+  needsFollowUp        Boolean       @default(false)
+  nextMessageGenerated Boolean       @default(false)
+  contact              Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  owner                User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sequence             Sequence?     @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  template             Template?     @relation("TemplateMessages", fields: [templateId], references: [id])
 
   @@index([status, scheduledAt])
 }
 
 model EmailReply {
   id                Int       @id @default(autoincrement())
-  ownerId           Int
-  owner             User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  originalMessageId String    // Gmail messageId of the original outbound message
-  replyMessageId    String    // Gmail messageId of the reply
-  threadId          String    // Gmail threadId
   contactId         Int
-  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
-  sequenceId        Int?
-  sequence          Sequence? @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
-  replySubject      String
   replyContent      String
-  replyHistory      String?
   replyDate         DateTime
-  isAutomated       Boolean   @default(false) // OOO or auto-reply
   processed         Boolean   @default(false)
   createdAt         DateTime  @default(now())
+  originalMessageId String
+  replyMessageId    String
+  ownerId           Int
+  replySubject      String
+  replyHistory      String?
+  sequenceId        Int?
+  threadId          String
+  isAutomated       Boolean   @default(false)
+  contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  owner             User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sequence          Sequence? @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
 }
 
 model Sequence {
-  id                        Int       @id @default(autoincrement())
-  title                     String    
-  contactId                 Int
-  contact                   Contact   @relation(fields: [contactId], references: [id], name: "ContactSequences", onDelete: Cascade)
-  ownerId                   Int
-  owner                     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  sequenceType              String    // e.g. "3-2-1"
-  autoSend                  Boolean   @default(false)
-  autoSendDelay             Int?      // days
-  sequenceDuration          Int?      @default(30)
-  currentStep               Int       @default(0)
-  nextStepDue               DateTime?
-  endDate                   DateTime? // createdAt + autoSendDuration days
-  active                    Boolean   @default(true)
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
-  referencePreviousEmail    Boolean?     
-  alterSubjectLine          Boolean? 
-
-  messages         Message[]
-  emailReplies     EmailReply[]
+  id                     Int          @id @default(autoincrement())
+  contactId              Int
+  ownerId                Int
+  sequenceType           String
+  autoSend               Boolean      @default(false)
+  autoSendDelay          Int?
+  currentStep            Int          @default(0)
+  nextStepDue            DateTime?
+  active                 Boolean      @default(true)
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  endDate                DateTime?
+  sequenceDuration       Int?         @default(30)
+  title                  String
+  alterSubjectLine       Boolean?
+  referencePreviousEmail Boolean?
+  emailReplies           EmailReply[]
+  messages               Message[]
+  contact                Contact      @relation("ContactSequences", fields: [contactId], references: [id], onDelete: Cascade)
+  owner                  User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }
 
 model Job {
-  id         Int       @id @default(autoincrement())
-  type       String    // e.g., 'send_email', 'parse_email', 'bounce_handler'
-  payload    Json
-  status     String    @default("pending") // pending, in_progress, done, failed
-  attempts   Int       @default(0)
-  runAt      DateTime? // scheduled time
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  type      String
+  payload   Json
+  status    String    @default("pending")
+  attempts  Int       @default(0)
+  runAt     DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Template {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  owner        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name         String   // "Follow-up Template #1", "Initial Outreach"
-  subject      String   // Email subject line with placeholders
-  content      String   @db.Text // Quill delta JSON or HTML content
-  contentType  String   @default("quill") // "quill", "html", "plain"
-  category     String?  // "follow-up", "initial", "thank-you", etc.
-  isDefault    Boolean  @default(false)
-  isActive     Boolean  @default(true)
-  usageCount   Int      @default(0) // Track how often it's used
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  // Track which messages used this template
-  messages     Message[] @relation("TemplateMessages")
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  name        String
+  subject     String
+  content     String
+  contentType String    @default("quill")
+  category    String?
+  isDefault   Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  usageCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  messages    Message[] @relation("TemplateMessages")
+  owner       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserSignature {
   id        Int      @id @default(autoincrement())
   userId    Int
-  owner     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String   // "Professional", "Casual", "Default"
-  content   String   @db.Text // Quill delta JSON or HTML
+  name      String
+  content   String
   isDefault Boolean  @default(false)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  owner     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Waitlist {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
 
 enum MessageStatus {
   scheduled
   pending
-  processing
   sent
   failed
   cancelled
+  processing
 }
 
 enum SubscriptionTier {

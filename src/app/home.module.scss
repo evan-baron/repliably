@@ -1,9 +1,219 @@
 .home-container {
+	position: relative;
 	width: 100%;
-	min-height: 100vh;
+	height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	justify-content: center;
-	background: hsla(0, 0%, 0%, 0.125);
+	overflow: hidden;
+	color: var(--text-secondary);
+	// background: hsla(0, 0%, 0%, 0.125);
+
+	.left {
+		position: absolute;
+		width: 60%;
+		height: 125dvh;
+		transform: translate(-10%) rotate(10deg);
+		transform-origin: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: var(--gradient-welcome);
+		box-shadow:
+			1rem 1rem 2.5rem rgba(0, 0, 0, 0.15),
+			0.5rem 0.5rem 2rem rgba(0, 0, 0, 0.1);
+		z-index: 10;
+
+		.left-contents {
+			transform: translateX(5%) rotate(-10deg);
+			transform-origin: center;
+			padding: 2rem;
+			max-width: 40rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			color: white;
+
+			.home-heading {
+				display: flex;
+				align-items: center;
+				font-size: 4.5rem;
+				font-weight: 700;
+				margin: 0;
+				text-shadow: var(--text-shadow);
+
+				.home-highlight {
+					font-size: 5rem;
+
+					display: flex;
+					align-items: center;
+					gap: 0.5rem;
+					font-weight: 700;
+					background: var(--gradient-primary);
+					-webkit-background-clip: text;
+					-webkit-text-fill-color: transparent;
+					background-clip: text;
+					line-height: 1.5;
+
+					.icon {
+						font-size: 4.75rem;
+						color: white;
+						transform: rotate(15deg);
+					}
+				}
+			}
+
+			.home-description {
+				font-size: 1.125rem;
+				letter-spacing: 1px;
+				word-spacing: 1px;
+				line-height: 1.5;
+				margin: 0;
+				text-shadow: var(--text-shadow);
+			}
+
+			.input-wrapper {
+				width: 100%;
+				display: flex;
+				align-items: center;
+				gap: 1.5rem;
+
+				input {
+					height: 3rem;
+					flex: 1;
+					padding: 0 1rem;
+					font-size: 1.25rem;
+					color: white;
+					background: hsla(0, 0%, 100%, 0.25);
+					border-radius: var(--border-radius-md);
+					outline: none;
+					border: none;
+					box-shadow: var(--text-shadow);
+					letter-spacing: 1px;
+
+					&::placeholder {
+						color: white;
+						opacity: 1;
+						text-shadow: var(--text-shadow);
+					}
+
+					&:focus {
+						border: 2px solid white;
+					}
+				}
+
+				input:-internal-autofill-selected {
+					background-color: hsla(0, 0%, 100%, 0.25) !important;
+					background-image: none !important;
+					transition: background-color 30000s ease-in-out 0s;
+					color: white !important;
+				}
+
+				button {
+					height: 3rem;
+					background: white;
+					color: var(--color-primary);
+					padding: 0.75rem 1.5rem;
+					border-radius: var(--border-radius-md);
+					font-weight: 600;
+					font-size: 1rem;
+					border: none;
+					cursor: pointer;
+					transition: all 0.2s ease;
+					box-shadow: var(--text-shadow);
+
+					&:hover {
+						transform: translateY(-2px);
+						box-shadow: var(--text-shadow), var(--shadow-floating);
+					}
+				}
+			}
+
+			.important-links {
+				display: flex;
+
+				.link {
+					color: white;
+					text-decoration: none;
+					font-size: 0.875rem;
+					transition: all 0.2s ease;
+					text-shadow: var(--text-shadow);
+
+					&:hover {
+						text-decoration: underline;
+					}
+
+					&:not(:last-child) {
+						margin-right: 1.5rem;
+						border-right: 1px solid white;
+						padding-right: 1.5rem;
+						margin-left: 0;
+						padding-left: 0;
+					}
+				}
+			}
+		}
+	}
+
+	.right {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 50%;
+		height: 100%;
+		outline: 1px solid blue;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		.login-wrapper {
+			width: auto;
+			// max-width: 31.25rem;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 2rem;
+			padding: 3rem;
+			background: var(--background-secondary);
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow-floating);
+			border: 0.0625rem solid var(--border-light);
+			position: relative;
+			transition: all 0.3s ease;
+			line-height: 1.25;
+
+			/* Inset shadow for depth */
+			&::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				border-radius: var(--border-radius);
+				// box-shadow: var(--shadow-inset);
+				pointer-events: none;
+			}
+
+			/* Gradient top border */
+			&::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 0.5rem;
+				background: var(--gradient-primary);
+				border-radius: var(--border-radius) var(--border-radius) 0 0;
+			}
+
+			h2 {
+				margin: 0;
+				font-size: 1.5rem;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
+		}
+	}
 }

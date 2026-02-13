@@ -1,0 +1,52 @@
+.input-wrapper {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+
+	input {
+		height: 3rem;
+		flex: 1;
+		padding: 0 1rem;
+		font-size: 1.25rem;
+		color: white;
+		background: hsla(0, 0%, 100%, 0.25);
+		border-radius: var(--border-radius-md);
+		outline: none;
+		border: none;
+		box-shadow: var(--text-shadow);
+		letter-spacing: 1px;
+
+		&::placeholder {
+			color: white;
+			opacity: 1;
+			text-shadow: var(--text-shadow);
+		}
+
+		&:focus {
+			border: 2px solid white;
+		}
+	}
+
+	button {
+		width: 30%;
+		height: 3rem;
+		background: white;
+		color: var(--color-primary);
+		padding: 0.75rem 1.5rem;
+		border-radius: var(--border-radius-md);
+		font-weight: 600;
+		font-size: 1rem;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		box-shadow: var(--text-shadow);
+
+		@media (hover: hover) {
+			&:not(.disabled):hover {
+				transform: translateY(-2px);
+				box-shadow: var(--text-shadow), var(--shadow-floating);
+			}
+		}
+	}
+}

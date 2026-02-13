@@ -200,7 +200,7 @@ export default function LoginModal() {
                 </button> */}
 			</section>
 
-			<footer className={`${styles.authFooter} ${styles.disabled}`}>
+			{/* <footer className={`${styles.authFooter} ${styles.disabled}`}>
 				<p>
 					Don't have an account?{' '}
 					<button
@@ -222,7 +222,7 @@ export default function LoginModal() {
 				>
 					Forgot password?
 				</Link>
-			</footer>
+			</footer> */}
 		</div>
 	);
 }
