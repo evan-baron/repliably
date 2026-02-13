@@ -26,46 +26,46 @@ const Page = async () => {
 					<h2>Table of Contents</h2>
 					<ul>
 						<li>
-							<a href='#acceptance'>Acceptance of Terms</a>
+							<Link href='#acceptance'>Acceptance of Terms</Link>
 						</li>
 						<li>
-							<a href='#description'>Service Description</a>
+							<Link href='#description'>Service Description</Link>
 						</li>
 						<li>
-							<a href='#account'>Account Registration</a>
+							<Link href='#account'>Account Registration</Link>
 						</li>
 						<li>
-							<a href='#acceptable-use'>Acceptable Use Policy</a>
+							<Link href='#acceptable-use'>Acceptable Use Policy</Link>
 						</li>
 						<li>
-							<a href='#gmail-terms'>Gmail Integration Terms</a>
+							<Link href='#gmail-terms'>Gmail Integration Terms</Link>
 						</li>
 						<li>
-							<a href='#content'>Your Content & Data</a>
+							<Link href='#content'>Your Content & Data</Link>
 						</li>
 						<li>
-							<a href='#intellectual-property'>Intellectual Property</a>
+							<Link href='#intellectual-property'>Intellectual Property</Link>
 						</li>
 						<li>
-							<a href='#fees'>Fees & Payment</a>
+							<Link href='#fees'>Fees & Payment</Link>
 						</li>
 						<li>
-							<a href='#termination'>Termination</a>
+							<Link href='#termination'>Termination</Link>
 						</li>
 						<li>
-							<a href='#warranties'>Warranties & Disclaimers</a>
+							<Link href='#warranties'>Warranties & Disclaimers</Link>
 						</li>
 						<li>
-							<a href='#limitation'>Limitation of Liability</a>
+							<Link href='#limitation'>Limitation of Liability</Link>
 						</li>
 						<li>
-							<a href='#indemnification'>Indemnification</a>
+							<Link href='#indemnification'>Indemnification</Link>
 						</li>
 						<li>
-							<a href='#changes'>Changes to Terms</a>
+							<Link href='#changes'>Changes to Terms</Link>
 						</li>
 						<li>
-							<a href='#contact'>Contact Information</a>
+							<Link href='#contact'>Contact Information</Link>
 						</li>
 					</ul>
 				</nav>
@@ -317,9 +317,9 @@ const Page = async () => {
 						<h3>Gmail API Compliance</h3>
 						<p>
 							Our use of the Gmail API is subject to the{' '}
-							<a href='https://developers.google.com/terms/api-services-user-data-policy'>
+							<Link href='https://developers.google.com/terms/api-services-user-data-policy'>
 								Google API Services User Data Policy
-							</a>
+							</Link>
 							, including the Limited Use requirements. You acknowledge that:
 						</p>
 						<ul>
@@ -807,11 +807,15 @@ const Page = async () => {
 							<h3>Get In Touch</h3>
 							<p>
 								<strong>Email:</strong>{' '}
-								<a href='mailto:contact@repliably.com'>contact@repliably.com</a>
+								<Link href='mailto:contact@repliably.com'>
+									contact@repliably.com
+								</Link>
 							</p>
 							<p>
 								<strong>Support:</strong>{' '}
-								<a href='mailto:support@repliably.com'>support@repliably.com</a>
+								<Link href='mailto:support@repliably.com'>
+									support@repliably.com
+								</Link>
 							</p>
 							{/* <p>
 								<strong>Address:</strong> Repliably Address]
@@ -827,7 +831,7 @@ const Page = async () => {
 				<footer>
 					<p>&copy; 2026 Repliably. All rights reserved.</p>
 					<p>
-						<a href='privacy-policy.html'>Privacy Policy</a>
+						<Link href='/privacy'>Privacy Policy</Link>
 					</p>
 				</footer>
 			</div>
