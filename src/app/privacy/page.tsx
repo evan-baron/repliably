@@ -560,6 +560,9 @@ const Page = async () => {
 
 				<footer>
 					<p>&copy; 2026 Repliably. All rights reserved.</p>
+					<p>
+						<Link href='/terms'>Terms of Service</Link>
+					</p>
 				</footer>
 			</div>
 		</div>
