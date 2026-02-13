@@ -18,7 +18,6 @@ import styles from './waitlist.module.scss';
 
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
-import { set } from 'zod';
 
 const Waitlist = () => {
 	const { setModalType, setAlertMessage } = useAppContext();
