@@ -102,7 +102,12 @@ const ContactActivities = ({
 			),
 		},
 		all: {
-			component: <AllActivities messages={messageList} />,
+			component:
+				messageList.length > 0 ?
+					<AllActivities messages={messageList} />
+				:	<div className={styles.activity}>
+						<p>No activities</p>
+					</div>,
 		},
 	};
 
