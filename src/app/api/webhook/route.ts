@@ -8,8 +8,6 @@ import { OAuth2Client } from 'google-auth-library';
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const PUBSUB_AUDIENCE =
-	'application-automation-gmail-n@application-automation-480821.iam.gserviceaccount.com';
 
 export async function POST(req: NextRequest) {
 	// 1. Get the Authorization header
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest) {
 	try {
 		const ticket = await client.verifyIdToken({
 			idToken: token,
-			audience: PUBSUB_AUDIENCE,
+			audience: process.env.PUBSUB_AUDIENCE,
 		});
 		payload = ticket.getPayload();
 	} catch (err) {
@@ -72,7 +70,8 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ success: true });
 	} catch (error: any) {
 		console.error('Webhook error:', error);
-		return NextResponse.json({ error: error.message }, { status: 500 });
+		// return NextResponse.json({ error: error.message }, { status: 500 });
+		return NextResponse.json({ success: true });
 	}
 }
 
