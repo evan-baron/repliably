@@ -42,17 +42,42 @@
 				z-index: -1;
 				fill: white;
 				opacity: 0.35;
+				box-shadow: 0.5rem 0.5rem 1.5rem hsla(215, 100%, 50%, 0.25);
 			}
 
 			.svg1 {
 				transform: scale(1.5);
 				left: 65%;
 				bottom: 50%;
+
+				animation: floating1 6s ease-in-out infinite;
+
+				@keyframes floating1 {
+					0%,
+					100% {
+						transform: translateY(0) scale(1.5);
+					}
+					50% {
+						transform: translateY(-1rem) scale(1.5);
+					}
+				}
 			}
 
 			.svg2 {
 				left: -50%;
 				bottom: -40%;
+
+				animation: sliding 6s ease-in-out infinite;
+
+				@keyframes sliding {
+					0%,
+					100% {
+						transform: translateX(0);
+					}
+					50% {
+						transform: translateX(1rem);
+					}
+				}
 			}
 
 			.home-heading {

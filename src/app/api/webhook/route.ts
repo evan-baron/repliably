@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { decrypt } from '@/lib/encryption';
+import { processMessage } from '@/lib/helpers/checkReplies';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 
 export async function POST(req: NextRequest) {
+	console.log(
+		'Incoming webhook Authorization:',
+		req.headers.get('authorization'),
+	);
+
 	try {
 		const body = await req.json();
 		console.log('Gmail webhook received:', body);
@@ -91,104 +95,4 @@ async function fallbackToRecentMessages(gmail: any) {
 			await processMessage(gmail, message.id!);
 		}
 	}
-}
-
-async function processMessage(gmail: any, messageId: string) {
-	try {
-		const message = await gmail.users.messages.get({
-			userId: 'me',
-			id: messageId,
-		});
-
-		const headers = message.data.payload.headers;
-		const threadId = message.data.threadId;
-
-		// Extract sender email and USE it for validation
-		const from = headers.find((h: any) => h.name === 'From')?.value;
-		const senderEmail = extractEmailFromHeader(from);
-
-		// Check if this is a reply to one of our sent emails
-		const sentMessage = await prisma.message.findFirst({
-			where: {
-				threadId: threadId,
-				direction: 'outbound',
-			},
-			include: {
-				contact: true,
-			},
-		});
-
-		if (sentMessage) {
-			// Validate that the reply is from the same contact we sent to
-			if (senderEmail !== sentMessage.contact.email) {
-				console.log(
-					'Reply from different email than original contact, skipping',
-				);
-				return;
-			}
-
-			// Rest of processing...
-			const subject = headers.find((h: any) => h.name === 'Subject')?.value;
-
-			// Extract email body (simplified)
-			let bodyContent = '';
-			if (message.data.payload.parts) {
-				const textPart = message.data.payload.parts.find(
-					(part: any) => part.mimeType === 'text/plain',
-				);
-				if (textPart?.body?.data) {
-					bodyContent = Buffer.from(textPart.body.data, 'base64').toString();
-				}
-			} else if (message.data.payload.body?.data) {
-				bodyContent = Buffer.from(
-					message.data.payload.body.data,
-					'base64',
-				).toString();
-			}
-
-			// Store the reply
-			await prisma.message.create({
-				data: {
-					contactId: sentMessage.contactId,
-					ownerId: sentMessage.ownerId,
-					subject: subject || 'Reply',
-					contents: bodyContent,
-					direction: 'inbound',
-					messageId: messageId,
-					threadId: threadId,
-					createdAt: new Date(parseInt(message.data.internalDate)),
-				},
-			});
-
-			// Update contact as replied
-			await prisma.contact.update({
-				where: { id: sentMessage.contactId },
-				data: {
-					replied: true,
-					lastActivity: new Date(),
-				},
-			});
-
-			// Mark original message as having reply
-			await prisma.message.update({
-				where: { id: sentMessage.id },
-				data: { hasReply: true },
-			});
-
-			console.log(
-				'Reply processed from:',
-				senderEmail,
-				'for contact:',
-				sentMessage.contact.email,
-			);
-		}
-	} catch (error) {
-		console.error('Error processing message:', error);
-	}
-}
-
-// Helper function to extract email from "Name <email@domain.com>" format
-function extractEmailFromHeader(fromHeader: string): string {
-	const emailMatch = fromHeader?.match(/<(.+?)>/);
-	return emailMatch ? emailMatch[1] : fromHeader;
 }

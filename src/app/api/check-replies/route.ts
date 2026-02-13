@@ -7,7 +7,6 @@ import { decrypt } from '@/lib/encryption';
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
-const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN!;
 
 export async function POST(req: NextRequest) {
 	const { user, error: authError } = await getApiUser();
