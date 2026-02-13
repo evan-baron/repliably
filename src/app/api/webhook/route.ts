@@ -77,6 +77,14 @@ export async function POST(req: NextRequest) {
 		// Check for new emails
 		await checkForNewEmails(gmailHistoryId, gmailRefreshToken);
 
+		// Update historyId in database (to avoid reprocessing same emails)
+		const newHistoryId = message.historyId;
+
+		await prisma.user.update({
+			where: { id },
+			data: { gmailHistoryId: newHistoryId },
+		});
+
 		return NextResponse.json({ success: true });
 	} catch (error: any) {
 		console.error('Webhook error:', error);
