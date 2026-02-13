@@ -52,12 +52,15 @@ const EmailSettings = ({
 		useDisconnectEmail();
 	const { mutateAsync: setupGmailNotifications } = useSetupGmailNotifications();
 	const { mutateAsync: stopGmailNotifications } = useStopGmailNotifications();
+	const { setModalType, setErrors, setAlertMessage } = useAppContext();
 	const [addingNewSignature, setAddingNewSignature] = useState(false);
 	const [editorContent, setEditorContent] = useState<string>('');
 	const [signatureName, setSignatureName] = useState<string>('');
 	const [editing, setEditing] = useState<number | null>(null);
 	const [isConnecting, setIsConnecting] = useState<boolean>(false);
-	const { setModalType, setErrors, setAlertMessage } = useAppContext();
+	const [watchAllowed, setWatchAllowed] = useState<boolean>(
+		user.gmailWatchAllowed,
+	);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -202,6 +205,7 @@ const EmailSettings = ({
 		const { success } = result;
 
 		if (success) {
+			setWatchAllowed(true);
 			setModalType('alert');
 			setAlertMessage('Gmail watch notifications setup successfully!');
 		} else {
@@ -215,6 +219,7 @@ const EmailSettings = ({
 		const { success } = result;
 
 		if (success) {
+			setWatchAllowed(false);
 			setModalType('alert');
 			setAlertMessage('Gmail watch notifications stopped successfully!');
 		} else {
@@ -386,13 +391,11 @@ const EmailSettings = ({
 
 							<p aria-labelledby='connection-status-title'>
 								<span
-									className={`${styles['status-dot']} ${user.gmailWatchAllowed ? styles.active : styles.inactive}`}
+									className={`${styles['status-dot']} ${watchAllowed ? styles.active : styles.inactive}`}
 									role='img'
-									aria-label={
-										user.gmailWatchAllowed ? 'Watching' : 'Not watching'
-									}
+									aria-label={watchAllowed ? 'Watching' : 'Not watching'}
 								/>
-								{user.gmailWatchAllowed ? 'Watching' : 'Not watching'}
+								{watchAllowed ? 'Watching' : 'Not watching'}
 							</p>
 							<small>
 								Watching allows Repliably to monitor your inbox for new replies
@@ -403,23 +406,19 @@ const EmailSettings = ({
 							type='button'
 							className={'button settings-button'}
 							onClick={() =>
-								user.gmailWatchAllowed ? handleStopWatching() : (
-									handleStartWatching()
-								)
+								watchAllowed ? handleStopWatching() : handleStartWatching()
 							}
 							disabled={isConnecting}
 							aria-disabled={isConnecting || isDisconnecting}
 							aria-label={
-								user.gmailWatchAllowed ?
-									'Stop watching Gmail'
-								:	'Start watching Gmail'
+								watchAllowed ? 'Stop watching Gmail' : 'Start watching Gmail'
 							}
 						>
 							{isConnecting ?
 								'Connecting...'
 							: isDisconnecting ?
 								'Disconnecting...'
-							: user.gmailWatchAllowed ?
+							: watchAllowed ?
 								'Stop watching'
 							:	'Start watching'}
 						</button>

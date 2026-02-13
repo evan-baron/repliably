@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
+import { decrypt } from '@/lib/encryption';
 
 export async function POST(req: NextRequest) {
 	const { user, error: authError } = await getApiUser();
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
-	const gmailRefreshToken = user.gmailRefreshToken;
+	const refreshToken = decrypt(user.gmailRefreshToken);
 
 	const oAuth2Client = new google.auth.OAuth2(
 		process.env.GOOGLE_CLIENT_ID!,
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
 		process.env.GOOGLE_REDIRECT_URI!,
 	);
 
-	oAuth2Client.setCredentials({ refresh_token: gmailRefreshToken });
+	oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
 	const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
 			data: {
 				gmailWatchExpiration: null,
 				gmailHistoryId: null,
+				gmailWatchAllowed: false,
 			},
 		});
 

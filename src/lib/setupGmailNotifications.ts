@@ -49,6 +49,7 @@ export async function setupGmailNotifications() {
 						new Date(Number(result.data.expiration))
 					:	null,
 				gmailHistoryId: result.data.historyId,
+				gmailWatchAllowed: true,
 			},
 		});
 

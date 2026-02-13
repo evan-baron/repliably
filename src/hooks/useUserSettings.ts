@@ -154,9 +154,7 @@ export const useStopGmailNotifications = () => {
 		mutationFn: async () => {
 			return await userAPI.stopWatchNotifications();
 		},
-		onSuccess: () => {
-			console.log('Gmail notifications stopped successfully');
-		},
+		onSuccess: () => {},
 		onError: (error) => {
 			console.error('Error stopping Gmail notifications:', error);
 		},
