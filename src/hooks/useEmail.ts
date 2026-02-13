@@ -49,15 +49,15 @@ export const useEmailSend = () => {
 							...oldData,
 							active: response.contact.active,
 						};
-					}
+					},
 				);
 
 				queryClient.setQueryData(['contacts-get-all'], (oldData: any) => {
 					if (!oldData) return oldData;
 					const updatedContacts = oldData.contacts.map((contact: any) =>
-						contact.id === response.contact.id
-							? { ...contact, active: response.contact.active }
-							: contact
+						contact.id === response.contact.id ?
+							{ ...contact, active: response.contact.active }
+						:	contact,
 					);
 					return { ...oldData, contacts: updatedContacts };
 				});

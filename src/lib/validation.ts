@@ -82,12 +82,12 @@ export const sendEmailSchema = z.object({
 		},
 	),
 	// autoSendDelay can be 'never', '', or a string number - storeSentEmail expects string
-	autoSendDelay: z.string(),
+	autoSendDelay: z.string().optional(),
 	// cadenceDuration is a string like '30', '60', '90', 'indefinite'
 	cadenceDuration: z.string(),
 	override: z.boolean().optional(),
-	referencePreviousEmail: z.boolean().optional(),
-	alterSubjectLine: z.boolean().optional(),
+	referencePreviousEmail: z.boolean().nullable().optional(),
+	alterSubjectLine: z.boolean().nullable().optional(),
 	activeSequenceId: z.number().int().positive().optional(),
 });
 
