@@ -21,7 +21,7 @@ const Page = async () => {
 	return (
 		<PageTemplate
 			title='Sequences'
-			description='View all active and previous sequences.'
+			description='View all active and previous sequences'
 		>
 			<SequencesClient initialSequences={sequences} />
 		</PageTemplate>

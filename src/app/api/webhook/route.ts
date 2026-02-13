@@ -9,11 +9,6 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 
 export async function POST(req: NextRequest) {
-	console.log(
-		'Incoming webhook Authorization:',
-		req.headers.get('authorization'),
-	);
-
 	try {
 		const body = await req.json();
 		console.log('Gmail webhook received:', body);
@@ -22,8 +17,6 @@ export async function POST(req: NextRequest) {
 		const message = JSON.parse(
 			Buffer.from(body.message.data, 'base64').toString(),
 		);
-
-		console.log('Decoded message:', message);
 
 		// Check for new emails
 		await checkForNewEmails(message.historyId);

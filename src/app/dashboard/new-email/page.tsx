@@ -37,7 +37,7 @@ const Page = async () => {
 	return (
 		<PageTemplate
 			title='New Email'
-			description='Write a new email or use a template to get started.'
+			description='Write a new email or use a template to get started'
 		>
 			<NewEmailForm
 				signatures={signatures}

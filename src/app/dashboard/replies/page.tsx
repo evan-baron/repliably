@@ -11,7 +11,7 @@ const Page = async () => {
 	return (
 		<PageTemplate
 			title='Replies'
-			description='Replies to emails sent from the platform.'
+			description='Replies to emails sent from the platform'
 		>
 			<RepliesClient initialReplies={replies} />
 		</PageTemplate>

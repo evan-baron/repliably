@@ -11,7 +11,7 @@ const Page = async () => {
 	return (
 		<PageTemplate
 			title='Pending Emails'
-			description='Approve or edit pending emails.'
+			description='Approve or edit pending emails'
 		>
 			<PendingMessagesClient initialMessages={messages} />
 		</PageTemplate>

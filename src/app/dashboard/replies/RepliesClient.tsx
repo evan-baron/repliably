@@ -25,13 +25,13 @@ const RepliesClient = ({
 	initialReplies: RepliesFromDB[];
 }) => {
 	const queryClient = useQueryClient();
-	const { mutate: checkNewReplies } = useCheckNewReplies();
+	// const { mutate: checkNewReplies } = useCheckNewReplies();
 
 	useEffect(() => {
 		if (initialReplies && initialReplies.length > 0) {
 			queryClient.setQueryData<RepliesFromDB[]>(
 				['replies-get-all'],
-				initialReplies
+				initialReplies,
 			);
 		}
 	}, [initialReplies, queryClient]);
@@ -42,7 +42,7 @@ const RepliesClient = ({
 
 	return (
 		<div>
-			<button onClick={() => checkNewReplies()}>Check for Replies</button>
+			{/* <button onClick={() => checkNewReplies()}>Check for Replies</button> */}
 			<RepliesTable replies={replies} />
 		</div>
 	);
