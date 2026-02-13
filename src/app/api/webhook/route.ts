@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 		const message = JSON.parse(
 			Buffer.from(body.message.data, 'base64').toString(),
 		);
+		console.log('Decoded message:', message);
 
 		// Check for new emails
 		await checkForNewEmails(message.historyId);
@@ -39,6 +40,8 @@ async function checkForNewEmails(historyId: string) {
 			'Gmail account not connected. Please connect your Gmail account in settings.',
 		);
 	}
+
+	console.log('Checking for new emails with historyId:', historyId);
 
 	// Decrypt the refresh token
 	const refreshToken = decrypt(user.gmailRefreshToken);

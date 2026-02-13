@@ -41,6 +41,8 @@ export async function setupGmailNotifications() {
 			},
 		});
 
+		console.log('result from Gmail watch setup:', result.data);
+
 		await prisma.user.update({
 			where: { id: user.id },
 			data: {

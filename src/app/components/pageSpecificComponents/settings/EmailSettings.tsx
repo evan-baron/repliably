@@ -419,8 +419,8 @@ const EmailSettings = ({
 							: isDisconnecting ?
 								'Disconnecting...'
 							: watchAllowed ?
-								'Stop watching'
-							:	'Start watching'}
+								'Disable'
+							:	'Enable'}
 						</button>
 					</div>
 				</div>
