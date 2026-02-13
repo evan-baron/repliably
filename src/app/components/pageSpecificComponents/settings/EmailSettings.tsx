@@ -393,9 +393,11 @@ const EmailSettings = ({
 								<span
 									className={`${styles['status-dot']} ${watchAllowed ? styles.active : styles.inactive}`}
 									role='img'
-									aria-label={watchAllowed ? 'Watching' : 'Not watching'}
+									aria-label={
+										watchAllowed ? 'Watching enabled' : 'Watching disabled'
+									}
 								/>
-								{watchAllowed ? 'Watching' : 'Not watching'}
+								{watchAllowed ? 'Enabled' : 'Disabled'}
 							</p>
 							<small>
 								Watching allows Repliably to monitor your inbox for new replies

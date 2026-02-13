@@ -1,14 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import { getApiUser } from '@/services/getUserService';
 import { decrypt } from '@/lib/encryption';
 import { processMessage } from '@/lib/helpers/checkReplies';
+import { prisma } from '@/lib/prisma';
+import { OAuth2Client } from 'google-auth-library';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
+const PUBSUB_AUDIENCE = 'https://www.repliably.com/api/webhook';
 
 export async function POST(req: NextRequest) {
+	// 1. Get the Authorization header
+	const authHeader = req.headers.get('authorization');
+	if (!authHeader || !authHeader.startsWith('Bearer ')) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+	const token = authHeader.split(' ')[1];
+
+	// 2. Verify the JWT
+	const client = new OAuth2Client();
+	let payload;
+	try {
+		const ticket = await client.verifyIdToken({
+			idToken: token,
+			audience: PUBSUB_AUDIENCE,
+		});
+		payload = ticket.getPayload();
+	} catch (err) {
+		console.error('JWT verification failed:', err);
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	try {
 		const body = await req.json();
 		console.log('Gmail webhook received:', body);
@@ -19,8 +42,31 @@ export async function POST(req: NextRequest) {
 		);
 		console.log('Decoded message:', message);
 
+		const { emailAddress, historyId } = message;
+
+		// Find user by email address
+		const user = await prisma.user.findUnique({
+			where: { email: emailAddress },
+			select: { id: true, gmailRefreshToken: true },
+		});
+
+		const { id, gmailRefreshToken } = user || {};
+
+		if (!id) {
+			console.error('No user found for email:', emailAddress);
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
+		if (!gmailRefreshToken) {
+			console.error('User does not have a Gmail refresh token:', emailAddress);
+			return NextResponse.json(
+				{ error: 'Gmail refresh token not found' },
+				{ status: 404 },
+			);
+		}
+
 		// Check for new emails
-		await checkForNewEmails(message.historyId);
+		await checkForNewEmails(historyId, gmailRefreshToken);
 
 		return NextResponse.json({ success: true });
 	} catch (error: any) {
@@ -29,22 +75,16 @@ export async function POST(req: NextRequest) {
 	}
 }
 
-async function checkForNewEmails(historyId: string) {
-	const { user, error: authError } = await getApiUser();
-	if (authError || !user) {
-		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-	}
-
-	if (!user.emailConnectionActive || !user.gmailRefreshToken) {
-		throw new Error(
-			'Gmail account not connected. Please connect your Gmail account in settings.',
-		);
-	}
-
+async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 	console.log('Checking for new emails with historyId:', historyId);
 
+	if (!gmailRefreshToken) {
+		console.error('User does not have a Gmail refresh token');
+		return;
+	}
+
 	// Decrypt the refresh token
-	const refreshToken = decrypt(user.gmailRefreshToken);
+	const refreshToken = decrypt(gmailRefreshToken);
 
 	const oAuth2Client = new google.auth.OAuth2(
 		CLIENT_ID,
