@@ -75,7 +75,7 @@ const Waitlist = () => {
 			<input
 				id='email'
 				type='email'
-				placeholder='you@candoit.com'
+				placeholder='name@domain.com'
 				aria-label='Email address input'
 				value={email}
 				onChange={handleChange}
