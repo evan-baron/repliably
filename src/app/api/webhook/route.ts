@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
 		await prisma.user.update({
 			where: { id },
-			data: { gmailHistoryId: newHistoryId },
+			data: { gmailHistoryId: String(newHistoryId) },
 		});
 
 		return NextResponse.json({ success: true });
