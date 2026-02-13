@@ -250,12 +250,15 @@
 				flex-direction: column;
 				gap: 1.5rem;
 				background: var(--gradient-welcome);
+				background-size: 150%;
+				background-position: center;
 				color: white;
 				padding: 2rem;
 				border-radius: 12px;
 
 				h3 {
 					color: white;
+					margin-top: 0;
 				}
 
 				a {
