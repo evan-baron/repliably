@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 		siteName: 'Repliably',
 		images: [
 			{
-				url: '/og-image.jpg',
+				url: '/og-image.webp',
 				width: 1200,
 				height: 630,
 				alt: 'Repliably - Email Automation for the Modern Job Seeker',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 		title: 'Repliably | Email Automation for the Modern Job Seeker',
 		description:
 			'Repliably is an email automation tool designed to help job seekers manage their job applications and follow-ups efficiently. With Repliably, you can create personalized email templates, schedule automated follow-ups, and track your email outreach data all in one place. Say goodbye to manual emailing and hello to a more sophisticated strategy with Repliably.',
-		images: ['/og-image.jpg'],
+		images: ['/og-image.webp'],
 	},
 
 	keywords: [
