@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
 	// 2. Verify the JWT
 	const client = new OAuth2Client();
 	let payload;
+
 	try {
 		const ticket = await client.verifyIdToken({
 			idToken: token,
@@ -29,8 +30,7 @@ export async function POST(req: NextRequest) {
 		payload = ticket.getPayload();
 	} catch (err) {
 		console.error('JWT verification failed:', err);
-		// return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-		return NextResponse.json({ success: true });
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	try {
@@ -88,18 +88,12 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ success: true });
 	} catch (error: any) {
 		console.error('Webhook error:', error);
-		// return NextResponse.json({ error: error.message }, { status: 500 });
-		return NextResponse.json({ success: true });
+		return NextResponse.json({ error: error.message }, { status: 500 });
 	}
 }
 
 async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 	console.log('Checking for new emails with historyId:', historyId);
-
-	if (!gmailRefreshToken) {
-		console.error('User does not have a Gmail refresh token');
-		return;
-	}
 
 	// Decrypt the refresh token
 	const refreshToken = decrypt(gmailRefreshToken);
@@ -111,6 +105,9 @@ async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 	);
 	oAuth2Client.setCredentials({ refresh_token: refreshToken });
 	const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+
+	const MAX_EMAILS_TO_PROCESS = 20;
+	let processed = 0;
 
 	try {
 		// Use historyId to get only NEW changes (much more efficient)
@@ -127,8 +124,10 @@ async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 				if (historyItem.messagesAdded) {
 					for (const messageAdded of historyItem.messagesAdded) {
 						await processMessage(gmail, messageAdded.message!.id!);
+						processed++;
 					}
 				}
+				if (processed >= MAX_EMAILS_TO_PROCESS) break;
 			}
 		}
 	} catch (error) {
@@ -140,10 +139,11 @@ async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 
 // Fallback method (your original approach)
 async function fallbackToRecentMessages(gmail: any) {
+	const MAX_EMAILS_TO_PROCESS = 20;
 	const response = await gmail.users.messages.list({
 		userId: 'me',
 		q: 'in:inbox',
-		maxResults: 10,
+		maxResults: MAX_EMAILS_TO_PROCESS,
 	});
 
 	if (response.data.messages) {
