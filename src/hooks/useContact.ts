@@ -16,7 +16,6 @@ export const useContactGetUnique = (id: number) => {
 		queryKey: ['contact-get-unique', id],
 		queryFn: () => contactAPI.readUnique(id),
 		refetchOnWindowFocus: true,
-		refetchInterval: 1000 * 30, // Refetch every 30 seconds
 	});
 };
 
@@ -25,7 +24,6 @@ export const useContactsGetAll = () => {
 		queryKey: ['contacts-get-all'],
 		queryFn: contactAPI.read,
 		refetchOnWindowFocus: true,
-		refetchInterval: 1000 * 30, // Refetch every 30 seconds
 	});
 };
 
