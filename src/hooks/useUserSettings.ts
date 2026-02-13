@@ -152,7 +152,7 @@ export const useSetupGmailNotifications = () => {
 export const useStopGmailNotifications = () => {
 	return useMutation({
 		mutationFn: async () => {
-			return await userAPI.setupWatchNotifications();
+			return await userAPI.stopWatchNotifications();
 		},
 		onSuccess: () => {
 			console.log('Gmail notifications stopped successfully');
