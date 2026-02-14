@@ -51,6 +51,8 @@ export async function processMessage(gmail: any, messageId: string) {
 		);
 
 		if (isBounceSenderResult) {
+			console.log('Message identified as bounce based on sender:', from);
+
 			const { data } = message;
 
 			const { threadId } = data;
@@ -420,6 +422,8 @@ export function isBounceSender(
 ) {
 	const f = (fromHeader || '').toLowerCase();
 	const rp = (returnPath || '').trim();
+
+	console.log('Checking if sender is bounce:', { fromHeader, returnPath });
 
 	// regex patterns to catch common bounce senders / subsystems
 	const patterns = [
