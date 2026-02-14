@@ -24,12 +24,7 @@ export default function NavigationItem({
 	icon,
 	emailConnectionStatus = false,
 }: NavigationItemProps) {
-	const {
-		setModalType,
-		setAlertMessage,
-		newReplyNotification,
-		setNewReplyNotification,
-	} = useAppContext();
+	const { setModalType, setAlertMessage } = useAppContext();
 
 	const activeLabels = [
 		'New Email',
@@ -41,8 +36,6 @@ export default function NavigationItem({
 		'Settings',
 	];
 
-	const newReply = label === 'Replies' && newReplyNotification;
-
 	const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
 		if (label === 'New Email' && !emailConnectionStatus) {
 			e.preventDefault();
@@ -50,10 +43,6 @@ export default function NavigationItem({
 			setAlertMessage('No email');
 
 			setModalType('alert');
-		}
-
-		if (label === 'Replies' && newReplyNotification) {
-			setNewReplyNotification(false);
 		}
 
 		if (!activeLabels.includes(label)) {
@@ -71,7 +60,7 @@ export default function NavigationItem({
 					label !== 'New Email' ? styles.navLink : styles.actionButton
 				} ${isActive ? styles.active : ''} ${
 					notifications ? styles.notification : ''
-				} ${newReply ? styles.newReply : ''}`}
+				}`}
 				aria-current={isActive ? 'page' : undefined}
 				aria-label={
 					notifications ? `${displayLabel} - has notifications` : displayLabel
@@ -88,7 +77,6 @@ export default function NavigationItem({
 				{notifications && (
 					<span className='sr-only'>You have new notifications</span>
 				)}
-				{newReply && <span className='sr-only'>You have new replies</span>}
 			</Link>
 		</li>
 	);

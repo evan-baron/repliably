@@ -11,6 +11,9 @@ import { useGetEmailConnectionStatus } from '@/hooks/useUserSettings';
 // Components imports
 import SideBar from './SideBar';
 
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
+
 // Types imports
 import { MessageFromDB, MessagesResponse } from '@/types/messageTypes';
 
@@ -22,7 +25,7 @@ export default function SideBarClient({
 	initialEmailConnectionActive: boolean;
 }) {
 	const queryClient = useQueryClient();
-
+	const { newReplyNotification, setNewReplyNotification } = useAppContext();
 	// hydrate server data into the cache
 	useEffect(() => {
 		if (initialMessages) {
@@ -64,6 +67,8 @@ export default function SideBarClient({
 		}
 	}, [data, initialMessages, initialEmailConnectionActive, queryClient]);
 
+	useEffect(() => {}, [newReplyNotification]);
+
 	const messages = data?.messages || [];
 	const pendingMessages = messages.filter((message) => message.needsApproval);
 	const hasNotifications = pendingMessages.length > 0;
@@ -72,6 +77,7 @@ export default function SideBarClient({
 		<SideBar
 			notifications={hasNotifications}
 			emailConnectionStatus={emailConnectionStatus?.active}
+			newReply={newReplyNotification}
 		/>
 	);
 }

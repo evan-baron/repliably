@@ -23,11 +23,13 @@ import {
 interface SidebarProps {
 	notifications?: boolean;
 	emailConnectionStatus?: boolean;
+	newReply?: boolean;
 }
 
 export default function SideBar({
 	notifications = false,
 	emailConnectionStatus = false,
+	newReply = false,
 }: SidebarProps) {
 	// Navigation data
 	const navigationItems = [
@@ -98,7 +100,10 @@ export default function SideBar({
 							href={item.href}
 							label={item.label}
 							isActive={isActive(item.href)}
-							notifications={notifications && item.label === 'Pending'}
+							notifications={
+								(notifications && item.label === 'Pending') ||
+								(newReply && item.label === 'Replies')
+							}
 							emailConnectionStatus={
 								emailConnectionStatus && item.label === 'New Email'
 							}

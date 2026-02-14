@@ -178,6 +178,12 @@ export async function processMessage(gmail: any, messageId: string) {
 				},
 			});
 
+			console.log(
+				'Reply stored in database for message ID:',
+				messageId,
+				'triggering pusher now...',
+			);
+
 			pusher.trigger(`user-${sentMessage.ownerId}`, 'reply-received', {
 				contactId: sentMessage.contactId,
 				replyMessageId: messageId,

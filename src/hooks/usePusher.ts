@@ -14,6 +14,8 @@ export function useReplyNotifications(userId: string) {
 			cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
 		});
 
+		console.log('Subscribing to Pusher channel for user:', userId);
+
 		const channel = pusher.subscribe(`user-${userId}`);
 
 		channel.bind('reply-received', (data: any) => {
