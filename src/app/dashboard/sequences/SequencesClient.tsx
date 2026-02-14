@@ -11,7 +11,7 @@ import styles from './sequencesClient.module.scss';
 import { useAllSequencesByUserId } from '@/hooks/useSequence';
 
 // Types imports
-import { SequenceFromDB } from '@/types/sequenceTypes';
+import { SequenceFromDB, SequencesResponse } from '@/types/sequenceTypes';
 
 // Components imports
 import DeactivateAllSequencesButton from '@/app/components/buttons/DeactivateAllSequencesButton';
@@ -36,9 +36,9 @@ const SequencesClient = ({
 
 	useEffect(() => {
 		if (initialSequences && initialSequences.length > 0) {
-			queryClient.setQueryData<SequenceFromDB[]>(
+			queryClient.setQueryData<SequencesResponse>(
 				['sequences-by-user-id'],
-				initialSequences,
+				{ sequences: initialSequences },
 			);
 		}
 	}, [initialSequences, queryClient]);
