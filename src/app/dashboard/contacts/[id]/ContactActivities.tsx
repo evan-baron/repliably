@@ -22,7 +22,7 @@ import { useAppContext } from '@/app/context/AppContext';
 
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
-import { SequencesResponse, SequenceFromDB } from '@/types/sequenceTypes';
+import { SequencesResponse, SanitizedSequence } from '@/types/sequenceTypes';
 import { MessagesWithActiveSequence } from '@/types/messageTypes';
 import { SignatureFromDB } from '@/types/userTypes';
 
@@ -67,10 +67,10 @@ const ContactActivities = ({
 	const { sequences: sequenceList } = sequences;
 	const messageList = allMessages;
 
-	const activeSequence: SequenceFromDB | undefined = sequenceList.find(
+	const activeSequence: SanitizedSequence | undefined = sequenceList.find(
 		(seq) => seq.active,
 	);
-	const previousSequences: SequenceFromDB[] = sequenceList.filter(
+	const previousSequences: SanitizedSequence[] = sequenceList.filter(
 		(seq) => !seq.active,
 	);
 

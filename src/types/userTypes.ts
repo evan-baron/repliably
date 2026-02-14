@@ -12,7 +12,11 @@ export type UserFromDB = Prisma.UserGetPayload<{
 
 export type UserToClientFromDB = Omit<
 	UserFromDB,
-	'auth0Id' | 'gmailRefreshToken'
+	| 'auth0Id'
+	| 'gmailRefreshToken'
+	| 'gmailHistoryId'
+	| 'gmailWatchExpiration'
+	| 'emailTokenExpiresAt'
 >;
 
 export type SignatureFromDB = Prisma.UserSignatureGetPayload<{}>;

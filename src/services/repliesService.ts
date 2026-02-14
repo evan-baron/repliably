@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { sanitizeReplies } from '@/lib/api';
 
 // Services imports
 import { getApiUser } from './getUserService';
@@ -16,5 +17,5 @@ export async function getAllRepliesByUserId() {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { replies };
+	return { replies: sanitizeReplies(replies) };
 }

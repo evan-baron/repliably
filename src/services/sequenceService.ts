@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { sanitizeSequence, sanitizeSequences } from '@/lib/api';
 
 // Services imports
 import { getApiUser } from './getUserService';
@@ -25,7 +26,7 @@ export async function getAllSequencesByUserId() {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { sequences };
+	return { sequences: sanitizeSequences(sequences) };
 }
 
 export async function getSequencesByContactId(contactId: number) {
@@ -49,7 +50,7 @@ export async function getSequencesByContactId(contactId: number) {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { sequences };
+	return { sequences: sanitizeSequences(sequences) };
 }
 
 export async function getSequenceById(sequenceId: number) {
@@ -73,7 +74,7 @@ export async function getSequenceById(sequenceId: number) {
 		},
 	});
 
-	return sequence;
+	return sequence ? sanitizeSequence(sequence) : null;
 }
 
 export async function deactivateSequence(sequenceId: number) {

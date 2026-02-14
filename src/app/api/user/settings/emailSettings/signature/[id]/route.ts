@@ -4,6 +4,7 @@ import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
 import { signatureSchema } from '@/lib/validation';
 import { z } from 'zod';
+import { jsonAuthError, json400, json404, json500, jsonValidationError } from '@/lib/api';
 
 export async function PUT(
 	request: NextRequest,
@@ -11,15 +12,10 @@ export async function PUT(
 ) {
 	try {
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		if (!user) {
-			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+			return json404('User not found');
 		}
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
@@ -27,23 +23,17 @@ export async function PUT(
 
 		const { id } = await params;
 
-		// Validate signature ID
 		const signatureId = parseInt(id, 10);
 
 		if (isNaN(signatureId) || signatureId <= 0) {
-			return NextResponse.json(
-				{ error: 'Invalid signature ID' },
-				{ status: 400 },
-			);
+			return json400('Invalid signature ID');
 		}
 
 		const { emailSignature } = await request.json();
 
-		// Validate input using Zod schema
 		try {
 			const validatedData = signatureSchema.parse(emailSignature);
 
-			// Remove undefined values (only update fields that were provided)
 			const updateData: {
 				name?: string;
 				content?: string;
@@ -58,22 +48,14 @@ export async function PUT(
 				updateData.isDefault = Boolean(validatedData.isDefault);
 			}
 
-			// Verify the signature belongs to this user
 			const signature = await prisma.userSignature.findFirst({
 				where: { id: signatureId, userId: user.id },
 			});
 
 			if (!signature) {
-				return NextResponse.json(
-					{ error: 'Signature not found' },
-					{ status: 404 },
-				);
+				return json404('Signature not found');
 			}
 
-			// No need to check userId again - findFirst already filtered by userId
-			// if (signature.userId !== user.id) { ... } // Redundant
-
-			// If isDefault is being set to true, unset the current default signature
 			if (updateData.isDefault) {
 				await prisma.userSignature.updateMany({
 					where: { userId: user.id, isDefault: true },
@@ -81,7 +63,6 @@ export async function PUT(
 				});
 			}
 
-			// Update the signature
 			await prisma.userSignature.update({
 				where: { id: signatureId },
 				data: updateData,
@@ -90,24 +71,13 @@ export async function PUT(
 			return NextResponse.json({ success: true });
 		} catch (validationError) {
 			if (validationError instanceof z.ZodError) {
-				const errors = validationError.issues.map((issue) => ({
-					path: issue.path.join('.'),
-					message: issue.message,
-				}));
-				return NextResponse.json(
-					{
-						error: 'Validation failed',
-						details: errors.map((e) => e.message),
-						fields: errors,
-					},
-					{ status: 400 },
-				);
+				return jsonValidationError(validationError);
 			}
 			throw validationError;
 		}
 	} catch (error) {
 		console.error('Error updating signature:', error);
-		return NextResponse.json({ error: 'Server error' }, { status: 500 });
+		return json500('Failed to update signature');
 	}
 }
 
@@ -117,15 +87,10 @@ export async function DELETE(
 ) {
 	try {
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		if (!user) {
-			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+			return json404('User not found');
 		}
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
@@ -133,32 +98,20 @@ export async function DELETE(
 
 		const { id } = await params;
 
-		// Validate signature ID
 		const signatureId = parseInt(id, 10);
 
 		if (isNaN(signatureId) || signatureId <= 0) {
-			return NextResponse.json(
-				{ error: 'Invalid signature ID' },
-				{ status: 400 },
-			);
+			return json400('Invalid signature ID');
 		}
 
-		// Verify the signature belongs to this user
 		const signature = await prisma.userSignature.findFirst({
 			where: { id: signatureId, userId: user.id },
 		});
 
 		if (!signature) {
-			return NextResponse.json(
-				{ error: 'Signature not found' },
-				{ status: 404 },
-			);
+			return json404('Signature not found');
 		}
 
-		// No need to check userId again - findFirst already filtered by userId
-		// if (signature.userId !== user.id) { ... } // Redundant
-
-		// Delete the signature
 		await prisma.userSignature.delete({
 			where: { id: signatureId },
 		});
@@ -166,6 +119,6 @@ export async function DELETE(
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error('Error deleting signature:', error);
-		return NextResponse.json({ error: 'Server error' }, { status: 500 });
+		return json500('Failed to delete signature');
 	}
 }

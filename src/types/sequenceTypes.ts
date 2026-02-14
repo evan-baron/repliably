@@ -8,6 +8,9 @@ export type SequenceFromDB = Prisma.SequenceGetPayload<{
 	};
 }>;
 
+// Sanitized variant with internal fields stripped
+export type SanitizedSequence = Omit<SequenceFromDB, 'ownerId'>;
+
 export interface SequencesResponse {
-	sequences: SequenceFromDB[];
+	sequences: SanitizedSequence[];
 }

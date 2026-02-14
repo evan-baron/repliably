@@ -2,7 +2,7 @@ import { ContactFromDB } from './contactTypes';
 
 export interface RepliesFromDB {
 	id: number;
-	ownerId: number;
+	ownerId?: number;
 	originalMessageId: string;
 	replyMessageId: string;
 	threadId: string;

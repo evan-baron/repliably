@@ -1,6 +1,7 @@
 // Library imports
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { sanitizeContact, sanitizeContacts } from '@/lib/api';
 
 // Services imports
 import { getApiUser } from './getUserService';
@@ -16,7 +17,7 @@ export async function getAllContacts() {
 		where: { ownerId: user.id },
 	});
 
-	return contacts;
+	return sanitizeContacts(contacts);
 }
 
 export async function getContactById(contactId: number) {
@@ -30,5 +31,5 @@ export async function getContactById(contactId: number) {
 		where: { ownerId: user.id, id: contactId },
 	});
 
-	return contact;
+	return contact ? sanitizeContact(contact) : null;
 }

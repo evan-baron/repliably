@@ -8,12 +8,12 @@ export interface MessageFromDB {
 	hasReply: boolean;
 	id: number;
 	inReplyTo: string | null;
-	lastError: string | null;
+	lastError?: string | null;
 	messageId: string | null;
 	needsApproval: boolean | null;
 	approved: boolean | null;
 	approvalDeadline: Date | null;
-	ownerId: number;
+	ownerId?: number;
 	replyDate: Date | null;
 	scheduledAt: Date | null;
 	sendAttempts: number;
@@ -21,7 +21,7 @@ export interface MessageFromDB {
 	sequenceId: number | null;
 	status: string;
 	subject: string;
-	templateId: number | null;
+	templateId?: number | null;
 	threadId: string | null;
 	needsFollowUp: boolean;
 	nextMessageGenerated: boolean;

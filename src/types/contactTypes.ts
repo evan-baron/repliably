@@ -69,7 +69,7 @@ export interface ContactUpdateData {
 export interface ContactFromDB {
 	id: number;
 	email: string;
-	ownerId: number;
+	ownerId?: number;
 	firstName: string | null;
 	lastName: string | null;
 	company: string | null;

@@ -2,16 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
+import { jsonAuthError, json500, sanitizeRepliesWithContact } from '@/lib/api';
 
 export async function GET(req: NextRequest) {
 	try {
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status }
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
@@ -21,16 +17,16 @@ export async function GET(req: NextRequest) {
 				ownerId: user.id,
 			},
 			include: {
-				contact: true, // Include contact details
+				contact: true,
 			},
 			orderBy: {
 				replyDate: 'desc',
 			},
 		});
 
-		return NextResponse.json({ replies });
-	} catch (error: any) {
+		return NextResponse.json({ replies: sanitizeRepliesWithContact(replies) });
+	} catch (error) {
 		console.error('Error fetching replies:', error);
-		return NextResponse.json({ error: error.message }, { status: 500 });
+		return json500('Failed to fetch replies');
 	}
 }

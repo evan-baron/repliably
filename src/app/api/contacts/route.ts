@@ -2,52 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 import { applyRateLimit } from '@/lib/rateLimit';
+import { jsonAuthError, json400, json500, sanitizeContact, sanitizeContacts } from '@/lib/api';
 
 export async function GET(req: NextRequest) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status }
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
 
-		// 3. Fetch contacts for the user
 		const contacts = await prisma.contact.findMany({
 			where: { ownerId: user.id },
 		});
 
-		// 4. Return contacts
-		return NextResponse.json({ contacts });
-	} catch (error: any) {
+		return NextResponse.json({ contacts: sanitizeContacts(contacts) });
+	} catch (error) {
 		console.error('Error fetching contacts:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to fetch contacts' },
-			{ status: 500 }
-		);
+		return json500('Failed to fetch contacts');
 	}
 }
 
 export async function POST(req: NextRequest) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status }
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'contacts-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
 
-		// 3. Parse request body
 		const {
 			firstName,
 			lastName,
@@ -60,15 +43,10 @@ export async function POST(req: NextRequest) {
 			reasonForEmail,
 		} = await req.json();
 
-		// 4. Validate required fields
 		if (!firstName || !lastName || !email) {
-			return NextResponse.json(
-				{ error: 'Missing required fields: firstName, lastName, email' },
-				{ status: 400 }
-			);
+			return json400('Missing required fields: firstName, lastName, email');
 		}
 
-		// 5. Validate contact does not already exist for this user
 		const existingContact = await prisma.contact.findFirst({
 			where: {
 				ownerId: user.id,
@@ -89,42 +67,16 @@ export async function POST(req: NextRequest) {
 				existingContact.reasonForEmail === (reasonForEmail || null);
 
 			if (isIdentical) {
-				// Pretend we created it - return success with existing contact
 				return NextResponse.json({
 					success: true,
-					contact: {
-						id: existingContact.id,
-						firstName: existingContact.firstName,
-						lastName: existingContact.lastName,
-						company: existingContact.company,
-						title: existingContact.title,
-						email: existingContact.email,
-						phone: existingContact.phone,
-						linkedIn: existingContact.linkedIn,
-						importance: existingContact.importance,
-						reasonForEmail: existingContact.reasonForEmail,
-						createdAt: existingContact.createdAt.toISOString(),
-						updatedAt: existingContact.updatedAt.toISOString(),
-					},
+					contact: sanitizeContact(existingContact),
 				});
 			}
 
-			// Return duplicate data for comparison instead of error
 			return NextResponse.json({
 				success: false,
 				duplicate: true,
-				existingContact: {
-					id: existingContact.id,
-					firstName: existingContact.firstName,
-					lastName: existingContact.lastName,
-					company: existingContact.company,
-					title: existingContact.title,
-					email: existingContact.email,
-					phone: existingContact.phone,
-					linkedIn: existingContact.linkedIn,
-					importance: existingContact.importance,
-					reasonForEmail: existingContact.reasonForEmail,
-				},
+				existingContact: sanitizeContact(existingContact),
 				submittedData: {
 					firstName,
 					lastName,
@@ -139,7 +91,6 @@ export async function POST(req: NextRequest) {
 			});
 		}
 
-		// 6. Create contact in database
 		const contact = await prisma.contact.create({
 			data: {
 				ownerId: user.id,
@@ -155,16 +106,12 @@ export async function POST(req: NextRequest) {
 			},
 		});
 
-		// 7. Return success response
 		return NextResponse.json({
 			success: true,
-			contact,
+			contact: sanitizeContact(contact),
 		});
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Contact creation error:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to create contact' },
-			{ status: 500 }
-		);
+		return json500('Failed to create contact');
 	}
 }

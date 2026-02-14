@@ -4,22 +4,15 @@ import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
 import { accountSettingsSchema } from '@/lib/validation';
 import { z } from 'zod';
+import { jsonAuthError, json401, json500, jsonValidationError, sanitizeUser } from '@/lib/api';
 
 export async function PUT(request: NextRequest) {
 	try {
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		if (!user) {
-			return NextResponse.json(
-				{ error: 'User not authenticated' },
-				{ status: 401 },
-			);
+			return json401('User not authenticated');
 		}
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
@@ -27,19 +20,15 @@ export async function PUT(request: NextRequest) {
 
 		const body = await request.json();
 
-		// Validate input using Zod schema
 		try {
-			// Parse and validate - this will filter out any fields not in the schema
 			const validatedData = accountSettingsSchema.parse(body.updateData);
 
-			// Remove undefined values (only update fields that were provided)
 			const updateData = Object.fromEntries(
 				Object.entries(validatedData).filter(
 					([_, value]) => value !== undefined,
 				),
 			);
 
-			// Ensure booleans are actual booleans
 			if ('trackEmailOpens' in updateData) {
 				updateData.trackEmailOpens = Boolean(updateData.trackEmailOpens);
 			}
@@ -81,48 +70,30 @@ export async function PUT(request: NextRequest) {
 			}
 
 			if (updateData.defaultSequenceDuration === -1) {
-				updateData.defaultSequenceDuration = null; // Use null to represent "Indefinitely"
+				updateData.defaultSequenceDuration = null;
 			}
 
-			// Update user with validated and sanitized data
 			const updatedUser = await prisma.user.update({
 				where: { id: user.id },
 				data: updateData,
+				include: {
+					signatures: {
+						orderBy: {
+							createdAt: 'asc',
+						},
+					},
+				},
 			});
 
-			return NextResponse.json({ success: true, user: updatedUser });
+			return NextResponse.json({ success: true, user: sanitizeUser(updatedUser) });
 		} catch (validationError) {
 			if (validationError instanceof z.ZodError) {
-				const errors = validationError.issues.map((issue) => ({
-					path: issue.path.join('.'),
-					message: issue.message,
-				}));
-				return NextResponse.json(
-					{
-						error: 'Validation failed',
-						details: errors.map((e) => e.message),
-						fields: errors,
-					},
-					{ status: 400 },
-				);
+				return jsonValidationError(validationError);
 			}
 			throw validationError;
 		}
 	} catch (error) {
 		console.error('Error updating user:', error);
-		let message = 'Unknown error';
-		let stack = undefined;
-		if (error instanceof Error) {
-			message = error.message;
-			stack = error.stack;
-		}
-		console.error('Error details:', {
-			message,
-			stack,
-		});
-		return NextResponse.json(
-			{ success: false, error: 'Failed to update user' },
-			{ status: 500 },
-		);
+		return json500('Failed to update user');
 	}
 }

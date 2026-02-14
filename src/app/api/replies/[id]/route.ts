@@ -2,20 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
+import { jsonAuthError, json500, sanitizeReply } from '@/lib/api';
 
 export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status }
-			);
-		}
+		if (error) return jsonAuthError(error);
+
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
 
@@ -28,12 +24,9 @@ export async function PUT(
 			},
 		});
 
-		return NextResponse.json({ reply });
-	} catch (error: any) {
+		return NextResponse.json({ reply: sanitizeReply(reply) });
+	} catch (error) {
 		console.error('Error updating reply:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to update reply' },
-			{ status: 500 }
-		);
+		return json500('Failed to update reply');
 	}
 }

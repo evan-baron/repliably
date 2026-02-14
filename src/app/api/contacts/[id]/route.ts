@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
+import { jsonAuthError, json400, json404, json500, sanitizeContact } from '@/lib/api';
 
 export async function GET(
 	request: NextRequest,
@@ -9,12 +10,7 @@ export async function GET(
 ) {
 	try {
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
@@ -25,15 +21,12 @@ export async function GET(
 			where: { id: contactId, ownerId: user.id },
 		});
 		if (!contact) {
-			return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
+			return json404('Contact not found');
 		}
-		return NextResponse.json(contact);
+		return NextResponse.json(sanitizeContact(contact));
 	} catch (error) {
 		console.error('Error fetching contact:', error);
-		return NextResponse.json(
-			{ error: 'Failed to fetch contact' },
-			{ status: 500 },
-		);
+		return json500('Failed to fetch contact');
 	}
 }
 
@@ -42,14 +35,8 @@ export async function PUT(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
@@ -58,14 +45,12 @@ export async function PUT(
 		const contactId = parseInt(id);
 		const body = await request.json();
 
-		// Remove id from the update data since we don't want to update the ID
 		const { id: bodyId, ...updateData } = body;
 
-		// Convert importance to integer if it exists
 		if (updateData.importance !== undefined && updateData.importance !== '') {
 			updateData.importance = parseInt(updateData.importance);
 		} else {
-			updateData.importance = null; // Remove importance if not set
+			updateData.importance = null;
 		}
 
 		const existingContact = await prisma.contact.findUnique({
@@ -75,13 +60,9 @@ export async function PUT(
 		});
 
 		if (!existingContact || existingContact.ownerId !== user.id) {
-			return NextResponse.json(
-				{ success: false, error: 'Contact not found' },
-				{ status: 404 },
-			);
+			return json404('Contact not found');
 		}
 
-		// Check if email is being changed to a different contact's email
 		if (updateData.email && updateData.email !== existingContact.email) {
 			const emailConflict = await prisma.contact.findFirst({
 				where: {
@@ -92,13 +73,7 @@ export async function PUT(
 			});
 
 			if (emailConflict) {
-				return NextResponse.json(
-					{
-						success: false,
-						error: 'Contact with this email already exists',
-					},
-					{ status: 400 },
-				);
+				return json400('Contact with this email already exists');
 			}
 		}
 
@@ -114,24 +89,11 @@ export async function PUT(
 
 		return NextResponse.json({
 			success: true,
-			contact: updatedContact,
+			contact: sanitizeContact(updatedContact),
 		});
 	} catch (error) {
 		console.error('Error updating contact:', error);
-		let message = 'Unknown error';
-		let stack = undefined;
-		if (error instanceof Error) {
-			message = error.message;
-			stack = error.stack;
-		}
-		console.error('Error details:', {
-			message,
-			stack,
-		});
-		return NextResponse.json(
-			{ success: false, error: 'Failed to update contact' },
-			{ status: 500 },
-		);
+		return json500('Failed to update contact');
 	}
 }
 
@@ -140,14 +102,8 @@ export async function DELETE(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
@@ -163,9 +119,6 @@ export async function DELETE(
 		return NextResponse.json({ success: true });
 	} catch (error) {
 		console.error('Error deleting contact:', error);
-		return NextResponse.json(
-			{ error: 'Failed to delete contact' },
-			{ status: 500 },
-		);
+		return json500('Failed to delete contact');
 	}
 }

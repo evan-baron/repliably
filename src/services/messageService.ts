@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { sanitizeMessages, sanitizeMessagesWithContact } from '@/lib/api';
 
 // Services imports
 import { getApiUser } from './getUserService';
@@ -16,7 +17,7 @@ export async function getAllMessagesByUserId() {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { messages };
+	return { messages: sanitizeMessages(messages) };
 }
 
 export async function getAllPendingMessages() {
@@ -33,7 +34,7 @@ export async function getAllPendingMessages() {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { messages };
+	return { messages: sanitizeMessagesWithContact(messages) };
 }
 
 export async function getAllMessagesByContactId(contactId: number) {
@@ -49,7 +50,7 @@ export async function getAllMessagesByContactId(contactId: number) {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { messages };
+	return { messages: sanitizeMessages(messages) };
 }
 
 export async function getStandaloneMessagesByContactId(contactId: number) {
@@ -65,5 +66,5 @@ export async function getStandaloneMessagesByContactId(contactId: number) {
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { messages };
+	return { messages: sanitizeMessages(messages) };
 }

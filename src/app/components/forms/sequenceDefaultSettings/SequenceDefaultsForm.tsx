@@ -93,6 +93,9 @@ const SequenceDefaultsForm = ({ user }: { user: UserToClientFromDB }) => {
 			setLoadingMessage('Saving');
 			await updateUser({ ...payload });
 
+			reset(payload);
+			setHasChanged(false);
+
 			// Delaying by a small amount to ensure the user sees the loading state
 			setTimeout(() => {
 				setLoading(false);

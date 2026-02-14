@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Types imports
-import { SequenceFromDB } from '@/types/sequenceTypes';
+import { SanitizedSequence } from '@/types/sequenceTypes';
 import {
 	MasterTableData,
 	CellOrientation,
@@ -15,7 +15,7 @@ import {
 // Components
 import MasterTable from '../masterTable/MasterTable';
 
-const ActiveSequences = ({ sequences }: { sequences: SequenceFromDB[] }) => {
+const ActiveSequences = ({ sequences }: { sequences: SanitizedSequence[] }) => {
 	const columnHeaders = [
 		{ label: 'Contact', size: 'sm', sortable: true },
 		{ label: 'Sequence Name', size: 'md' },

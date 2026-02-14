@@ -1,11 +1,11 @@
 // Types imports
-import { SequenceFromDB } from '@/types/sequenceTypes';
+import { SanitizedSequence } from '@/types/sequenceTypes';
 import { MasterTableData } from '@/types/masterTableTypes';
 
 // Components imports
 import MasterTable from '../masterTable/MasterTable';
 
-const ActiveSequenceTable = ({ sequence }: { sequence: SequenceFromDB }) => {
+const ActiveSequenceTable = ({ sequence }: { sequence: SanitizedSequence }) => {
 	const columnHeaders = [
 		{ label: 'Subject', size: 'md' },
 		{ label: 'Content', size: 'lrg' },

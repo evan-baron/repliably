@@ -137,6 +137,9 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 			setLoadingMessage('Saving');
 			await updateUser({ ...sanitizedData });
 
+			reset(sanitizedData);
+			setHasChanged(false);
+
 			// Delaying by a small amount to ensure the user sees the loading state
 			setTimeout(() => {
 				setLoading(false);

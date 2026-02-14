@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 
 // Types imports
-import { SequenceFromDB } from '@/types/sequenceTypes';
+import { SanitizedSequence } from '@/types/sequenceTypes';
 import {
 	MasterTableData,
 	CellOrientation,
@@ -20,7 +20,7 @@ const PreviousSequences = ({
 	contact,
 }: // previousActivities,
 {
-	sequences: SequenceFromDB[];
+	sequences: SanitizedSequence[];
 	contact?: boolean;
 	// previousActivities: PreviousActivity[];
 }) => {

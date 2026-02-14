@@ -4,21 +4,15 @@ import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
 import { messageUpdateSchema } from '@/lib/validation';
 import { z } from 'zod';
+import { jsonAuthError, json500, jsonValidationError, sanitizeMessage } from '@/lib/api';
 
 export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status }
-			);
-		}
+		if (error) return jsonAuthError(error);
 
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
@@ -30,18 +24,7 @@ export async function PUT(
 			validatedData = messageUpdateSchema.parse(body);
 		} catch (validationError) {
 			if (validationError instanceof z.ZodError) {
-				const errors = validationError.issues.map((issue) => ({
-					path: issue.path.join('.'),
-					message: issue.message,
-				}));
-				return NextResponse.json(
-					{
-						error: 'Validation failed',
-						details: errors.map((e) => e.message),
-						fields: errors,
-					},
-					{ status: 400 },
-				);
+				return jsonValidationError(validationError);
 			}
 			throw validationError;
 		}
@@ -59,12 +42,9 @@ export async function PUT(
 			},
 		});
 
-		return NextResponse.json({ message });
-	} catch (error: any) {
-		console.error('Error approving message:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to approve message' },
-			{ status: 500 }
-		);
+		return NextResponse.json({ message: sanitizeMessage(message) });
+	} catch (error) {
+		console.error('Error updating message:', error);
+		return json500('Failed to update message');
 	}
 }

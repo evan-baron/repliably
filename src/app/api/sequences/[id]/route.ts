@@ -2,20 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { applyRateLimit } from '@/lib/rateLimit';
+import { jsonAuthError, json500, sanitizeSequence, sanitizeContact } from '@/lib/api';
 
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
+
 		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
 
@@ -32,13 +28,11 @@ export async function GET(
 				},
 			},
 		});
-		return NextResponse.json({ sequence });
-	} catch (error: any) {
-		console.error('Error fetching sequences for contact:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to fetch sequences' },
-			{ status: 500 },
-		);
+
+		return NextResponse.json({ sequence: sequence ? sanitizeSequence(sequence) : null });
+	} catch (error) {
+		console.error('Error fetching sequence:', error);
+		return json500('Failed to fetch sequence');
 	}
 }
 
@@ -47,14 +41,9 @@ export async function PUT(
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
-		// 1. Check authentication
 		const { user, error } = await getApiUser();
-		if (error) {
-			return NextResponse.json(
-				{ error: error.error },
-				{ status: error.status },
-			);
-		}
+		if (error) return jsonAuthError(error);
+
 		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
 		if (rateLimited) return rateLimited;
 
@@ -76,15 +65,12 @@ export async function PUT(
 			data: { active: false },
 		});
 		return NextResponse.json({
-			updatedSequence,
+			updatedSequence: sanitizeSequence(updatedSequence),
 			deletedMessages,
-			updatedContact,
+			updatedContact: sanitizeContact(updatedContact),
 		});
-	} catch (error: any) {
+	} catch (error) {
 		console.error('Error updating sequence:', error);
-		return NextResponse.json(
-			{ error: error.message || 'Failed to update sequence' },
-			{ status: 500 },
-		);
+		return json500('Failed to update sequence');
 	}
 }

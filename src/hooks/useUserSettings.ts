@@ -96,15 +96,7 @@ export const useDeleteUser = () => {
 	const queryClient = useQueryClient();
 	return useMutation<void, Error>({
 		mutationFn: async () => {
-			const { auth0Id } = await userAPI.deleteUser();
-
-			if (auth0Id) {
-				try {
-					await userAPI.deleteAuth0User(auth0Id);
-				} catch (error) {
-					console.error('Error deleting Auth0 user:', error);
-				}
-			}
+			await userAPI.deleteUser();
 		},
 		onSuccess: () => {
 			queryClient.clear();

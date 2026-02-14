@@ -5,13 +5,13 @@ import { sequenceType } from '@/lib/helpers/sequenceHelpers';
 import styles from './activeSequence.module.scss';
 
 // Types imports
-import { SequenceFromDB } from '@/types/sequenceTypes';
+import { SanitizedSequence } from '@/types/sequenceTypes';
 
 // Components imports
 import DeactivateSequenceButton from '@/app/components/buttons/DeactivateSequenceButton';
 import ActiveSequenceTable from './ActiveSequenceTable';
 
-const ActiveSequence = ({ sequence }: { sequence: SequenceFromDB }) => {
+const ActiveSequence = ({ sequence }: { sequence: SanitizedSequence }) => {
 	const startDate = new Date(sequence.createdAt).toLocaleDateString();
 	const endDate =
 		sequence.endDate ? new Date(sequence.endDate).toLocaleDateString() : null;
