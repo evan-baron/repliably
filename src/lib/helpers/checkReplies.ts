@@ -176,7 +176,7 @@ export async function processMessage(gmail: any, messageId: string) {
 				'triggering pusher now...',
 			);
 
-			pusher.trigger(`user-${sentMessage.ownerId}`, 'reply-received', {
+			pusher.trigger(`private-user-${sentMessage.ownerId}`, 'reply-received', {
 				contactId: sentMessage.contactId,
 				replyMessageId: messageId,
 				replySubject: subject || 'Reply',

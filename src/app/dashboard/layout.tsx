@@ -68,6 +68,7 @@ export default async function DashboardLayout({
 					<SideBarClient
 						initialMessages={messages}
 						initialEmailConnectionActive={emailConnectionActive}
+						userId={user.id}
 					/>
 
 					<main className={styles.dashboardContent}>{children}</main>

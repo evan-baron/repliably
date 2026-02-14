@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 // Hooks imports
 import { useMessagesGetAllPending } from '@/hooks/useMessages';
 import { useGetEmailConnectionStatus } from '@/hooks/useUserSettings';
+import { useReplyNotifications } from '@/hooks/usePusher';
 
 // Components imports
 import SideBar from './SideBar';
@@ -20,12 +21,15 @@ import { MessageFromDB, MessagesResponse } from '@/types/messageTypes';
 export default function SideBarClient({
 	initialMessages = [],
 	initialEmailConnectionActive = false,
+	userId,
 }: {
 	initialMessages: MessageFromDB[];
 	initialEmailConnectionActive: boolean;
+	userId: number;
 }) {
 	const queryClient = useQueryClient();
 	const { newReplyNotification, setNewReplyNotification } = useAppContext();
+	useReplyNotifications(userId.toString());
 	// hydrate server data into the cache
 	useEffect(() => {
 		if (initialMessages) {

@@ -12,6 +12,10 @@ export function useReplyNotifications(userId: string) {
 	useEffect(() => {
 		const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
 			cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+			channelAuthorization: {
+				endpoint: '/api/pusher/auth',
+				transport: 'ajax',
+			},
 		});
 
 		console.log('Subscribing to Pusher channel for user:', userId);
@@ -26,7 +30,7 @@ export function useReplyNotifications(userId: string) {
 						query.queryKey[0] as string,
 					),
 			});
-			!newReplyNotification && setNewReplyNotification(true);
+			setNewReplyNotification(true);
 		});
 
 		return () => {
@@ -34,5 +38,5 @@ export function useReplyNotifications(userId: string) {
 			channel.unsubscribe();
 			pusher.disconnect();
 		};
-	}, [userId, queryClient, newReplyNotification, setNewReplyNotification]);
+	}, [userId, queryClient, setNewReplyNotification]);
 }
