@@ -37,7 +37,7 @@ const SequencesClient = ({
 	useEffect(() => {
 		if (initialSequences && initialSequences.length > 0) {
 			queryClient.setQueryData<SequenceFromDB[]>(
-				['sequences-get-all'],
+				['sequences-by-user-id'],
 				initialSequences,
 			);
 		}
