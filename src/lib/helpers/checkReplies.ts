@@ -33,6 +33,17 @@ export async function processMessage(gmail: any, messageId: string) {
 			id: messageId,
 		});
 
+		const outboundMessage = await prisma.message.findFirst({
+			where: {
+				messageId: messageId,
+				direction: 'outbound',
+			},
+		});
+
+		if (outboundMessage) {
+			return;
+		}
+
 		const headers = message.data.payload.headers;
 		const threadId = message.data.threadId;
 
