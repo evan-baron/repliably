@@ -24,7 +24,12 @@ export default function NavigationItem({
 	icon,
 	emailConnectionStatus = false,
 }: NavigationItemProps) {
-	const { setModalType, setAlertMessage } = useAppContext();
+	const {
+		setModalType,
+		setAlertMessage,
+		newReplyNotification,
+		setNewReplyNotification,
+	} = useAppContext();
 
 	const activeLabels = [
 		'New Email',
@@ -43,6 +48,10 @@ export default function NavigationItem({
 			setAlertMessage('No email');
 
 			setModalType('alert');
+		}
+
+		if (label === 'Replies' && newReplyNotification) {
+			setNewReplyNotification(false);
 		}
 
 		if (!activeLabels.includes(label)) {

@@ -26,7 +26,6 @@ export async function checkForReplies(gmail: any) {
 
 // Process a single Gmail message by ID (ONLY WORKS IF SENT FROM GMAIL API)
 export async function processMessage(gmail: any, messageId: string) {
-	console.log('processing message with ID:', messageId);
 	try {
 		const message = await gmail.users.messages.get({
 			userId: 'me',
@@ -169,12 +168,6 @@ export async function processMessage(gmail: any, messageId: string) {
 					isAutomated: isAutoReply,
 				},
 			});
-
-			console.log(
-				'Reply stored in database for message ID:',
-				messageId,
-				'triggering pusher now...',
-			);
 
 			pusher.trigger(`private-user-${sentMessage.ownerId}`, 'reply-received', {
 				contactId: sentMessage.contactId,
@@ -413,8 +406,6 @@ export function isBounceSender(
 	const f = (fromHeader || '').toLowerCase();
 	const rp = (returnPath || '').trim();
 
-	console.log('Checking if sender is bounce:', { fromHeader, returnPath });
-
 	// regex patterns to catch common bounce senders / subsystems
 	const patterns = [
 		/mailer-?daemon/i,
@@ -443,12 +434,6 @@ export function detectBounce(message: any) {
 	const xFailed = headers.find(
 		(h: any) => h.name.toLowerCase() === 'x-failed-recipients',
 	)?.value;
-
-	console.log('Checking for bounce indicators in headers:', {
-		from,
-		autoSubmitted,
-		xFailed,
-	});
 
 	if (/mailer-daemon|postmaster/i.test(from)) {
 		console.log('Bounce sender detected based on From header:', from);
@@ -480,8 +465,6 @@ export function detectBounce(message: any) {
 				)
 			:	'');
 		const parsed = analyzeDeliveryStatusText(deliveryText);
-
-		console.log('Analyzed delivery status text:', parsed);
 
 		if (parsed.status && parsed.status.startsWith('5')) {
 			return {
@@ -516,8 +499,6 @@ export function detectBounce(message: any) {
 		'no such user',
 		'mailbox unavailable',
 	];
-
-	console.log('text inside bounce detection:', text);
 
 	for (const phrase of bounceIndicators) {
 		if (text.includes(phrase)) {
