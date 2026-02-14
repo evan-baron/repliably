@@ -1,8 +1,7 @@
 'use client';
 
 // Library imports
-import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 // Styles
 import styles from './sequencesClient.module.scss';
@@ -11,7 +10,7 @@ import styles from './sequencesClient.module.scss';
 import { useAllSequencesByUserId } from '@/hooks/useSequence';
 
 // Types imports
-import { SequenceFromDB, SequencesResponse } from '@/types/sequenceTypes';
+import { SequenceFromDB } from '@/types/sequenceTypes';
 
 // Components imports
 import DeactivateAllSequencesButton from '@/app/components/buttons/DeactivateAllSequencesButton';
@@ -23,8 +22,6 @@ const SequencesClient = ({
 }: {
 	initialSequences: SequenceFromDB[];
 }) => {
-	const queryClient = useQueryClient();
-
 	type SelectedType = 'active' | 'previous';
 	const [selected, setSelected] = useState<SelectedType>('active');
 
@@ -34,16 +31,9 @@ const SequencesClient = ({
 		};
 	}
 
-	useEffect(() => {
-		if (initialSequences && initialSequences.length > 0) {
-			queryClient.setQueryData<SequencesResponse>(
-				['sequences-by-user-id'],
-				{ sequences: initialSequences },
-			);
-		}
-	}, [initialSequences, queryClient]);
-
-	const { data: sequencesData } = useAllSequencesByUserId();
+	const { data: sequencesData } = useAllSequencesByUserId({
+		sequences: initialSequences,
+	});
 
 	const sequences = sequencesData?.sequences || [];
 

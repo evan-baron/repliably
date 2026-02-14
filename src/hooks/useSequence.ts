@@ -7,10 +7,11 @@ import { SequencesResponse } from '@/types/sequenceTypes';
 // Tanstack React Query
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useAllSequencesByUserId = () => {
+export const useAllSequencesByUserId = (initialData?: SequencesResponse) => {
 	return useQuery<SequencesResponse>({
 		queryKey: ['sequences-by-user-id'],
 		queryFn: () => sequenceAPI.readAll(),
+		...(initialData ? { initialData } : {}),
 	});
 };
 
