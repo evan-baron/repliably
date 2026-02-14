@@ -450,7 +450,14 @@ export function detectBounce(message: any) {
 		(h: any) => h.name.toLowerCase() === 'x-failed-recipients',
 	)?.value;
 
+	console.log('Checking for bounce indicators in headers:', {
+		from,
+		autoSubmitted,
+		xFailed,
+	});
+
 	if (/mailer-daemon|postmaster/i.test(from)) {
+		console.log('Bounce sender detected based on From header:', from);
 		return { bounced: true, reason: 'mailer-daemon sender' };
 	}
 
@@ -479,6 +486,9 @@ export function detectBounce(message: any) {
 				)
 			:	'');
 		const parsed = analyzeDeliveryStatusText(deliveryText);
+
+		console.log('Analyzed delivery status text:', parsed);
+
 		if (parsed.status && parsed.status.startsWith('5')) {
 			return {
 				bounced: true,
