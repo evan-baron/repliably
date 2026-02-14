@@ -70,6 +70,12 @@ export const createSignatureSchema = z.object({
 	isDefault: z.boolean().optional(),
 });
 
+// Message Update Schema
+export const messageUpdateSchema = z.object({
+	subject: z.string().min(1, 'Subject is required').max(500, 'Subject must be less than 500 characters'),
+	contents: z.string().min(1, 'Contents are required').max(5000, 'Contents must be less than 5000 characters'),
+});
+
 // Send Email Schema - matches StoredEmailData interface
 export const sendEmailSchema = z.object({
 	to: z.email('Invalid recipient email address'),
