@@ -12,7 +12,7 @@ const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI!;
 export async function POST(req: NextRequest) {
 	// 1. Get the Authorization header
 	const authHeader = req.headers.get('authorization');
-	console.log('Received webhook with Authorization header:', authHeader);
+
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -20,14 +20,12 @@ export async function POST(req: NextRequest) {
 
 	// 2. Verify the JWT
 	const client = new OAuth2Client();
-	let payload;
 
 	try {
-		const ticket = await client.verifyIdToken({
+		await client.verifyIdToken({
 			idToken: token,
 			audience: process.env.PUBSUB_AUDIENCE,
 		});
-		payload = ticket.getPayload();
 	} catch (err) {
 		console.error('JWT verification failed:', err);
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -35,13 +33,11 @@ export async function POST(req: NextRequest) {
 
 	try {
 		const body = await req.json();
-		console.log('Gmail webhook received:', body);
 
 		// Decode the Pub/Sub message
 		const message = JSON.parse(
 			Buffer.from(body.message.data, 'base64').toString(),
 		);
-		console.log('Decoded message:', message);
 
 		const { emailAddress } = message;
 
@@ -93,8 +89,6 @@ export async function POST(req: NextRequest) {
 }
 
 async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
-	console.log('Checking for new emails with historyId:', historyId);
-
 	// Decrypt the refresh token
 	const refreshToken = decrypt(gmailRefreshToken);
 
@@ -116,8 +110,6 @@ async function checkForNewEmails(historyId: string, gmailRefreshToken: string) {
 			startHistoryId: historyId,
 			historyTypes: ['messageAdded'], // Only new messages
 		});
-
-		console.log('History response:', historyResponse.data);
 
 		if (historyResponse.data.history) {
 			for (const historyItem of historyResponse.data.history) {

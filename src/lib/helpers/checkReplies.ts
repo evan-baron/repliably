@@ -11,8 +11,6 @@ const pusher = new Pusher({
 
 // Reuse existing processMessage function logic
 export async function checkForReplies(gmail: any) {
-	console.log('Fetching recent messages from Gmail...');
-
 	const response = await gmail.users.messages.list({
 		userId: 'me',
 		q: 'in:inbox',
@@ -20,9 +18,6 @@ export async function checkForReplies(gmail: any) {
 	});
 
 	if (response.data.messages) {
-		console.log(
-			`Found ${response.data.messages.length} recent messages to check`,
-		);
 		for (const message of response.data.messages) {
 			await processMessage(gmail, message.id!);
 		}
@@ -44,39 +39,6 @@ export async function processMessage(gmail: any, messageId: string) {
 		// Extract sender email and use it for validation
 		const from = headers.find((h: any) => h.name === 'From')?.value;
 
-		const isBounceSenderResult = isBounceSender(
-			from,
-			message.data.payload.headers.find((h: any) => h.name === 'Return-Path')
-				?.value,
-		);
-
-		if (isBounceSenderResult) {
-			console.log('Message identified as bounce based on sender:', from);
-
-			const { data } = message;
-
-			const { threadId } = data;
-
-			const sentMessage = await prisma.message.findFirst({
-				where: {
-					threadId: threadId,
-					direction: 'outbound',
-				},
-				include: { contact: true },
-			});
-
-			if (!sentMessage) {
-				return;
-			}
-
-			await prisma.contact.update({
-				where: { id: sentMessage.contactId },
-				data: { validEmail: false },
-			});
-
-			return;
-		}
-
 		// Extract email address from the "From" header
 		const senderEmail = extractEmailFromHeader(from);
 
@@ -92,6 +54,23 @@ export async function processMessage(gmail: any, messageId: string) {
 		});
 
 		if (sentMessage) {
+			const isBounceSenderResult = isBounceSender(
+				from,
+				message.data.payload.headers.find((h: any) => h.name === 'Return-Path')
+					?.value,
+			);
+
+			if (isBounceSenderResult) {
+				console.log('Message identified as bounce based on sender:', from);
+
+				await prisma.contact.update({
+					where: { id: sentMessage.contactId },
+					data: { validEmail: false },
+				});
+
+				return;
+			}
+
 			// Validate that the reply is from the same contact user sent to
 			if (senderEmail !== sentMessage.contact.email) {
 				//Reply from different email than original contact, SKIP
