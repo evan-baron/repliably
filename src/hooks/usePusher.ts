@@ -18,8 +18,6 @@ export function useReplyNotifications(userId: string) {
 			},
 		});
 
-		console.log('Subscribing to Pusher channel for user:', userId);
-
 		const channel = pusher.subscribe(`private-user-${userId}`);
 
 		channel.bind('reply-received', (data: any) => {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function PUT(request: NextRequest) {
 	try {
@@ -12,6 +13,9 @@ export async function PUT(request: NextRequest) {
 				{ status: error.status },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const activeSequences = await prisma.sequence.findMany({
 			where: { ownerId: user.id, active: true },

@@ -204,6 +204,17 @@ enum MessageStatus {
   processing
 }
 
+model RateLimit {
+  id          Int      @id @default(autoincrement())
+  identifier  String
+  bucket      String
+  windowStart DateTime
+  count       Int      @default(1)
+
+  @@unique([identifier, bucket])
+  @@index([windowStart])
+}
+
 enum SubscriptionTier {
   free
   basic

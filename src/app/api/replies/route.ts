@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function GET(req: NextRequest) {
 	try {
@@ -11,6 +12,9 @@ export async function GET(req: NextRequest) {
 				{ status: error.status }
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const replies = await prisma.emailReply.findMany({
 			where: {

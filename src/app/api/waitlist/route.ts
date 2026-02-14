@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { waitlistEmailSchema } from '@/lib/validation';
+import { applyPublicRateLimit } from '@/lib/rateLimit';
 import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
 	try {
+		const rateLimited = await applyPublicRateLimit(req, 'waitlist');
+		if (rateLimited) return rateLimited;
+
 		const body = await req.json();
 
 		const parseResult = waitlistEmailSchema.safeParse(body);

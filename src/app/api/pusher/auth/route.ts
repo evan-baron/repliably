@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Pusher from 'pusher';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 const pusher = new Pusher({
 	appId: process.env.PUSHER_APP_ID!,
@@ -19,6 +20,9 @@ export async function POST(req: NextRequest) {
 				{ status: error.status },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const body = await req.formData();
 		const socketId = body.get('socket_id') as string;

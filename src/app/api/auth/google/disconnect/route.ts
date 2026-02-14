@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
 	try {
@@ -9,6 +10,9 @@ export async function POST(request: NextRequest) {
 		if (error || !user) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		// Clear Gmail connection data from database
 		await prisma.user.update({

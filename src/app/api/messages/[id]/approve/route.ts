@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function PUT(
 	request: NextRequest,
@@ -16,6 +17,9 @@ export async function PUT(
 				{ status: error.status }
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const { id } = await params;
 		const messageId = parseInt(id);

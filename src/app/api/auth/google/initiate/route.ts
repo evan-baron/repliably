@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 const oauth2Client = new google.auth.OAuth2(
 	process.env.GOOGLE_CLIENT_ID,
@@ -23,6 +24,9 @@ export async function GET(request: NextRequest) {
 		if (error || !user) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		// Generate OAuth URL
 		const authUrl = oauth2Client.generateAuthUrl({

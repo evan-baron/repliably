@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function GET(req: NextRequest) {
 	try {
@@ -12,6 +13,9 @@ export async function GET(req: NextRequest) {
 				{ status: error.status }
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		// 3. Fetch contacts for the user
 		const contacts = await prisma.contact.findMany({
@@ -39,6 +43,9 @@ export async function POST(req: NextRequest) {
 				{ status: error.status }
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'contacts-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		// 3. Parse request body
 		const {

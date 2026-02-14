@@ -50,12 +50,10 @@ export async function POST(req: NextRequest) {
 		const { id, gmailRefreshToken, gmailHistoryId } = user || {};
 
 		if (!id) {
-			console.error('No user found for email:', emailAddress);
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
 		if (!gmailRefreshToken) {
-			console.error('User does not have a Gmail refresh token:', emailAddress);
 			return NextResponse.json(
 				{ error: 'Gmail refresh token not found' },
 				{ status: 404 },
@@ -63,7 +61,6 @@ export async function POST(req: NextRequest) {
 		}
 
 		if (!gmailHistoryId) {
-			console.error('User does not have a Gmail history ID:', emailAddress);
 			return NextResponse.json(
 				{ error: 'Gmail history ID not found' },
 				{ status: 404 },

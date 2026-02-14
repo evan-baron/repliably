@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
 	const { user: apiUser, error } = await getApiUser();
@@ -8,6 +9,9 @@ export async function GET(request: NextRequest) {
 	if (!apiUser || error) {
 		return NextResponse.json({ error: error.error }, { status: error.status });
 	}
+
+	const rateLimited = await applyRateLimit(apiUser.id, 'crud-read', apiUser.subscriptionTier);
+	if (rateLimited) return rateLimited;
 
 	try {
 		const userFromDB = await prisma.user.findUnique({
@@ -42,6 +46,9 @@ export async function DELETE(request: NextRequest) {
 	if (!apiUser || error) {
 		return NextResponse.json({ error: error.error }, { status: error.status });
 	}
+	const rateLimited = await applyRateLimit(apiUser.id, 'auth-action', apiUser.subscriptionTier);
+	if (rateLimited) return rateLimited;
+
 	try {
 		const userToDelete = await prisma.user.findUnique({
 			where: { id: apiUser.id },

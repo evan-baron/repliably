@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
+import { createSignatureSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 export async function POST(request: NextRequest) {
 	try {
@@ -19,14 +22,38 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
+
 		const body = await request.json();
 
 		const { emailSignature } = body;
 
+		let validatedData;
+		try {
+			validatedData = createSignatureSchema.parse(emailSignature);
+		} catch (validationError) {
+			if (validationError instanceof z.ZodError) {
+				const errors = validationError.issues.map((issue) => ({
+					path: issue.path.join('.'),
+					message: issue.message,
+				}));
+				return NextResponse.json(
+					{
+						error: 'Validation failed',
+						details: errors.map((e) => e.message),
+						fields: errors,
+					},
+					{ status: 400 },
+				);
+			}
+			throw validationError;
+		}
+
 		const updatedUser = await prisma.userSignature.create({
 			data: {
 				userId: user.id,
-				...emailSignature,
+				...validatedData,
 			},
 		});
 

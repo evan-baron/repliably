@@ -56,10 +56,17 @@ export const accountSettingsSchema = z.object({
 		.optional(),
 });
 
-// Signature Schema
+// Signature Schema (for updates - all fields optional)
 export const signatureSchema = z.object({
 	name: z.string().min(1).max(50).optional(),
 	content: z.string().max(500).optional(),
+	isDefault: z.boolean().optional(),
+});
+
+// Signature Creation Schema (name and content required)
+export const createSignatureSchema = z.object({
+	name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
+	content: z.string().min(1, 'Content is required').max(500, 'Content must be less than 500 characters'),
 	isDefault: z.boolean().optional(),
 });
 

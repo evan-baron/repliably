@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
 import { generateMessage } from '@/services/messageGenerationService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function PUT(
 	request: NextRequest,
@@ -19,6 +20,9 @@ export async function PUT(
 	if (Number.isNaN(messageId)) {
 		return NextResponse.json({ error: 'invalid message id' }, { status: 400 });
 	}
+
+	const rateLimited = await applyRateLimit(user.id, 'generate', user.subscriptionTier);
+	if (rateLimited) return rateLimited;
 
 	console.log(`[${new Date().toISOString()}] Generate next message started`);
 

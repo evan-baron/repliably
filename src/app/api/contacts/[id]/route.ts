@@ -1,16 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
+		const { user, error } = await getApiUser();
+		if (error) {
+			return NextResponse.json(
+				{ error: error.error },
+				{ status: error.status },
+			);
+		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
+
 		const { id } = await params;
 		const contactId = parseInt(id);
 		const contact = await prisma.contact.findUnique({
-			where: { id: contactId },
+			where: { id: contactId, ownerId: user.id },
 		});
 		if (!contact) {
 			return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
@@ -38,6 +50,9 @@ export async function PUT(
 				{ status: error.status },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const { id } = await params;
 		const contactId = parseInt(id);
@@ -133,6 +148,9 @@ export async function DELETE(
 				{ status: error.status },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const { id } = await params;
 

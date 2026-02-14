@@ -5,6 +5,7 @@ import { getApiUser } from '@/services/getUserService';
 import { prisma } from '@/lib/prisma';
 import { deactivateSequence } from '@/services/sequenceService';
 import { sendEmailSchema } from '@/lib/validation';
+import { applyRateLimit } from '@/lib/rateLimit';
 import { z } from 'zod';
 
 export async function POST(req: NextRequest) {
@@ -23,6 +24,9 @@ export async function POST(req: NextRequest) {
 				{ status: 401 },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'send-email', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const requestBody = await req.json();
 

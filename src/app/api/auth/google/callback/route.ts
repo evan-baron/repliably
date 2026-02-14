@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { prisma } from '@/lib/prisma';
 import { encrypt } from '@/lib/encryption';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 const oauth2Client = new google.auth.OAuth2(
 	process.env.GOOGLE_CLIENT_ID,
@@ -47,6 +48,9 @@ export async function GET(request: NextRequest) {
 				),
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		// Exchange authorization code for tokens
 		const { tokens } = await oauth2Client.getToken(code);
@@ -93,8 +97,6 @@ export async function GET(request: NextRequest) {
 					tokens.expiry_date ? new Date(tokens.expiry_date) : null,
 			},
 		});
-
-		console.log(`✅ Email connected for user ${user.id}: ${gmailAddress}`);
 
 		// Redirect back to settings with success message
 		return NextResponse.redirect(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
 
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest) {
 			{ status: 401 },
 		);
 	}
+
+	const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+	if (rateLimited) return rateLimited;
 
 	const userId = user.id;
 

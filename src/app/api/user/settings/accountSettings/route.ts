@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 import { accountSettingsSchema } from '@/lib/validation';
 import { z } from 'zod';
 
@@ -20,6 +21,9 @@ export async function PUT(request: NextRequest) {
 				{ status: 401 },
 			);
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const body = await request.json();
 

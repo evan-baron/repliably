@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runGenerateNextMessages } from './generate-next-messages/handler';
 import { runUpdatePendingMessages } from './update-pending-messages/handler';
 import { runSendScheduledMessages } from './send-scheduled-messages/handler';
+import { cleanupExpiredRateLimits } from '@/lib/rateLimit';
 
 export async function GET(req: NextRequest) {
 	try {
@@ -24,11 +25,13 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const [generate, update, send] = await Promise.allSettled([
-			runGenerateNextMessages({ limit: 50 }),
-			runUpdatePendingMessages({ limit: 50 }),
-			runSendScheduledMessages({ limit: 50 }),
-		]);
+		const [generate, update, send, rateLimitCleanup] =
+			await Promise.allSettled([
+				runGenerateNextMessages({ limit: 50 }),
+				runUpdatePendingMessages({ limit: 50 }),
+				runSendScheduledMessages({ limit: 50 }),
+				cleanupExpiredRateLimits(),
+			]);
 
 		// ✅ Check for any handler failures
 		const hasFailures = [generate, update, send].some(
@@ -58,12 +61,21 @@ export async function GET(req: NextRequest) {
 						success: false,
 						error: (send.reason as Error)?.message || 'Unknown error',
 					},
+			rateLimitCleanup:
+				rateLimitCleanup.status === 'fulfilled' ?
+					{ success: true, deleted: rateLimitCleanup.value }
+				:	{
+						success: false,
+						error:
+							(rateLimitCleanup.reason as Error)?.message || 'Unknown error',
+					},
 		};
 
 		console.log(`[${new Date().toISOString()}] Cron orchestrator completed:`, {
 			generate: results.generate.success,
 			update: results.update.success,
 			send: results.send.success,
+			rateLimitCleanup: results.rateLimitCleanup.success,
 		});
 
 		return NextResponse.json({

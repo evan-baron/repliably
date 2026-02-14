@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth0 } from '@/lib/auth0';
+import { applyPublicRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
 	const session = await auth0.getSession();
@@ -7,6 +8,9 @@ export async function POST(request: NextRequest) {
 	if (!session || !session.user) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
+
+	const rateLimited = await applyPublicRateLimit(request, 'auth-action');
+	if (rateLimited) return rateLimited;
 
 	try {
 		const body = await request.json();

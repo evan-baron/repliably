@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 import { signatureSchema } from '@/lib/validation';
 import { z } from 'zod';
 
@@ -20,6 +21,9 @@ export async function PUT(
 		if (!user) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const { id } = await params;
 
@@ -123,6 +127,9 @@ export async function DELETE(
 		if (!user) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
+
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
 
 		const { id } = await params;
 

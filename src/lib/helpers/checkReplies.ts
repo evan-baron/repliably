@@ -71,8 +71,6 @@ export async function processMessage(gmail: any, messageId: string) {
 			);
 
 			if (isBounceSenderResult) {
-				console.log('Message identified as bounce based on sender:', from);
-
 				await prisma.contact.update({
 					where: { id: sentMessage.contactId },
 					data: { validEmail: false },
@@ -128,12 +126,6 @@ export async function processMessage(gmail: any, messageId: string) {
 			const bounceInfo = detectBounce(message.data);
 
 			if (bounceInfo.bounced) {
-				console.log(
-					'Bounce detected for message:',
-					messageId,
-					bounceInfo.reason,
-				);
-
 				// Update contact as invalid email, deactivate sequence, etc.
 				await prisma.$transaction(async (transaction) => {
 					transaction.contact.update({
@@ -436,7 +428,6 @@ export function detectBounce(message: any) {
 	)?.value;
 
 	if (/mailer-daemon|postmaster/i.test(from)) {
-		console.log('Bounce sender detected based on From header:', from);
 		return { bounced: true, reason: 'mailer-daemon sender' };
 	}
 

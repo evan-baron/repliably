@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { checkForReplies } from '@/lib/helpers/checkReplies';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 import { decrypt } from '@/lib/encryption';
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest) {
 	if (authError || !user) {
 		return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 	}
+
+	const rateLimited = await applyRateLimit(user.id, 'check-replies', user.subscriptionTier);
+	if (rateLimited) return rateLimited;
 
 	if (!user.emailConnectionActive || !user.gmailRefreshToken) {
 		throw new Error(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setupGmailNotifications } from '@/lib/setupGmailNotifications';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
 	const { user, error: authError } = await getApiUser();
@@ -10,6 +11,9 @@ export async function POST(req: NextRequest) {
 			{ status: 401 },
 		);
 	}
+
+	const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+	if (rateLimited) return rateLimited;
 
 	try {
 		const result = await setupGmailNotifications();

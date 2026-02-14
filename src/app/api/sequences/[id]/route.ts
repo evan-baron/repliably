@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getApiUser } from '@/services/getUserService';
+import { applyRateLimit } from '@/lib/rateLimit';
 
 export async function GET(
 	request: NextRequest,
@@ -15,6 +16,9 @@ export async function GET(
 				{ status: error.status },
 			);
 		}
+		const rateLimited = await applyRateLimit(user.id, 'crud-read', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
+
 		const { id } = await params;
 		const sequenceId = parseInt(id);
 		const sequence = await prisma.sequence.findFirst({
@@ -51,6 +55,9 @@ export async function PUT(
 				{ status: error.status },
 			);
 		}
+		const rateLimited = await applyRateLimit(user.id, 'crud-write', user.subscriptionTier);
+		if (rateLimited) return rateLimited;
+
 		const { id } = await params;
 		const sequenceId = parseInt(id);
 		const updatedSequence = await prisma.sequence.update({
