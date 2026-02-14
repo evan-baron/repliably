@@ -513,6 +513,8 @@ export function detectBounce(message: any) {
 		'mailbox unavailable',
 	];
 
+	console.log('text inside bounce detection:', text);
+
 	for (const phrase of bounceIndicators) {
 		if (text.includes(phrase)) {
 			return { bounced: true, reason: `matched phrase: ${phrase}` };
