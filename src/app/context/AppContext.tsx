@@ -41,6 +41,8 @@ interface AppContextType {
 	setLoading: (loading: boolean) => void;
 	loadingMessage: string | null;
 	setLoadingMessage: (message: string | null) => void;
+	newReplyNotification: boolean;
+	setNewReplyNotification: (value: boolean) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -58,7 +60,7 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	const [modalType, setModalType] = useState<string | null>(null);
 	const [duplicateContact, setDuplicateContact] = useState<boolean>(false);
 	const [selectedContact, setSelectedContact] = useState<ContactFromDB | null>(
-		null
+		null,
 	);
 	const [errors, setErrors] = useState<string[]>([]);
 	const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -68,6 +70,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		setErrors([]);
 		setModalType(null);
 	};
+	const [newReplyNotification, setNewReplyNotification] =
+		useState<boolean>(false);
 
 	// Auto-sync isModalOpen with modalType
 	useEffect(() => {
@@ -105,6 +109,8 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		setLoading: () => {},
 		loadingMessage: null,
 		setLoadingMessage: () => {},
+		newReplyNotification: false,
+		setNewReplyNotification: () => {},
 	};
 
 	// Client-side checks only after hydration
@@ -121,19 +127,19 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	}, []);
 
 	const rawMobileWidth = useMediaQuery(
-		'(max-width: 550px) and (orientation: portrait)'
+		'(max-width: 550px) and (orientation: portrait)',
 	);
 	const rawMobileHeight = useMediaQuery(
-		'(max-height: 550px) and (orientation: landscape)'
+		'(max-height: 550px) and (orientation: landscape)',
 	);
 	const rawTabletWidth = useMediaQuery(
-		'(max-width: 950px) and (orientation: portrait)'
+		'(max-width: 950px) and (orientation: portrait)',
 	);
 	const rawTabletHeight = useMediaQuery(
-		'(max-height: 850px) and (orientation: landscape)'
+		'(max-height: 850px) and (orientation: landscape)',
 	);
 	const rawSmallTablet = useMediaQuery(
-		'(max-height: 850px) and (max-width: 850px)'
+		'(max-height: 850px) and (max-width: 850px)',
 	);
 
 	const isMobileWidth = hydrated ? rawMobileWidth : false;
@@ -146,8 +152,9 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	const isTablet = isTabletWidth || isTabletHeight;
 
 	// Merge fallback values until hydration completes
-	const contextValue = hydrated
-		? {
+	const contextValue =
+		hydrated ?
+			{
 				isTouchDevice,
 				isMobile,
 				isMobileWidth,
@@ -172,8 +179,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				setLoading,
 				loadingMessage,
 				setLoadingMessage,
-		  }
-		: fallback;
+				newReplyNotification,
+				setNewReplyNotification,
+			}
+		:	fallback;
 
 	return (
 		<AppContext.Provider value={contextValue}>{children}</AppContext.Provider>

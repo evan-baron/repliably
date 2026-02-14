@@ -55,6 +55,10 @@
 		animation: blinking 1.5s infinite;
 	}
 
+	&.newReply {
+		animation: newReplyBlinking 1.5s infinite;
+	}
+
 	.linkInner {
 		display: flex;
 		align-items: center;
@@ -101,5 +105,15 @@
 	}
 	50% {
 		color: var(--accent-important);
+	}
+}
+
+@keyframes newReplyBlinking {
+	0%,
+	100% {
+		color: var(--text-secondary);
+	}
+	50% {
+		color: var(--color-primary);
 	}
 }

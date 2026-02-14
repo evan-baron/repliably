@@ -1,4 +1,13 @@
 import { prisma } from '@/lib/prisma';
+import Pusher from 'pusher';
+
+const pusher = new Pusher({
+	appId: process.env.PUSHER_APP_ID!,
+	key: process.env.PUSHER_KEY!,
+	secret: process.env.PUSHER_SECRET!,
+	cluster: process.env.PUSHER_CLUSTER!,
+	useTLS: true,
+});
 
 // Reuse existing processMessage function logic
 export async function checkForReplies(gmail: any) {
@@ -167,6 +176,14 @@ export async function processMessage(gmail: any, messageId: string) {
 					replyDate: new Date(parseInt(message.data.internalDate)),
 					isAutomated: isAutoReply,
 				},
+			});
+
+			pusher.trigger(`user-${sentMessage.ownerId}`, 'reply-received', {
+				contactId: sentMessage.contactId,
+				replyMessageId: messageId,
+				replySubject: subject || 'Reply',
+				replyContent: parsedEmail.reply || parsedEmail.raw,
+				replyDate: new Date(parseInt(message.data.internalDate)),
 			});
 
 			if (!isAutoReply) {
