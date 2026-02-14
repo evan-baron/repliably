@@ -1,7 +1,8 @@
 'use client';
 
 // Library imports
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Styles
 import styles from './sequencesClient.module.scss';
@@ -22,6 +23,8 @@ const SequencesClient = ({
 }: {
 	initialSequences: SequenceFromDB[];
 }) => {
+	const queryClient = useQueryClient();
+
 	type SelectedType = 'active' | 'previous';
 	const [selected, setSelected] = useState<SelectedType>('active');
 
@@ -31,9 +34,16 @@ const SequencesClient = ({
 		};
 	}
 
-	const { data: sequencesData } = useAllSequencesByUserId({
-		sequences: initialSequences,
-	});
+	useEffect(() => {
+		if (initialSequences && initialSequences.length > 0) {
+			queryClient.setQueryData<SequenceFromDB[]>(
+				['sequences-by-user-id'],
+				initialSequences,
+			);
+		}
+	}, [initialSequences, queryClient]);
+
+	const { data: sequencesData } = useAllSequencesByUserId();
 
 	const sequences = sequencesData?.sequences || [];
 
