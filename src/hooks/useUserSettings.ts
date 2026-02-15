@@ -70,12 +70,11 @@ export const useGetUserSettings = () => {
 export const useUserAccountSettingsUpdate = () => {
 	const queryClient = useQueryClient();
 
-	return useMutation<UserToClientFromDB, Error, Partial<UserToClientFromDB>>({
+	return useMutation<{ success: boolean; user: UserToClientFromDB }, Error, Partial<UserToClientFromDB>>({
 		mutationFn: (updateData) => userAPI.updateAccountSettings(updateData),
 
-		onSuccess: (updatedUser) => {
-			// Update the user data in the cache with the updated user data
-			queryClient.setQueryData<UserToClientFromDB>(['user-get'], updatedUser);
+		onSuccess: (response) => {
+			queryClient.setQueryData<UserToClientFromDB>(['user-get'], response.user);
 
 			queryClient.invalidateQueries({
 				predicate: (query) =>

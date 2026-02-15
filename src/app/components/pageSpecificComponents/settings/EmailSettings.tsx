@@ -58,6 +58,8 @@ const EmailSettings = ({
 	const [signatureName, setSignatureName] = useState<string>('');
 	const [editing, setEditing] = useState<number | null>(null);
 	const [isConnecting, setIsConnecting] = useState<boolean>(false);
+	const [isConnectingWatching, setIsConnectingWatching] =
+		useState<boolean>(false);
 	const [watchAllowed, setWatchAllowed] = useState<boolean>(
 		user.gmailWatchAllowed,
 	);
@@ -201,6 +203,7 @@ const EmailSettings = ({
 	};
 
 	const handleStartWatching = async () => {
+		setIsConnectingWatching(true);
 		const result = await setupGmailNotifications();
 		const { success } = result;
 
@@ -212,9 +215,11 @@ const EmailSettings = ({
 			setModalType('error');
 			setErrors(['Failed to setup Gmail watch notifications']);
 		}
+		setIsConnectingWatching(false);
 	};
 
 	const handleStopWatching = async () => {
+		setIsConnectingWatching(true);
 		const result = await stopGmailNotifications();
 		const { success } = result;
 
@@ -226,6 +231,7 @@ const EmailSettings = ({
 			setModalType('error');
 			setErrors(['Failed to stop Gmail watch notifications']);
 		}
+		setIsConnectingWatching(false);
 	};
 
 	return (
@@ -410,13 +416,13 @@ const EmailSettings = ({
 							onClick={() =>
 								watchAllowed ? handleStopWatching() : handleStartWatching()
 							}
-							disabled={isConnecting}
-							aria-disabled={isConnecting || isDisconnecting}
+							disabled={isConnectingWatching}
+							aria-disabled={isConnectingWatching || isDisconnecting}
 							aria-label={
 								watchAllowed ? 'Stop watching Gmail' : 'Start watching Gmail'
 							}
 						>
-							{isConnecting ?
+							{isConnectingWatching ?
 								'Connecting...'
 							: isDisconnecting ?
 								'Disconnecting...'

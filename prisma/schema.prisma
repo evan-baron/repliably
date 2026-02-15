@@ -20,9 +20,9 @@ model User {
   updatedAt                    DateTime         @updatedAt
   defaultAlterSubjectLine      Boolean          @default(false)
   defaultReferencePrevious     Boolean          @default(true)
-  defaultRequireApproval       Boolean          @default(false)
-  defaultSendDelay             Int?
-  defaultSequenceDuration      Int?
+  defaultRequireApproval       Boolean          @default(true)
+  defaultSendDelay             Int?             @default(2)
+  defaultSequenceDuration      Int?             @default(60)
   defaultSequenceType          Int              @default(3)
   notificationBounce           Boolean          @default(true)
   notificationMessageApproval  Boolean          @default(true)
@@ -37,7 +37,7 @@ model User {
   emailConnectionActive        Boolean          @default(false)
   emailTokenExpiresAt          DateTime?
   gmailRefreshToken            String?
-  gmailWatchAllowed            Boolean          @default(true)
+  gmailWatchAllowed            Boolean          @default(false)
   gmailWatchExpiration         DateTime?
   gmailHistoryId               String?
   contacts                     Contact[]
