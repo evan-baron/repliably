@@ -28,8 +28,6 @@ interface AppContextType {
 	setIsModalOpen: (type: boolean) => void;
 	modalType: string | null;
 	setModalType: (type: string | null) => void;
-	duplicateContact?: boolean;
-	setDuplicateContact: (type: boolean) => void;
 	selectedContact: ContactFromDB | null;
 	setSelectedContact: (contact: ContactFromDB | null) => void;
 	errors: string[];
@@ -58,7 +56,6 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	const [isTouchDevice, setIsTouchDevice] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [modalType, setModalType] = useState<string | null>(null);
-	const [duplicateContact, setDuplicateContact] = useState<boolean>(false);
 	const [selectedContact, setSelectedContact] = useState<ContactFromDB | null>(
 		null,
 	);
@@ -96,8 +93,6 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		setIsModalOpen: () => {},
 		modalType: null,
 		setModalType: () => {},
-		duplicateContact: false,
-		setDuplicateContact: () => {},
 		selectedContact: null,
 		setSelectedContact: () => {},
 		errors: [],
@@ -166,8 +161,6 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				setIsModalOpen,
 				modalType,
 				setModalType,
-				duplicateContact,
-				setDuplicateContact,
 				selectedContact,
 				setSelectedContact,
 				errors,

@@ -17,6 +17,7 @@ import NewContactModal from './modalTypes/contacts/NewContactModal';
 import SearchContactsModal from './modalTypes/contacts/SearchContactsModal';
 import EditContactModal from './modalTypes/contacts/EditContactModal';
 import DeleteContactModal from './modalTypes/contacts/DeleteContactModal';
+import DuplicateContactModal from './modalTypes/contacts/DuplicateContactModal';
 import ErrorModal from './modalTypes/error/ErrorModal';
 import OverrideModal from './modalTypes/error/OverrideModal';
 import AlertModal from './modalTypes/alert/AlertModal';
@@ -29,10 +30,8 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		modalType,
 		setModalType,
 		setIsModalOpen,
-		duplicateContact,
 		selectedContact,
 		setSelectedContact,
-		setDuplicateContact,
 		errors,
 		clearErrors,
 		alertMessage,
@@ -49,8 +48,8 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		setIsModalOpen(false);
 		setModalType(modalType === 'login' ? 'auth' : null);
 		modalType === 'editContact' && setSelectedContact(null);
-		modalType === 'editContact' && setDuplicateContact(false);
 		modalType === 'deleteContact' && setSelectedContact(null);
+		modalType === 'duplicateContact' && setSelectedContact(null);
 		modalType === 'error' && clearErrors();
 		modalType === 'alert' && setAlertMessage(null);
 	};
@@ -81,7 +80,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		},
 		newContact: {
 			component: <NewContactModal />,
-			title: duplicateContact ? 'Update Existing Contact' : 'New Contact',
+			title: 'New Contact',
 			width: '31.5rem',
 		},
 		searchContacts: {
@@ -101,6 +100,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		deleteContact: {
 			component: <DeleteContactModal selectedContact={selectedContact!} />,
 			title: 'Delete Contact',
+			width: '31.5rem',
+		},
+		duplicateContact: {
+			component: <DuplicateContactModal selectedContact={selectedContact!} />,
+			title: 'Duplicate Contact',
 			width: '31.5rem',
 		},
 		error: {

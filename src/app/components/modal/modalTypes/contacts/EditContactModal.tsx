@@ -10,8 +10,6 @@ import { ContactFromDB, ContactFormData } from '@/types/contactTypes';
 // Styles imports
 import styles from './newContactModal.module.scss';
 
-// Components imports
-
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
 
@@ -27,8 +25,6 @@ const EditContactModal = ({
 	const {
 		setModalType,
 		setSelectedContact,
-		duplicateContact,
-		setDuplicateContact,
 		setLoading,
 		setLoadingMessage,
 	} = useAppContext();
@@ -38,8 +34,9 @@ const EditContactModal = ({
 	const {
 		register,
 		handleSubmit,
-		formState: { touchedFields, errors },
+		formState: { errors },
 		reset,
+		setError,
 	} = useForm<ContactFormData>({
 		defaultValues: {
 			firstName: selectedContact.firstName || '',
@@ -72,9 +69,16 @@ const EditContactModal = ({
 			setLoading(false);
 			setLoadingMessage(null);
 		} catch (error) {
-			// Error handling is done in the hook
 			setLoading(false);
 			setLoadingMessage(null);
+			if (
+				error instanceof Error &&
+				error.message === 'Contact with this email already exists'
+			) {
+				setError('email', {
+					message: 'A contact with this email already exists',
+				});
+			}
 		}
 	};
 
@@ -292,8 +296,8 @@ const EditContactModal = ({
 					<button
 						type='submit'
 						className={`${styles['save-button']} button contact`}
-						disabled={updating || duplicateContact}
-						aria-disabled={updating || duplicateContact}
+						disabled={updating}
+						aria-disabled={updating}
 					>
 						{updating ? 'Saving...' : 'Save Changes'}
 					</button>
@@ -302,28 +306,12 @@ const EditContactModal = ({
 						name='cancel'
 						onClick={handleCancel}
 						className={`${styles['cancel-button']} button`}
-						disabled={updating || duplicateContact}
-						aria-disabled={updating || duplicateContact}
+						disabled={updating}
+						aria-disabled={updating}
 					>
 						Cancel
 					</button>
 				</div>
-
-				{/* Error Detected */}
-				{duplicateContact && (
-					<div className={styles['mini-alert']}>
-						<p className={styles['error-message']}>
-							One of your contacts is already using this email.
-						</p>
-						<button
-							type='button'
-							onClick={() => setDuplicateContact(false)}
-							aria-disabled={updating || duplicateContact}
-						>
-							Ok
-						</button>
-					</div>
-				)}
 			</form>
 		</div>
 	);

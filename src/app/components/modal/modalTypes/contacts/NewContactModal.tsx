@@ -2,8 +2,7 @@
 import { useForm, SubmitHandler } from 'react-hook-form';
 
 // Hooks imports
-import { useContactCreate, useContactUpdate } from '@/hooks/useContact';
-import { useDuplicateContactHandler } from '@/hooks/useDuplicateContactHandler';
+import { useContactCreate } from '@/hooks/useContact';
 
 // Types imports
 import { ContactFormData } from '@/types/contactTypes';
@@ -11,22 +10,18 @@ import { ContactFormData } from '@/types/contactTypes';
 // Styles imports
 import styles from './newContactModal.module.scss';
 
-// Components imports
-
 // Context imports
 import { useAppContext } from '@/app/context/AppContext';
 
 const NewContactModal = () => {
-	const { setModalType, setDuplicateContact, setLoading, setLoadingMessage } =
+	const { setModalType, setSelectedContact, setLoading, setLoadingMessage } =
 		useAppContext();
 	const { mutateAsync: createContact, isPending: saving } = useContactCreate();
-	const { mutateAsync: updateContact, isPending: updating } =
-		useContactUpdate();
 
 	const {
 		register,
 		handleSubmit,
-		formState: { touchedFields, errors },
+		formState: { errors },
 		reset,
 	} = useForm<ContactFormData>({
 		defaultValues: {
@@ -42,55 +37,7 @@ const NewContactModal = () => {
 		},
 	});
 
-	const {
-		mismatchFields,
-		isUpdateMode,
-		contactId,
-		processDuplicate,
-		clearDuplicateState,
-		isFieldDifferent,
-	} = useDuplicateContactHandler();
-
 	const onSubmit: SubmitHandler<ContactFormData> = async (data) => {
-		if (isUpdateMode) {
-			try {
-				setLoading(true);
-				setLoadingMessage('Saving');
-				// Ensure contactId exists
-				if (!contactId) {
-					console.error('Contact ID is missing');
-					return;
-				}
-
-				const changedFields = mismatchFields.reduce(
-					(acc: Record<string, string>, fieldName) => {
-						acc[fieldName] = data[fieldName as keyof ContactFormData];
-						return acc;
-					},
-					{} as Record<string, string>,
-				);
-
-				const updateData = {
-					id: contactId,
-					...changedFields,
-				};
-
-				await updateContact(updateData);
-
-				// Handle success
-				reset();
-				setModalType(null);
-				clearDuplicateState();
-				setLoading(false);
-				setLoadingMessage(null);
-			} catch (error) {
-				// Error handling is done in the hook
-				setLoading(false);
-				setLoadingMessage(null);
-			}
-			return;
-		}
-
 		try {
 			setLoading(true);
 			setLoadingMessage('Saving');
@@ -98,18 +45,18 @@ const NewContactModal = () => {
 
 			// Handle duplicate contact scenario
 			if (response.success === false && response.duplicate) {
-				const normalizedData = processDuplicate(data, response.existingContact);
-				reset(normalizedData);
+				setLoading(false);
+				setLoadingMessage(null);
+				setSelectedContact(response.existingContact as any);
+				setModalType('duplicateContact');
 				return;
 			}
 
 			reset();
 			setModalType(null);
-			clearDuplicateState();
 			setLoading(false);
 			setLoadingMessage(null);
 		} catch (error) {
-			// Error handling is done in the hook
 			setLoading(false);
 			setLoadingMessage(null);
 		}
@@ -118,22 +65,20 @@ const NewContactModal = () => {
 	const handleCancel = () => {
 		reset();
 		setModalType(null);
-		clearDuplicateState();
-		setDuplicateContact(false);
 	};
 
 	return (
 		<div
 			className={styles['newcontact-modal-wrapper']}
 			role='dialog'
-			aria-labelledby='edit-contact-title'
+			aria-labelledby='new-contact-title'
 			aria-modal='true'
 		>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				className={styles['contact-form']}
 				noValidate
-				aria-label='Edit contact form'
+				aria-label='New contact form'
 			>
 				{/* Name Fields */}
 				<div className={styles['form-row']}>
@@ -149,11 +94,7 @@ const NewContactModal = () => {
 									message: 'First name must be at least 2 characters',
 								},
 							})}
-							className={`${errors.firstName ? styles.error : ''} ${
-								isFieldDifferent('firstName', touchedFields.firstName) ?
-									styles['field-updated']
-								:	''
-							}`}
+							className={errors.firstName ? styles.error : ''}
 							aria-required='true'
 							aria-invalid={errors.firstName ? 'true' : 'false'}
 							aria-describedby={
@@ -183,11 +124,7 @@ const NewContactModal = () => {
 									message: 'Last name must be at least 2 characters',
 								},
 							})}
-							className={`${errors.lastName ? styles.error : ''} ${
-								isFieldDifferent('lastName', touchedFields.lastName) ?
-									styles['field-updated']
-								:	''
-							}`}
+							className={errors.lastName ? styles.error : ''}
 							aria-required='true'
 							aria-invalid={errors.lastName ? 'true' : 'false'}
 							aria-describedby={errors.lastName ? 'lastName-error' : undefined}
@@ -208,30 +145,12 @@ const NewContactModal = () => {
 				<div className={styles['form-row']}>
 					<div className={styles['input-group']}>
 						<label htmlFor='company'>Company</label>
-						<input
-							type='text'
-							id='company'
-							{...register('company')}
-							className={`${
-								isFieldDifferent('company', touchedFields.company) ?
-									styles['field-updated']
-								:	''
-							}`}
-						/>
+						<input type='text' id='company' {...register('company')} />
 					</div>
 
 					<div className={styles['input-group']}>
 						<label htmlFor='title'>Title</label>
-						<input
-							type='text'
-							id='title'
-							{...register('title')}
-							className={`${
-								isFieldDifferent('title', touchedFields.title) ?
-									styles['field-updated']
-								:	''
-							}`}
-						/>
+						<input type='text' id='title' {...register('title')} />
 					</div>
 				</div>
 
@@ -249,11 +168,7 @@ const NewContactModal = () => {
 									message: 'Invalid email address',
 								},
 							})}
-							className={`${errors.email ? styles.error : ''} ${
-								isFieldDifferent('email', touchedFields.email) ?
-									styles['field-updated']
-								:	''
-							}`}
+							className={errors.email ? styles.error : ''}
 							aria-required='true'
 							aria-invalid={errors.email ? 'true' : 'false'}
 							aria-describedby={errors.email ? 'email-error' : undefined}
@@ -271,16 +186,7 @@ const NewContactModal = () => {
 
 					<div className={styles['input-group']}>
 						<label htmlFor='phone'>Phone</label>
-						<input
-							type='tel'
-							id='phone'
-							{...register('phone')}
-							className={`${
-								isFieldDifferent('phone', touchedFields.phone) ?
-									styles['field-updated']
-								:	''
-							}`}
-						/>
+						<input type='tel' id='phone' {...register('phone')} />
 					</div>
 				</div>
 
@@ -308,11 +214,7 @@ const NewContactModal = () => {
 								},
 							})}
 							placeholder='https://'
-							className={`${errors.linkedIn ? styles.error : ''} ${
-								isFieldDifferent('linkedIn', touchedFields.linkedIn) ?
-									styles['field-updated']
-								:	''
-							}`}
+							className={errors.linkedIn ? styles.error : ''}
 							aria-invalid={errors.linkedIn ? 'true' : 'false'}
 							aria-describedby={errors.linkedIn ? 'linkedIn-error' : undefined}
 						/>
@@ -329,15 +231,7 @@ const NewContactModal = () => {
 
 					<div className={styles['input-group']}>
 						<label htmlFor='importance'>Importance</label>
-						<select
-							id='importance'
-							{...register('importance')}
-							className={`${
-								isFieldDifferent('importance', touchedFields.importance) ?
-									styles['field-updated']
-								:	''
-							}`}
-						>
+						<select id='importance' {...register('importance')}>
 							<option value=''>Select importance...</option>
 							<option value='1'>1 - Lowest</option>
 							<option value='2'>2 - Low</option>
@@ -355,11 +249,7 @@ const NewContactModal = () => {
 						type='text'
 						id='reasonForEmail'
 						{...register('reasonForEmail')}
-						className={`${errors.reasonForEmail ? styles.error : ''} ${
-							isFieldDifferent('reasonForEmail', touchedFields.reasonForEmail) ?
-								styles['field-updated']
-							:	''
-						}`}
+						className={errors.reasonForEmail ? styles.error : ''}
 						placeholder='ex: Applied for Junior Engineer Role'
 						aria-invalid={errors.reasonForEmail ? 'true' : 'false'}
 						aria-describedby={
@@ -382,35 +272,22 @@ const NewContactModal = () => {
 					<button
 						type='submit'
 						className={`${styles['save-button']} button contact`}
-						disabled={updating}
-						aria-disabled={updating}
+						disabled={saving}
+						aria-disabled={saving}
 					>
-						{isUpdateMode ?
-							updating ?
-								'Updating...'
-							:	'Update Contact'
-						: saving ?
-							'Saving...'
-						:	'Save Contact'}
+						{saving ? 'Saving...' : 'Save Contact'}
 					</button>
 					<button
 						type='button'
 						name='cancel'
 						onClick={handleCancel}
 						className={`${styles['cancel-button']} button`}
-						disabled={updating}
-						aria-disabled={updating}
+						disabled={saving}
+						aria-disabled={saving}
 					>
 						Cancel
 					</button>
 				</div>
-
-				{/* Error Detected */}
-				{isUpdateMode && !Object.values(touchedFields).some(Boolean) && (
-					<div className={styles['error-duplicate']}>
-						<h3>Duplicate Contact Detected</h3>
-					</div>
-				)}
 			</form>
 		</div>
 	);

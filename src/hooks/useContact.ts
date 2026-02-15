@@ -1,5 +1,4 @@
 import { contactAPI } from '@/services/api';
-import { useAppContext } from '@/app/context/AppContext';
 import {
 	ContactData,
 	ContactFromDB,
@@ -28,16 +27,14 @@ export const useContactsGetAll = () => {
 };
 
 export const useContactCreate = () => {
-	const { setDuplicateContact } = useAppContext();
 	const queryClient = useQueryClient();
 
 	return useMutation<ContactResponse, Error, ContactData>({
 		mutationFn: contactAPI.create,
 
 		onSuccess: (response: ContactResponse, _contactData: ContactData) => {
-			// If API reports duplicate, set duplicate mode and do not add anything
+			// If API reports duplicate, the modal handles the flow — don't update cache
 			if (response.success === false && response.duplicate) {
-				setDuplicateContact(true);
 				return;
 			}
 
@@ -53,7 +50,6 @@ export const useContactCreate = () => {
 					},
 				);
 			} else {
-				// If server only returns contact id or similar, simply invalidate to refetch authoritative data
 				queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
 			}
 		},
@@ -64,21 +60,18 @@ export const useContactCreate = () => {
 		},
 
 		onSettled: () => {
-			// Ensure eventual consistency
 			queryClient.invalidateQueries({ queryKey: ['contacts-get-all'] });
 		},
 	});
 };
 
 export const useContactUpdate = () => {
-	const { duplicateContact, setDuplicateContact } = useAppContext();
 	const queryClient = useQueryClient();
 
 	return useMutation<ContactResponse, Error, ContactUpdateData>({
 		mutationFn: contactAPI.update,
 
 		onSuccess: (response: ContactResponse, updateData: ContactUpdateData) => {
-			duplicateContact ? setDuplicateContact(false) : null;
 			// Only update cache if server returns the updated contact
 			if (response?.contact) {
 				queryClient.setQueryData<ContactsResponse>(
@@ -103,10 +96,6 @@ export const useContactUpdate = () => {
 		},
 
 		onError: (error: Error) => {
-			if (error.message === 'Contact with this email already exists') {
-				setDuplicateContact(true);
-				return;
-			}
 			console.error('Failed to update contact:', error);
 		},
 
