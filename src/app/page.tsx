@@ -60,9 +60,13 @@ export default async function Home() {
 					<p className={styles['home-description']}>
 						Repliably is an email automation tool designed to help job seekers
 						manage their job applications and follow-ups efficiently. With
-						Repliably, you can create personalized email templates, schedule
-						automated follow-ups, and track your email outreach data all in one
-						place.
+						Repliably, you can create{' '}
+						<span style={{ fontWeight: 'bold' }}>
+							personalized email templates
+						</span>
+						, schedule{' '}
+						<span style={{ fontWeight: 'bold' }}>automated follow-ups</span>,
+						and track your email outreach data all in one place.
 					</p>
 					<p className={styles['home-description']}>
 						Say goodbye to manual emailing and hello to a more sophisticated
@@ -81,9 +85,9 @@ export default async function Home() {
 				</div>
 			</section>
 			<section className={styles.right} aria-labelledby='login-heading'>
-				<label id='login-heading' className='sr-only'>
+				<span id='login-heading' className='sr-only'>
 					Login
-				</label>
+				</span>
 				<div className={styles['login-wrapper']}>
 					<h2>Already have an account?</h2>
 					<LoginModal />

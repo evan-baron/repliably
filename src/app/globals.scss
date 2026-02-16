@@ -12,11 +12,17 @@
 	--text-shadow: 0.125rem 0.125rem 0.5rem hsla(0, 0%, 25%, 0.25);
 
 	/* 30% - Cyan/Teal/Green gradients (brightened) */
+	// --gradient-welcome: linear-gradient(
+	// 	135deg,
+	// 	hsl(180, 100%, 50%) 0%,
+	// 	hsl(185, 100%, 45%) 60%,
+	// 	hsl(160, 90%, 55%) 100%
+	// );
 	--gradient-welcome: linear-gradient(
 		135deg,
-		hsl(180, 100%, 50%) 0%,
-		hsl(185, 100%, 45%) 60%,
-		hsl(160, 90%, 55%) 100%
+		hsl(180, 100%, 48%) 0%,
+		hsl(185, 90%, 45%) 60%,
+		hsl(160, 80%, 48%) 100%
 	);
 	// --gradient-welcome: linear-gradient(
 	// 	135deg,
