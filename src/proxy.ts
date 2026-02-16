@@ -121,6 +121,15 @@ export async function proxy(request: NextRequest) {
 		}
 	}
 
+	// --- Auth callback error handling ---
+	// When an Auth0 trigger rejects a login (e.g., email not on whitelist),
+	// Auth0 redirects back to /auth/callback?error=access_denied.
+	// Without this check, the SDK renders a blank error page.
+	// Intercept it and send the user home instead.
+	if (pathname === '/auth/callback' && request.nextUrl.searchParams.has('error')) {
+		return NextResponse.redirect(new URL('/', request.url));
+	}
+
 	// All other routes: just run Auth0's middleware (handles /auth/* routes, session refresh)
 	return await auth0.middleware(request);
 }
