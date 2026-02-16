@@ -1,15 +1,18 @@
 'use client';
 
 export default function LogoutButton() {
+	const handleLogout = async () => {
+		await fetch('/auth/logout', { redirect: 'manual' });
+		window.location.href = '/';
+	};
+
 	return (
-		<form action='/auth/logout' method='GET'>
-			<button
-				type='submit'
-				className='button logout'
-				aria-label='Log out of your account'
-			>
-				Log Out
-			</button>
-		</form>
+		<button
+			onClick={handleLogout}
+			className='button logout'
+			aria-label='Log out of your account'
+		>
+			Log Out
+		</button>
 	);
 }
