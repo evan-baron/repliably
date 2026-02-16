@@ -66,7 +66,8 @@ export default async function Home() {
 						</span>
 						, schedule{' '}
 						<span style={{ fontWeight: 'bold' }}>automated follow-ups</span>,
-						and track your email outreach data all in one place.
+						and track your email outreach data{' '}
+						<span style={{ fontWeight: 'bold' }}>all in one place</span>.
 					</p>
 					<p className={styles['home-description']}>
 						Say goodbye to manual emailing and hello to a more sophisticated
