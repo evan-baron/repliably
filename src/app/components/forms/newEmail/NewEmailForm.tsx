@@ -72,7 +72,14 @@ const NewEmailForm = ({
 		defaultSignature?.content || '',
 	);
 
-	const initialEditorContent = originalBodyContent + signature;
+	// TinyMCE converts <p></p> to <p><br></p> internally, so we match both forms
+	const stripTrailingEmpties = (html: string) =>
+		html.replace(/(<p>(<br\s*\/?>|&nbsp;|\s)*<\/p>)+$/gi, '') || '<p></p>';
+
+	const initialEditorContent =
+		signature ?
+			stripTrailingEmpties(originalBodyContent) + '<p></p>' + signature
+		:	stripTrailingEmpties(originalBodyContent);
 
 	const [editorContent, setEditorContent] = useState<string>(
 		initialEditorContent || '',
@@ -82,7 +89,9 @@ const NewEmailForm = ({
 	const handleSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const signatureId = parseInt(e.target.value);
 		setSelectedSignatureId(signatureId);
-		setOriginalBodyContent(editorContent.replace(signature, '')); // Remove old signature from original content
+		setOriginalBodyContent(
+			stripTrailingEmpties(editorContent.replace(signature, '')),
+		);
 
 		if (signatureId === -1) {
 			setSignature('');
