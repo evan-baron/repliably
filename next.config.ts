@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://cdn.tiny.cloud",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data: https://cdn.tiny.cloud",
-              "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://*.auth0.com https://cdn.tiny.cloud https://sp.tinymce.com",
+              "connect-src 'self' https://*.pusher.com wss://*.pusher.com https://*.auth0.com https://cdn.tiny.cloud https://sp.tinymce.com https://www.googleapis.com https://api.openai.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
