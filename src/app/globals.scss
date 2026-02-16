@@ -30,11 +30,17 @@
 	// 	hsl(187, 92%, 56%) 50%,
 	// 	hsl(156, 72%, 54%) 100%
 	// );
+	// --gradient-primary: linear-gradient(
+	// 	135deg,
+	// 	hsl(180, 100%, 50%) 0%,
+	// 	hsl(185, 100%, 45%) 60%,
+	// 	hsl(160, 90%, 55%) 100%
+	// );
 	--gradient-primary: linear-gradient(
 		135deg,
-		hsl(180, 100%, 50%) 0%,
-		hsl(185, 100%, 45%) 60%,
-		hsl(160, 90%, 55%) 100%
+		hsl(188, 86%, 53%) 0%,
+		hsl(187, 92%, 69%) 50%,
+		hsl(156, 72%, 67%) 100%
 	);
 	// --gradient-primary: linear-gradient(
 	// 	135deg,
@@ -393,6 +399,11 @@ a {
 	padding: 0;
 	justify-content: center;
 	cursor: pointer;
+
+	@media screen and (max-width: 480px) {
+		top: 0.5rem;
+		right: 0.5rem;
+	}
 }
 
 .tiptap {

@@ -118,4 +118,11 @@
 			}
 		}
 	}
+
+	@media screen and (max-width: 480px) {
+		.modalContainer {
+			width: 80%;
+			padding: 2rem;
+		}
+	}
 }
