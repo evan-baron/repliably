@@ -20,7 +20,7 @@ const Dashboard = () => {
 					className={styles.welcomeSubtitle}
 					aria-describedby='dashboard-title'
 				>
-					Welcome to your application follow-up management center
+					Welcome to your follow-up management center
 				</p>
 			</section>
 
