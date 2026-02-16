@@ -28,6 +28,19 @@ export async function POST(req: NextRequest) {
 		const socketId = body.get('socket_id') as string;
 		const channel = body.get('channel_name') as string;
 
+		if (!socketId || !channel) {
+			return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+		}
+
+		// Pusher socket IDs follow the format "digits.digits" (e.g., "123456.789012").
+		// Without this check, an attacker could send arbitrary strings to authorizeChannel(),
+		// which would generate a valid auth token for whatever socket_id they provide.
+		// That token could then be used to authenticate a spoofed connection.
+		const PUSHER_SOCKET_ID_REGEX = /^\d+\.\d+$/;
+		if (!PUSHER_SOCKET_ID_REGEX.test(socketId)) {
+			return NextResponse.json({ error: 'Invalid socket_id format' }, { status: 400 });
+		}
+
 		// Ensure the user can only subscribe to their own channel
 		if (channel !== `private-user-${user.id}`) {
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
