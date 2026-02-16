@@ -8,6 +8,7 @@
 		display: none;
 		align-items: start;
 		gap: 0.5rem;
+		text-shadow: var(--text-shadow);
 
 		&::before {
 			content: '⚠️';

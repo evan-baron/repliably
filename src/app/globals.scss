@@ -9,21 +9,33 @@
 	--text-secondary: #4a5568;
 	--text-muted: hsl(216, 15%, 52%);
 	--text-light-muted: hsl(216, 15%, 72%);
-	--text-shadow: 0.25rem 0.25rem 0.5rem hsla(0, 0%, 25%, 0.125);
+	--text-shadow: 0.125rem 0.125rem 0.5rem hsla(0, 0%, 25%, 0.25);
 
 	/* 30% - Cyan/Teal/Green gradients (brightened) */
 	--gradient-welcome: linear-gradient(
 		135deg,
-		hsl(188, 86%, 40%) 0%,
-		hsl(187, 92%, 56%) 50%,
-		hsl(156, 72%, 54%) 100%
+		hsl(180, 100%, 50%) 0%,
+		hsl(185, 100%, 45%) 60%,
+		hsl(160, 90%, 55%) 100%
 	);
+	// --gradient-welcome: linear-gradient(
+	// 	135deg,
+	// 	hsl(188, 86%, 40%) 0%,
+	// 	hsl(187, 92%, 56%) 50%,
+	// 	hsl(156, 72%, 54%) 100%
+	// );
 	--gradient-primary: linear-gradient(
 		135deg,
-		#22d3ee 0%,
-		#67e8f9 50%,
-		#6ee7b7 100%
+		hsl(180, 100%, 50%) 0%,
+		hsl(185, 100%, 45%) 60%,
+		hsl(160, 90%, 55%) 100%
 	);
+	// --gradient-primary: linear-gradient(
+	// 	135deg,
+	// 	#22d3ee 0%,
+	// 	#67e8f9 50%,
+	// 	#6ee7b7 100%
+	// );
 	--gradient-primary-light: linear-gradient(
 		135deg,
 		hsl(188, 83%, 76%) 0%,
