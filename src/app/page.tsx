@@ -69,6 +69,7 @@ export default async function Home() {
 						follow-up strategy with Repliably!
 					</p>
 					<Waitlist />
+
 					<div className={styles['important-links']}>
 						<Link className={styles.link} href='/terms'>
 							Terms of Service

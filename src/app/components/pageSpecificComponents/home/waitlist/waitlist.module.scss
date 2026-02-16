@@ -1,52 +1,197 @@
-.input-wrapper {
-	width: 100%;
+.waitlist-wrapper {
 	display: flex;
-	align-items: center;
-	gap: 1.5rem;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 100%;
 
-	input {
-		height: 3rem;
-		flex: 1;
-		padding: 0 1rem;
-		font-size: 1.25rem;
-		color: white;
-		background: hsla(0, 0%, 100%, 0.25);
-		border-radius: var(--border-radius-md);
-		outline: none;
-		border: none;
-		box-shadow: var(--text-shadow);
-		letter-spacing: 1px;
+	.mobile-note {
+		display: none;
+		align-items: start;
+		gap: 0.5rem;
 
-		&::placeholder {
-			color: white;
-			opacity: 0.75;
-			text-shadow: var(--text-shadow);
-		}
-
-		&:focus {
-			border: 2px solid white;
+		&::before {
+			content: '⚠️';
 		}
 	}
 
-	button {
-		width: 30%;
-		height: 3rem;
-		background: white;
-		color: var(--color-primary);
-		padding: 0.75rem 1.5rem;
-		border-radius: var(--border-radius-md);
-		font-weight: 600;
-		font-size: 1rem;
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		box-shadow: var(--text-shadow);
+	.input-wrapper {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
 
-		@media (hover: hover) {
-			&:not(.disabled):hover {
-				transform: translateY(-2px);
-				box-shadow: var(--text-shadow), var(--shadow-floating);
+		input {
+			height: 3rem;
+			flex: 1;
+			padding: 0 1rem;
+			font-size: 1.25rem;
+			color: white;
+			background: hsla(0, 0%, 100%, 0.25);
+			border-radius: var(--border-radius-md);
+			outline: none;
+			border: none;
+			box-shadow: var(--text-shadow);
+			letter-spacing: 1px;
+
+			&::placeholder {
+				color: white;
+				opacity: 0.75;
+				text-shadow: var(--text-shadow);
+			}
+
+			&:focus {
+				border: 2px solid white;
+			}
+		}
+
+		button {
+			width: 30%;
+			height: 3rem;
+			background: white;
+			color: var(--color-primary);
+			padding: 0.75rem 1.5rem;
+			border-radius: var(--border-radius-md);
+			font-weight: 600;
+			font-size: 1rem;
+			border: none;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			box-shadow: var(--text-shadow);
+
+			@media (hover: hover) {
+				&:not(.disabled):hover {
+					transform: translateY(-2px);
+					box-shadow: var(--text-shadow), var(--shadow-floating);
+				}
 			}
 		}
 	}
+}
+
+// 1. Extra-extra Small Devices (Phones)
+@media screen and (min-width: 300px) and (orientation: portrait) {
+	.waitlist-wrapper {
+		.input-wrapper {
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5rem;
+
+			input {
+				width: 100%;
+				flex: none;
+			}
+
+			button {
+				width: 100%;
+			}
+		}
+
+		.mobile-note {
+			font-size: 0.875rem;
+			display: flex;
+		}
+	}
+}
+
+@media screen and (min-height: 300px) and (orientation: landscape) {
+	.waitlist-wrapper {
+		.input-wrapper {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+
+			input {
+				height: 3rem;
+				flex: 1;
+				padding: 0 1rem;
+				font-size: 1.25rem;
+				color: white;
+				background: hsla(0, 0%, 100%, 0.25);
+				border-radius: var(--border-radius-md);
+				outline: none;
+				border: none;
+				box-shadow: var(--text-shadow);
+				letter-spacing: 1px;
+
+				&::placeholder {
+					color: white;
+					opacity: 0.75;
+					text-shadow: var(--text-shadow);
+				}
+
+				&:focus {
+					border: 2px solid white;
+				}
+			}
+
+			button {
+				width: 30%;
+				height: 3rem;
+				background: white;
+				color: var(--color-primary);
+				padding: 0.75rem 1.5rem;
+				border-radius: var(--border-radius-md);
+				font-weight: 600;
+				font-size: 1rem;
+				border: none;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				box-shadow: var(--text-shadow);
+
+				@media (hover: hover) {
+					&:not(.disabled):hover {
+						transform: translateY(-2px);
+						box-shadow: var(--text-shadow), var(--shadow-floating);
+					}
+				}
+			}
+		}
+
+		.mobile-note {
+			display: flex;
+		}
+	}
+
+	.right {
+		display: none;
+	}
+}
+
+// 1. Extra Small Devices (Phones)
+@media screen and (min-width: 401px) and (orientation: portrait) {
+	.waitlist-wrapper.mobile-note {
+		font-size: 1rem;
+	}
+}
+
+@media screen and (min-height: 401) and (orientation: landscape) {
+}
+
+// 2. Small Devices (Large Phones/Small Tablets)
+@media screen and (min-width: 481px) and (max-width: 767px) and (orientation: portrait) {
+}
+
+@media screen and (min-width: 481px) and (max-height: 767px) and (orientation: landscape) {
+}
+
+// 3. Medium Devices (Tablets)
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+}
+
+@media screen and (min-width: 768px) and (max-height: 1024px) and (orientation: landscape) {
+}
+
+// 4. Large Devices (Laptops/Desktops)
+@media screen and (min-width: 1025px) and (max-width: 1440px) and (orientation: portrait) {
+}
+
+@media screen and (min-width: 1025px) and (orientation: landscape) {
+}
+
+// 5. Extra Large Devices (Large Desktops/Monitors)
+@media screen and (min-width: 1441px) and (orientation: portrait) {
+}
+
+@media screen and (min-width: 1441px) and (orientation: landscape) {
 }
