@@ -80,6 +80,7 @@ const Waitlist = () => {
 					id='email'
 					type='email'
 					placeholder='name@domain.com'
+					autoComplete='email'
 					aria-label='Email address input'
 					value={email}
 					onChange={handleChange}
