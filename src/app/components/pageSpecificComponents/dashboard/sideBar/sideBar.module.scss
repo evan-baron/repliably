@@ -15,17 +15,25 @@
 
 	.navigation {
 		padding: 1.5rem 0;
+		height: 100%;
 
 		.navList {
+			display: flex;
+			flex-direction: column;
 			list-style: none;
 			margin: 0;
 			padding: 0;
+			height: 100%;
 
 			li {
 				margin: 0.25rem 0;
 
 				.icon {
 					font-size: 1.75rem;
+				}
+
+				&:nth-child(9) {
+					margin-top: auto;
 				}
 			}
 		}

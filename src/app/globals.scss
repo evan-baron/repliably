@@ -20,9 +20,9 @@
 	// );
 	--gradient-welcome: linear-gradient(
 		135deg,
-		hsl(180, 100%, 48%) 0%,
-		hsl(185, 90%, 45%) 60%,
-		hsl(160, 80%, 48%) 100%
+		#00f5f5 0%,
+		#0bc9da 60%,
+		#18dc9b 100%
 	);
 	// --gradient-welcome: linear-gradient(
 	// 	135deg,
@@ -42,17 +42,17 @@
 		hsl(187, 92%, 69%) 50%,
 		hsl(156, 72%, 67%) 100%
 	);
-	// --gradient-primary: linear-gradient(
-	// 	135deg,
-	// 	#22d3ee 0%,
-	// 	#67e8f9 50%,
-	// 	#6ee7b7 100%
-	// );
+	--gradient-primary: linear-gradient(
+		135deg,
+		#22d3ee 0%,
+		#67e8f9 50%,
+		#6ee7b7 100%
+	);
 	--gradient-primary-light: linear-gradient(
 		135deg,
-		hsl(188, 83%, 76%) 0%,
+		hsl(188, 84%, 76%) 0%,
 		hsla(187, 88%, 83%) 50%,
-		hsla(157, 71%, 83%) 100%
+		hsl(157, 70%, 83%) 100%
 	);
 	// --gradient-primary-light: linear-gradient(
 	// 	135deg,
