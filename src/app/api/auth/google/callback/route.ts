@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { google } from 'googleapis';
 import { prisma } from '@/lib/prisma';
 import { encrypt } from '@/lib/encryption';
@@ -8,14 +9,30 @@ import { applyRateLimit } from '@/lib/rateLimit';
 const oauth2Client = new google.auth.OAuth2(
 	process.env.GOOGLE_CLIENT_ID,
 	process.env.GOOGLE_CLIENT_SECRET,
-	process.env.NEXT_PUBLIC_APP_URL + '/api/auth/google/callback', // Redirect URI
+	process.env.NEXT_PUBLIC_APP_URL + '/api/auth/google/callback',
 );
+
+// Timing-safe comparison for the state token — same principle as the cron
+// secret check. Prevents an attacker from guessing the state value through
+// timing differences.
+function verifyState(provided: string, expected: string): boolean {
+	const a = Buffer.from(provided);
+	const b = Buffer.from(expected);
+
+	if (a.length !== b.length) {
+		crypto.timingSafeEqual(b, b);
+		return false;
+	}
+
+	return crypto.timingSafeEqual(a, b);
+}
 
 export async function GET(request: NextRequest) {
 	try {
 		const searchParams = request.nextUrl.searchParams;
 		const code = searchParams.get('code');
 		const error = searchParams.get('error');
+		const state = searchParams.get('state');
 
 		// Handle user denial
 		if (error) {
@@ -33,6 +50,23 @@ export async function GET(request: NextRequest) {
 			return NextResponse.redirect(
 				new URL(
 					'/dashboard/settings?tab=email&error=no_code',
+					process.env.NEXT_PUBLIC_APP_URL!,
+				),
+			);
+		}
+
+		// --- State validation ---
+		// Check that the state parameter from Google matches the cookie we set
+		// during initiate. If they don't match, this request didn't originate
+		// from our OAuth flow — it could be a CSRF attack where someone is
+		// trying to link THEIR Gmail to the victim's account.
+		const storedState = request.cookies.get('oauth_state')?.value;
+
+		if (!state || !storedState || !verifyState(state, storedState)) {
+			console.warn('OAuth state mismatch — possible CSRF attempt');
+			return NextResponse.redirect(
+				new URL(
+					'/dashboard/settings?tab=email&error=invalid_state',
 					process.env.NEXT_PUBLIC_APP_URL!,
 				),
 			);
@@ -56,7 +90,6 @@ export async function GET(request: NextRequest) {
 		const { tokens } = await oauth2Client.getToken(code);
 
 		if (!tokens.refresh_token) {
-			// This can happen if user previously authorized - Google doesn't send refresh_token again
 			return NextResponse.redirect(
 				new URL(
 					'/dashboard/settings?tab=email&error=no_refresh_token',
@@ -98,13 +131,17 @@ export async function GET(request: NextRequest) {
 			},
 		});
 
-		// Redirect back to settings with success message
-		return NextResponse.redirect(
+		// Redirect back to settings with success message.
+		// Also clear the oauth_state cookie — it's single-use.
+		const successResponse = NextResponse.redirect(
 			new URL(
 				'/dashboard/settings?tab=email&email=connected',
 				process.env.NEXT_PUBLIC_APP_URL!,
 			),
 		);
+		successResponse.cookies.delete('oauth_state');
+
+		return successResponse;
 	} catch (error) {
 		console.error('OAuth callback error:', error);
 		return NextResponse.redirect(

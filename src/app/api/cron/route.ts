@@ -1,8 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { runGenerateNextMessages } from './generate-next-messages/handler';
 import { runUpdatePendingMessages } from './update-pending-messages/handler';
 import { runSendScheduledMessages } from './send-scheduled-messages/handler';
 import { cleanupExpiredRateLimits } from '@/lib/rateLimit';
+
+// Timing-safe comparison: always compares ALL bytes regardless of where
+// the mismatch is, so response time doesn't leak which characters are correct.
+function verifyBearerToken(authHeader: string, secret: string): boolean {
+	const provided = Buffer.from(authHeader);
+	const expected = Buffer.from(`Bearer ${secret}`);
+
+	// If lengths differ, we still run timingSafeEqual on equal-length buffers
+	// to avoid leaking length information through early return timing.
+	if (provided.length !== expected.length) {
+		// Compare expected against itself so the function still runs in constant time,
+		// then return false. Without this, an attacker could determine the secret's
+		// LENGTH by measuring whether the response is faster (length mismatch early return)
+		// vs slower (full comparison).
+		crypto.timingSafeEqual(expected, expected);
+		return false;
+	}
+
+	return crypto.timingSafeEqual(provided, expected);
+}
 
 export async function GET(req: NextRequest) {
 	try {
@@ -21,7 +42,7 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+		if (!verifyBearerToken(authHeader, cronSecret)) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 

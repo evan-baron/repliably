@@ -9,6 +9,8 @@ export {
 	jsonAuthError,
 } from './responses';
 
+export { withAuth } from './withAuth';
+
 export {
 	sanitizeContact,
 	sanitizeContacts,

@@ -11,7 +11,11 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
-		const rateLimited = await applyRateLimit(user.id, 'auth-action', user.subscriptionTier);
+		const rateLimited = await applyRateLimit(
+			user.id,
+			'auth-action',
+			user.subscriptionTier,
+		);
 		if (rateLimited) return rateLimited;
 
 		// Clear Gmail connection data from database
@@ -25,8 +29,6 @@ export async function POST(request: NextRequest) {
 				emailTokenExpiresAt: null,
 			},
 		});
-
-		console.log(`✅ Gmail disconnected for user ${user.id}`);
 
 		return NextResponse.json({
 			success: true,

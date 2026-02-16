@@ -3,7 +3,6 @@
 // Library imports
 import { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import Link from 'next/link';
 
 // Hooks imports
 import { useTimezoneSelect, allTimezones } from 'react-timezone-select';
@@ -230,7 +229,9 @@ const AccountSettingsForm = ({ user }: { user: UserToClientFromDB }) => {
 						/>
 						<small id='email-help' className={styles.helpText}>
 							Email cannot be changed.{' '}
-							<Link href='/support'>Contact support for assistance.</Link>
+							<a href='mailto:support@repliably.com'>
+								Contact support for assistance.
+							</a>
 						</small>
 					</div>
 				</div>
