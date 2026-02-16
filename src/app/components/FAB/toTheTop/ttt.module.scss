@@ -1,0 +1,92 @@
+.ttt-wrapper {
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	animation: fadeIn 0.3s ease-in forwards;
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+	z-index: 10;
+
+	&.mobile {
+		bottom: 1rem;
+		right: 1rem;
+
+		.ttt-button {
+			height: 2.25rem;
+			transition: none;
+
+			.icon {
+				font-size: 1.75rem;
+				transition: none;
+			}
+
+			&:active {
+				border-color: var(--color-primary);
+
+				.icon {
+					color: var(--color-primary);
+				}
+			}
+		}
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+
+		to {
+			opacity: 1;
+		}
+	}
+
+	.ttt-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 2px solid var(--text-secondary);
+		background-color: var(--background-primary);
+		height: 2.75rem;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		cursor: pointer;
+		transition: border-color 0.2s ease-in-out;
+
+		@media (hover: hover) and (pointer: fine) {
+			&:hover {
+				border-color: var(--color-primary);
+
+				.icon {
+					color: var(--color-primary);
+				}
+			}
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--color-primary) !important;
+			outline-offset: 2px;
+		}
+
+		.icon {
+			color: var(--text-secondary);
+			font-size: 2rem;
+			transition: color 0.2s ease-in-out;
+		}
+	}
+
+	.tooltip {
+		display: flex;
+		font-size: 1rem;
+		color: var(--color-primary);
+		opacity: 0;
+		transition: opacity 0.2s ease-in-out;
+		text-shadow: var(--text-shadow);
+		font-weight: 600;
+
+		&.visible {
+			opacity: 1;
+		}
+	}
+}

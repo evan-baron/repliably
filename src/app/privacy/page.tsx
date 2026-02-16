@@ -7,12 +7,15 @@ import styles from './privacy.module.scss';
 // MUI imports
 import { West } from '@mui/icons-material';
 
+// Components imports
+import FAB from '../components/FAB/FAB';
+
 const Page = async () => {
 	return (
 		<div className={styles.page}>
 			<div className={styles.container}>
 				<div className={styles.headerBg}></div>
-
+				<FAB type='ttt' />
 				<Link href='/' className={styles.goBack}>
 					<West /> Back to home
 				</Link>
