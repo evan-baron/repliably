@@ -291,6 +291,29 @@
 
 	// 4. Large Devices (Laptops/Desktops)
 	@media screen and (min-width: 1025px) and (max-width: 1440px) and (orientation: portrait) {
+		.left {
+			position: absolute;
+			width: 60%;
+			height: 125dvh;
+			transform: translate(-10%) rotate(10deg);
+			transform-origin: center;
+
+			.left-contents {
+				position: relative;
+				transform: translateX(5%) rotate(-10deg);
+				transform-origin: center;
+				padding: 2rem;
+				max-width: 40rem;
+
+				.home-heading {
+					font-size: 4.5rem;
+				}
+
+				.home-description {
+					font-size: 1.125rem;
+				}
+			}
+		}
 	}
 
 	@media screen and (min-width: 1025px) and (orientation: landscape) {
@@ -307,6 +330,14 @@
 				transform-origin: center;
 				padding: 2rem;
 				max-width: 40rem;
+
+				.home-heading {
+					font-size: 4.5rem;
+				}
+
+				.home-description {
+					font-size: 1.125rem;
+				}
 			}
 		}
 
