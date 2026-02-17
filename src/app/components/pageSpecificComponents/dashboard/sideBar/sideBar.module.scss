@@ -1,9 +1,9 @@
 .sideBar {
+	position: relative;
 	min-width: 16.25rem;
 	background: var(--background-secondary);
 	box-shadow: var(--shadow-sm);
 	overflow-y: auto;
-	position: relative;
 	border-width: 0;
 	border-right: 0.1875rem solid transparent;
 	border-image: linear-gradient(
