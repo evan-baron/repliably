@@ -124,6 +124,7 @@ model EmailReply {
   contact           Contact   @relation(fields: [contactId], references: [id], onDelete: Cascade)
   owner             User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sequence          Sequence? @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  isBounce          Boolean   @default(false)
 }
 
 model Sequence {
