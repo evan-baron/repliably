@@ -112,6 +112,11 @@ export const sequenceAPI = {
 		apiCall('/api/sequences/deactivate-all', {
 			method: 'PUT',
 		}),
+	changeEndDate: (sequenceId: number, endDate: string) =>
+		apiCall(`/api/sequences/${sequenceId}/change-end-date`, {
+			method: 'PUT',
+			body: JSON.stringify({ endDate }),
+		}),
 };
 
 // User API functions

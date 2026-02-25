@@ -24,7 +24,7 @@ const DeactivateSequenceButton = ({ sequenceId }: { sequenceId: number }) => {
 	return (
 		<button
 			type='button'
-			className={styles['edit-contact-button']}
+			className={styles['delete-contact-button']}
 			onClick={handleClick}
 			aria-label={`Deactivate sequence ${sequenceId}`}
 		>

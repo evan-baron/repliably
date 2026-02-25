@@ -24,6 +24,8 @@ interface EmailContextType {
 	setResetForm: (callback: boolean) => void;
 	selectedSequenceId: number | null;
 	setSelectedSequenceId: (sequenceId: number | null) => void;
+	selectedSequenceEndDate: Date | null;
+	setSelectedSequenceEndDate: (endDate: Date | null) => void;
 	emailSentId: number | null;
 	setEmailSentId: (id: number | null) => void;
 	originalBodyContent: string;
@@ -43,6 +45,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 	const [selectedSequenceId, setSelectedSequenceId] = useState<number | null>(
 		null,
 	);
+	const [selectedSequenceEndDate, setSelectedSequenceEndDate] =
+		useState<Date | null>(null);
 	const [emailSentId, setEmailSentId] = useState<number | null>(null);
 	const [originalBodyContent, setOriginalBodyContent] =
 		useState<string>('<p></p>');
@@ -125,6 +129,8 @@ export const EmailContextProvider = ({ children }: { children: ReactNode }) => {
 				setResetForm,
 				selectedSequenceId,
 				setSelectedSequenceId,
+				selectedSequenceEndDate,
+				setSelectedSequenceEndDate,
 				emailSentId,
 				setEmailSentId,
 				originalBodyContent,

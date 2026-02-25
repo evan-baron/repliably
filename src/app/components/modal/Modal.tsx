@@ -24,6 +24,7 @@ import AlertModal from './modalTypes/alert/AlertModal';
 import DeactivateSequenceModal from './modalTypes/sequence/DeactivateSequenceModal';
 import UnsavedChangesModal from './modalTypes/alert/UnsavedChangesModal';
 import DeleteAccountModal from './modalTypes/alert/DeleteAccountModal';
+import ChangeSequenceEndDateModal from './modalTypes/sequence/ChangeSequenceEndDateModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -126,6 +127,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		deactivateSequence: {
 			component: <DeactivateSequenceModal />,
 			title: 'Deactivate Sequence',
+			width: '31.5rem',
+		},
+		extendSequence: {
+			component: <ChangeSequenceEndDateModal />,
+			title: 'Change Sequence End Date',
 			width: '31.5rem',
 		},
 		deactivateAllSequences: {

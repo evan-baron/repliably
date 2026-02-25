@@ -28,7 +28,7 @@ const Dashboard = () => {
 				className={styles.previewTiles}
 				aria-labelledby='preview-tiles-title'
 			>
-				<PreviewTile title='Active Contacts' href='/dashboard/contacts'>
+				<PreviewTile title='Expiring Soon' href='/dashboard/sequences'>
 					<div></div>
 				</PreviewTile>
 				<PreviewTile
