@@ -16,6 +16,7 @@ export interface RepliesFromDB {
 	processed: boolean;
 	createdAt: Date;
 	contact?: ContactFromDB;
+	isBounce: boolean;
 }
 
 export interface RepliesResponse {

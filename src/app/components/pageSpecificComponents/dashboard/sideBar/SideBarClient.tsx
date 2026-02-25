@@ -48,7 +48,11 @@ export default function SideBarClient({
 
 	const { data } = useMessagesGetAllPending();
 	const { data: emailConnectionStatus } = useGetEmailConnectionStatus();
-	const { data: repliesData } = useGetAllReplies();
+	const { data: unfilteredRepliesData } = useGetAllReplies();
+
+	const repliesData =
+		unfilteredRepliesData &&
+		unfilteredRepliesData.replies.filter((reply) => !reply.isBounce);
 
 	useEffect(() => {
 		if (data?.messages) {
@@ -74,10 +78,8 @@ export default function SideBarClient({
 	}, [data, initialMessages, initialEmailConnectionActive, queryClient]);
 
 	useEffect(() => {
-		if (repliesData?.replies) {
-			const hasUnprocessed = repliesData.replies.some(
-				(reply) => !reply.processed
-			);
+		if (repliesData) {
+			const hasUnprocessed = repliesData.some((reply) => !reply.processed);
 			setNewReplyNotification(hasUnprocessed);
 		}
 	}, [repliesData, setNewReplyNotification]);

@@ -89,7 +89,8 @@ export async function processMessage(gmail: any, messageId: string) {
 							originalMessageId: sentMessage.messageId || '',
 							replyMessageId: messageId,
 							replySubject: subject || 'Delivery Failed',
-							replyContent: 'This email could not be delivered. The email address may be invalid.',
+							replyContent:
+								'This email could not be delivered. The email address may be invalid.',
 							replyDate: new Date(parseInt(message.data.internalDate)),
 							isBounce: true,
 						},
@@ -161,7 +162,8 @@ export async function processMessage(gmail: any, messageId: string) {
 							originalMessageId: sentMessage.messageId || '',
 							replyMessageId: messageId,
 							replySubject: subject || 'Delivery Failed',
-							replyContent: bounceInfo.reason || 'This email could not be delivered.',
+							replyContent:
+								bounceInfo.reason || 'This email could not be delivered.',
 							replyDate: new Date(parseInt(message.data.internalDate)),
 							isBounce: true,
 						},

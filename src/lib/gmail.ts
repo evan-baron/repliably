@@ -131,8 +131,6 @@ export async function sendGmail({
 			.replace(/\//g, '_')
 			.replace(/=+$/, '');
 
-		console.log('Sending email via Gmail API...');
-
 		// Send email using Gmail API directly
 		const requestBody: any = { raw: encodedMessage };
 		if (threadId) requestBody.threadId = threadId;

@@ -63,7 +63,7 @@ export const generateMessage = async (
 
 	const promptTemplate = `${systemInstruction}\n\n${userPrompt}`;
 
-	console.log('GPT Prompt Template:', promptTemplate);
+	// console.log('GPT Prompt Template:', promptTemplate);
 
 	let attempt = 0;
 	let lastError: any = null;
@@ -130,12 +130,12 @@ export const generateMessage = async (
 				attempt,
 			};
 
-			console.log('Generated message meta from messageGenerationService.ts:', {
-				subject,
-				bodyHtml,
-				bodyPlain,
-				generationMeta,
-			});
+			// console.log('Generated message meta from messageGenerationService.ts:', {
+			// 	subject,
+			// 	bodyHtml,
+			// 	bodyPlain,
+			// 	generationMeta,
+			// });
 
 			return {
 				subject,

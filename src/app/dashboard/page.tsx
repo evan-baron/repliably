@@ -1,53 +1,68 @@
 // Library imports
 
+// Services imports
+import { getAllContacts } from '@/services/contactsService';
+
 // Styles imports
 import styles from './dashboard.module.scss';
 
 // Components imports
-import PreviewTile from '../components/pageSpecificComponents/dashboard/previewTile/PreviewTile';
+import PageTemplate from '../components/pageSpecificComponents/PageTemplate';
 
-const Dashboard = () => {
+const Dashboard = async () => {
+	const contacts = await getAllContacts();
+
+	// filter contacts with !validEmail into a separate array for dashboard display
+	const invalidEmailContacts =
+		contacts && contacts.length > 0 ?
+			contacts.filter((contact) => contact.validEmail === false)
+		:	[];
+
 	return (
-		<div className={styles.dashboardHome} aria-labelledby='dashboard-title'>
-			<section
-				className={styles.welcomeSection}
-				aria-labelledby='dashboard-title'
-			>
-				<h1 className={styles.welcomeTitle} id='dashboard-title'>
-					Dashboard Overview
-				</h1>
-				<p
-					className={styles.welcomeSubtitle}
-					aria-describedby='dashboard-title'
+		<PageTemplate
+			title='Dashboard Overview'
+			description='Welcome to your follow-up management center'
+		>
+			<div className={styles.dashboardHome}>
+				{/* Conditionally rendered when items need attention */}
+				<section
+					className={styles.needsAttention}
+					aria-labelledby='needs-attention-title'
 				>
-					Welcome to your follow-up management center
-				</p>
-			</section>
+					<h2 className={styles.sectionTitle} id='needs-attention-title'>
+						Items Needing Attention
+					</h2>
+				</section>
 
-			<section
-				className={styles.previewTiles}
-				aria-labelledby='preview-tiles-title'
-			>
-				<PreviewTile title='Expiring Soon' href='/dashboard/sequences'>
-					<div></div>
-				</PreviewTile>
-				<PreviewTile
-					title='Pending & Scheduled Emails'
-					href='/dashboard/pending'
+				<div className={styles.previewTiles}>
+					<section
+						className={styles.previewTile}
+						aria-labelledby='expiring-soon-title'
+					>
+						<h2 className={styles.sectionTitle} id='expiring-soon-title'>
+							Expiring Soon
+						</h2>
+					</section>
+					<section
+						className={styles.previewTile}
+						aria-labelledby='pending-emails-title'
+					>
+						<h2 className={styles.sectionTitle} id='pending-emails-title'>
+							Pending & Scheduled Emails
+						</h2>
+					</section>
+				</div>
+
+				<section
+					className={styles.recentActivity}
+					aria-labelledby='recent-activity-title'
 				>
-					<div></div>
-				</PreviewTile>
-			</section>
-
-			<section
-				className={styles.recentActivity}
-				aria-labelledby='recent-activity-title'
-			>
-				<h2 className={styles.sectionTitle} id='recent-activity-title'>
-					Recent Activity
-				</h2>
-			</section>
-		</div>
+					<h2 className={styles.sectionTitle} id='recent-activity-title'>
+						Recent Activity
+					</h2>
+				</section>
+			</div>
+		</PageTemplate>
 	);
 };
 
