@@ -56,20 +56,17 @@ const ChangeSequenceEndDateModal = () => {
 		<div
 			className={styles['changeenddatemodal-wrapper']}
 			role='alertdialog'
-			aria-labelledby='change-end-date-title'
+			aria-labelledby='modal-title'
 			aria-describedby='change-end-date-message'
 			aria-modal='true'
 		>
-			<h2 id='change-end-date-title' className='sr-only'>
-				Change Sequence End Date
-			</h2>
-			<p id='change-end-date-message' className={styles.message}>
-				Select a new end date for this sequence.
+			<p id='change-end-date-message' className={'sr-only'}>
+				Select a new end date for the sequence.
 			</p>
 			<Flatpickr
 				options={{
 					inline: true,
-					minDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+					minDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
 					dateFormat: 'Y-m-d',
 				}}
 				onChange={([date]) => {
