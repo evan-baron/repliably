@@ -101,8 +101,10 @@ export default function SideBar({
 							label={item.label}
 							isActive={isActive(item.href)}
 							notifications={
-								(notifications && item.label === 'Pending') ||
-								(newReply && item.label === 'Replies')
+								(notifications &&
+									item.label === 'Pending' &&
+									!isActive(item.href)) ||
+								(newReply && item.label === 'Replies' && !isActive(item.href))
 							}
 							emailConnectionStatus={
 								emailConnectionStatus && item.label === 'New Email'
