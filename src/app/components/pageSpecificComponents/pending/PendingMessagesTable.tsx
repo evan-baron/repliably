@@ -23,9 +23,11 @@ import { MessageWithContact } from '@/types/messageTypes';
 import TinyEditor from '../../tinyEditor/TinyEditor';
 
 const PendingMessagesTable = ({
+	parentDiv,
 	messages,
 	nested,
 }: {
+	parentDiv: string;
 	messages: MessageWithContact[];
 	nested?: boolean;
 }) => {
@@ -129,7 +131,9 @@ const PendingMessagesTable = ({
 			aria-label='Pending messages table'
 			aria-rowcount={sortedMessages.length + 1}
 		>
-			<thead className={styles.tableHeader}>
+			<thead
+				className={`${styles.tableHeader} ${parentDiv === 'DashboardClient' ? styles.dashboardTableHeader : ''}`}
+			>
 				<tr role='row'>
 					<th className={styles.md} role='columnheader' scope='col'>
 						Contact Name
@@ -159,21 +163,29 @@ const PendingMessagesTable = ({
 							className={styles.sort}
 							aria-label='Sort by scheduled date'
 						>
-							<span>Scheduled Date</span>
+							<span>
+								{parentDiv === 'DashboardClient' ? 'Date' : 'Scheduled Date'}
+							</span>
 							<SwapVert fontSize='small' aria-hidden='true' focusable='false' />
 						</button>
 					</th>
-					<th
-						colSpan={2}
-						className={`${styles.sm} ${styles.center}`}
-						role='columnheader'
-						scope='col'
-					>
-						Actions
-					</th>
+					{parentDiv !== 'DashboardClient' && (
+						<th
+							colSpan={2}
+							className={`${styles.sm} ${styles.center}`}
+							role='columnheader'
+							scope='col'
+						>
+							Actions
+						</th>
+					)}
 				</tr>
 			</thead>
-			<tbody>
+			<tbody
+				className={
+					parentDiv === 'DashboardClient' ? styles.dashboardTableBody : ''
+				}
+			>
 				{sortedMessages.map((message, rowIndex) => {
 					const messageDateDay =
 						message.scheduledAt && new Date(message.scheduledAt);
@@ -188,7 +200,9 @@ const PendingMessagesTable = ({
 								message.needsApproval &&
 								!message.approved)
 						) ?
-							'Pending Approval'
+							parentDiv === 'DashboardClient' ?
+								'Pending'
+							:	'Pending Approval'
 						:	'Scheduled';
 					const messageNeedsApproval = message.needsApproval;
 					const contactName =
@@ -310,49 +324,53 @@ const PendingMessagesTable = ({
 									{messageDateDay!.toLocaleDateString()}
 								</time>
 							</td>
-							<td
-								colSpan={2}
-								className={styles.buttonBox}
-								style={{
-									verticalAlign:
-										isEditing || selectedMessage === message.id ?
-											'top'
-										:	'middle',
-									paddingTop:
-										isEditing || selectedMessage === message.id ?
-											'.25rem'
-										:	'0',
-								}}
-								role='cell'
-							>
-								<div className={styles.buttons}>
-									<button
-										type='button'
-										className={`${styles.action} ${
-											isEditing ? styles.disabled : ''
-										}`}
-										onClick={(e) => handleEdit(e, message.id)}
-										disabled={isEditing}
-										aria-disabled={isEditing}
-										aria-label={`Edit message to ${contactName}`}
-									>
-										<Edit className={styles.icon} />
-										Edit
-									</button>
-									<button
-										type='button'
-										className={`${styles.action} ${
-											isEditing || !messageNeedsApproval ? styles.disabled : ''
-										}`}
-										disabled={isEditing || !messageNeedsApproval}
-										aria-disabled={isEditing || !messageNeedsApproval}
-										onClick={() => handleApprove(message.id)}
-										aria-label={`Approve message to ${contactName}`}
-									>
-										Approve
-									</button>
-								</div>
-							</td>
+							{parentDiv !== 'DashboardClient' && (
+								<td
+									colSpan={2}
+									className={styles.buttonBox}
+									style={{
+										verticalAlign:
+											isEditing || selectedMessage === message.id ?
+												'top'
+											:	'middle',
+										paddingTop:
+											isEditing || selectedMessage === message.id ?
+												'.25rem'
+											:	'0',
+									}}
+									role='cell'
+								>
+									<div className={styles.buttons}>
+										<button
+											type='button'
+											className={`${styles.action} ${
+												isEditing ? styles.disabled : ''
+											}`}
+											onClick={(e) => handleEdit(e, message.id)}
+											disabled={isEditing}
+											aria-disabled={isEditing}
+											aria-label={`Edit message to ${contactName}`}
+										>
+											<Edit className={styles.icon} />
+											Edit
+										</button>
+										<button
+											type='button'
+											className={`${styles.action} ${
+												isEditing || !messageNeedsApproval ?
+													styles.disabled
+												:	''
+											}`}
+											disabled={isEditing || !messageNeedsApproval}
+											aria-disabled={isEditing || !messageNeedsApproval}
+											onClick={() => handleApprove(message.id)}
+											aria-label={`Approve message to ${contactName}`}
+										>
+											Approve
+										</button>
+									</div>
+								</td>
+							)}
 						</tr>
 					);
 				})}

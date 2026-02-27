@@ -47,11 +47,10 @@
 					}
 				}
 
-				.previewTiles,
-				.recentActivity {
-					// outline: 1px solid teal;
-					max-height: 20rem;
-				}
+				// .previewTiles,
+				// .recentActivity {
+				// 	// outline: 1px solid teal;
+				// }
 
 				.previewTiles {
 					display: grid;
@@ -63,9 +62,9 @@
 				.recentActivity {
 					display: flex;
 					flex-direction: column;
+					gap: 1rem;
 
 					.activity {
-						margin-top: 1rem;
 						min-height: 8rem;
 						display: flex;
 						align-items: center;

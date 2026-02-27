@@ -61,6 +61,10 @@
 				}
 			}
 		}
+
+		&.dashboardTableHeader {
+			display: block;
+		}
 	}
 
 	tbody {
@@ -288,6 +292,19 @@
 
 			&.selectedMessage {
 				background: var(--background-tertiary) !important;
+			}
+		}
+
+		&.dashboardTableBody {
+			display: block;
+			width: 100%;
+			max-height: 15rem;
+			overflow-y: auto;
+
+			tr {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
 			}
 		}
 	}

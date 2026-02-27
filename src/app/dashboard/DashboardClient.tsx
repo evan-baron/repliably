@@ -22,6 +22,7 @@ import { RepliesFromDB } from '@/types/repliesTypes';
 
 // Components Imports
 import NeedsAttention from '../components/pageSpecificComponents/dashboard/NeedsAttention';
+import PendingMessagesClient from './pending/PendingMessagesClient';
 
 interface DashboardClientProps {
 	initialInvalidEmailContacts: ContactFromDB[];
@@ -68,6 +69,7 @@ const DashboardClient = ({
 	const pendingMessages = pendingData?.messages || [];
 	const replies = repliesData?.replies || [];
 
+	console.log('pendingMessages in DashboardClient:', pendingMessages);
 	// Derived data for dashboard sections
 	// Use live contacts data if available, fall back to server-fetched initial data
 	const invalidContacts =
@@ -102,9 +104,15 @@ const DashboardClient = ({
 					<h2 className={styles.sectionTitle} id='pending-emails-title'>
 						Pending & Scheduled Emails
 					</h2>
-					<div className={styles.activity}>
-						<p>Pending or scheduled emails will appear here</p>
-					</div>
+					{pendingMessages.length > 0 ?
+						<PendingMessagesClient
+							parentDiv={'DashboardClient'}
+							initialMessages={pendingMessages}
+						/>
+					:	<div className={styles.activity}>
+							<p>Pending or scheduled emails will appear here</p>
+						</div>
+					}
 				</section>
 			</div>
 

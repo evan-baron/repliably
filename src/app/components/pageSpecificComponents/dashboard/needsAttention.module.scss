@@ -33,7 +33,12 @@
 		border-radius: var(--border-radius);
 
 		.tableHeader {
+			display: block;
+
 			.headerRow {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
 				background: var(--gradient-primary-light);
 
 				th {
@@ -52,7 +57,15 @@
 		}
 
 		.tableBody {
+			display: block;
+			width: 100%;
+			max-height: 10rem;
+			overflow-y: auto;
+
 			.bodyRow {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
 				line-height: 1.25;
 
 				&:nth-child(odd) {
