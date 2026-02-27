@@ -91,6 +91,9 @@ const DashboardClient = ({
 					<h2 className={styles.sectionTitle} id='expiring-soon-title'>
 						Expiring Soon
 					</h2>
+					<div className={styles.activity}>
+						<p>Sequences expiring within 7 days will appear here</p>
+					</div>
 				</section>
 				<section
 					className={styles.previewTile}
@@ -99,6 +102,9 @@ const DashboardClient = ({
 					<h2 className={styles.sectionTitle} id='pending-emails-title'>
 						Pending & Scheduled Emails
 					</h2>
+					<div className={styles.activity}>
+						<p>Pending or scheduled emails will appear here</p>
+					</div>
 				</section>
 			</div>
 
@@ -109,6 +115,9 @@ const DashboardClient = ({
 				<h2 className={styles.sectionTitle} id='recent-activity-title'>
 					Recent Activity
 				</h2>
+				<div className={styles.activity}>
+					<p>Any recent email activity will appear here</p>
+				</div>
 			</section>
 		</div>
 	);
