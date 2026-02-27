@@ -65,15 +65,27 @@ export const signatureSchema = z.object({
 
 // Signature Creation Schema (name and content required)
 export const createSignatureSchema = z.object({
-	name: z.string().min(1, 'Name is required').max(50, 'Name must be less than 50 characters'),
-	content: z.string().min(1, 'Content is required').max(500, 'Content must be less than 500 characters'),
+	name: z
+		.string()
+		.min(1, 'Name is required')
+		.max(50, 'Name must be less than 50 characters'),
+	content: z
+		.string()
+		.min(1, 'Content is required')
+		.max(500, 'Content must be less than 500 characters'),
 	isDefault: z.boolean().optional(),
 });
 
 // Message Update Schema
 export const messageUpdateSchema = z.object({
-	subject: z.string().min(1, 'Subject is required').max(500, 'Subject must be less than 500 characters'),
-	contents: z.string().min(1, 'Contents are required').max(5000, 'Contents must be less than 5000 characters'),
+	subject: z
+		.string()
+		.min(1, 'Subject line is required')
+		.max(500, 'Subject line must be less than 500 characters'),
+	contents: z
+		.string()
+		.min(1, 'Message content is required')
+		.max(5000, 'Message content must be less than 5000 characters'),
 });
 
 // Send Email Schema - matches StoredEmailData interface
@@ -81,12 +93,12 @@ export const sendEmailSchema = z.object({
 	to: z.email('Invalid recipient email address'),
 	subject: z
 		.string()
-		.min(1, 'Subject is required')
-		.max(500, 'Subject too long'),
+		.min(1, 'Subject line is required')
+		.max(200, 'Subject line must be less than 200 characters'),
 	body: z
 		.string()
 		.min(1, 'Email body is required')
-		.max(4500, 'Email body too long'),
+		.max(4500, 'Email body must be less than 4500 characters'),
 	autoSend: z.boolean(),
 	cadenceType: z.enum(
 		['none', '1day', '3day', '31day', 'weekly', 'biweekly', 'monthly'],

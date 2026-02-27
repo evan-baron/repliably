@@ -15,6 +15,7 @@ import { useMediaQuery } from '@mui/material';
 
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
+import { MessageWithContact } from '@/types/messageTypes';
 
 interface AppContextType {
 	isTouchDevice: boolean;
@@ -41,6 +42,10 @@ interface AppContextType {
 	setLoadingMessage: (message: string | null) => void;
 	newReplyNotification: boolean;
 	setNewReplyNotification: (value: boolean) => void;
+	selectedEmail: MessageWithContact | null;
+	setSelectedEmail: (message: MessageWithContact | null) => void;
+	modalTitle: string | null;
+	setModalTitle: (title: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -69,6 +74,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 	};
 	const [newReplyNotification, setNewReplyNotification] =
 		useState<boolean>(false);
+	const [selectedEmail, setSelectedEmail] = useState<MessageWithContact | null>(
+		null,
+	);
+	const [modalTitle, setModalTitle] = useState<string | null>(null);
 
 	// Auto-sync isModalOpen with modalType
 	useEffect(() => {
@@ -106,6 +115,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 		setLoadingMessage: () => {},
 		newReplyNotification: false,
 		setNewReplyNotification: () => {},
+		selectedEmail: null,
+		setSelectedEmail: () => {},
+		modalTitle: null,
+		setModalTitle: () => {},
 	};
 
 	// Client-side checks only after hydration
@@ -174,6 +187,10 @@ export const ContextProvider = ({ children }: ContextProviderProps) => {
 				setLoadingMessage,
 				newReplyNotification,
 				setNewReplyNotification,
+				selectedEmail,
+				setSelectedEmail,
+				modalTitle,
+				setModalTitle,
 			}
 		:	fallback;
 

@@ -25,6 +25,7 @@ import DeactivateSequenceModal from './modalTypes/sequence/DeactivateSequenceMod
 import UnsavedChangesModal from './modalTypes/alert/UnsavedChangesModal';
 import DeleteAccountModal from './modalTypes/alert/DeleteAccountModal';
 import ChangeSequenceEndDateModal from './modalTypes/sequence/ChangeSequenceEndDateModal';
+import EditMessageModal from './modalTypes/messages/EditMessageModal';
 
 const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 	const {
@@ -37,6 +38,8 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		clearErrors,
 		alertMessage,
 		setAlertMessage,
+		modalTitle,
+		setModalTitle,
 	} = useAppContext();
 
 	const currentModalType = modalType || backupModalType || null;
@@ -53,6 +56,7 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		modalType === 'duplicateContact' && setSelectedContact(null);
 		modalType === 'error' && clearErrors();
 		modalType === 'alert' && setAlertMessage(null);
+		modalType === 'editMessage' && setModalTitle(null);
 	};
 
 	interface ModalContent {
@@ -149,6 +153,11 @@ const Modal = ({ backupModalType }: { backupModalType?: string }) => {
 		deleteAccount: {
 			component: <DeleteAccountModal />,
 			title: 'Delete Account',
+			width: '50rem',
+		},
+		editMessage: {
+			component: <EditMessageModal />,
+			title: modalTitle || 'Edit Email',
 			width: '50rem',
 		},
 	} as const;

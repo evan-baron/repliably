@@ -14,13 +14,22 @@ import styles from './pendingMessagesTable.module.scss';
 import { Edit, SwapVert } from '@mui/icons-material';
 
 // Helper functions imports
-import { parseEmailContent } from '@/lib/helpers/emailHelpers';
+import {
+	parseEmailContent,
+	parseTinyMceContent,
+} from '@/lib/helpers/emailHelpers';
+
+// Validation imports
+import { messageUpdateSchema } from '@/lib/validation';
 
 // Types imports
 import { MessageWithContact } from '@/types/messageTypes';
 
 // Components imports
 import TinyEditor from '../../tinyEditor/TinyEditor';
+
+// Context imports
+import { useAppContext } from '@/app/context/AppContext';
 
 const PendingMessagesTable = ({
 	parentDiv,
@@ -31,6 +40,8 @@ const PendingMessagesTable = ({
 	messages: MessageWithContact[];
 	nested?: boolean;
 }) => {
+	const { setErrors, setModalType, setSelectedEmail, setModalTitle } =
+		useAppContext();
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [selectedMessage, setSelectedMessage] = useState<number | null>(null);
 	const [editorContent, setEditorContent] = useState<string>('');
@@ -91,23 +102,48 @@ const PendingMessagesTable = ({
 		setSubjectContent(e.target.value);
 	};
 
-	const handleSaveAndApprove = () => {
-		if (selectedMessage && isEditing) {
-			updateMessage({
-				messageId: selectedMessage,
-				contents:
-					editorContent ?
-						editorContent.trim()
-					:	messages.find((m) => m.id === selectedMessage)?.contents || '',
-				subject:
-					subjectContent ?
-						subjectContent.trim()
-					:	messages.find((m) => m.id === selectedMessage)?.subject || '',
-			});
-			approveMessage(selectedMessage);
+	const handleSaveAndApprove = async () => {
+		if (!selectedMessage || !isEditing) return;
+
+		const currentMessage = messages.find((m) => m.id === selectedMessage);
+
+		const rawContents = (
+			editorContent ??
+			currentMessage?.contents ??
+			''
+		).trim();
+
+		const strippedContents = rawContents
+			.replace(/<[^>]*>/g, '')
+			.replace(/&nbsp;/g, '')
+			.trim();
+
+		const result = messageUpdateSchema.safeParse({
+			subject: (subjectContent ?? currentMessage?.subject ?? '').trim(),
+			contents: strippedContents,
+		});
+
+		if (!result.success) {
+			setErrors(result.error.issues.map((issue) => issue.message));
+			setModalType('error');
+			return;
 		}
-		setIsEditing(false);
-		setSelectedMessage(null);
+
+		try {
+			await updateMessage({
+				messageId: selectedMessage,
+				subject: result.data.subject,
+				contents: parseTinyMceContent(rawContents),
+			});
+			if (currentMessage?.needsApproval) {
+				await approveMessage(selectedMessage);
+			}
+			setIsEditing(false);
+			setSelectedMessage(null);
+		} catch {
+			setErrors(['Failed to save message. Please try again.']);
+			setModalType('error');
+		}
 	};
 
 	const sortedMessages = [...messages].sort((a, b) => {
@@ -210,10 +246,20 @@ const PendingMessagesTable = ({
 							message.contact.firstName + ' ' + message.contact?.lastName
 						:	'Unknown';
 
+					console.log('Rendering message:', message.id === 58 && message);
+
 					return (
 						<tr
 							key={message.id}
-							onClick={() => handleClick(message.id)}
+							onClick={() => {
+								if (parentDiv === 'DashboardClient') {
+									setSelectedEmail(message);
+									setModalType('editMessage');
+									setModalTitle(`Edit Email to ${contactName}`);
+								} else {
+									handleClick(message.id);
+								}
+							}}
 							className={`${nested ? styles.nested : ''} ${
 								selectedMessage === message.id ? styles.selectedMessage : ''
 							} ${isEditing ? styles.editing : ''}`}
@@ -224,7 +270,13 @@ const PendingMessagesTable = ({
 							onKeyDown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
-									handleClick(message.id);
+									if (parentDiv === 'DashboardClient') {
+										setSelectedEmail(message);
+										setModalType('editMessage');
+										setModalTitle(`Edit Email to ${contactName}`);
+									} else {
+										handleClick(message.id);
+									}
 								}
 							}}
 						>
