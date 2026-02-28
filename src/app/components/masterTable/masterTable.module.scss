@@ -57,14 +57,6 @@
 		.bodyRow {
 			line-height: 1.25;
 
-			&:nth-child(odd) {
-				background-color: var(--background-tertiary);
-			}
-
-			&:nth-child(even) {
-				background-color: var(--background-tertiary-med);
-			}
-
 			@media (hover: hover) {
 				&:hover {
 					background: var(--gradient-primary-lighter);
@@ -154,28 +146,6 @@
 				}
 			}
 
-			// &.unread {
-			// 	font-weight: 600;
-			// }
-
-			// &.replies {
-			// 	.subject {
-			// 		font-weight: 600;
-			// 	}
-			// }
-
-			// &.expanded-row {
-			// 	background: var(--gradient-primary-lighter);
-			// }
-
-			// &.selected {
-			// 	background: var(--gradient-primary-lighter);
-			// }
-
-			// &.selectedMessage {
-			// 	background: var(--background-tertiary) !important;
-			// }
-
 			&.nested {
 				&.selected {
 					background: var(--gradient-greyscale-lighter);
@@ -191,6 +161,13 @@
 						cursor: pointer;
 					}
 				}
+			}
+		}
+
+		.fillerRow {
+			padding: 0.5rem 0;
+			td {
+				height: 1.25rem;
 			}
 		}
 	}
@@ -210,13 +187,30 @@
 		.tableBody {
 			display: block;
 			width: 100%;
-			max-height: 22rem;
+			max-height: 22.5rem;
 			overflow-y: auto;
 
 			tr {
 				display: table;
 				table-layout: fixed;
 				width: 100%;
+			}
+
+			&.multiPage {
+				height: 22.5rem;
+				overflow-y: auto;
+			}
+
+			&.fillerRows {
+				tr {
+					&:nth-child(odd) {
+						background-color: var(--background-tertiary);
+					}
+
+					&:nth-child(even) {
+						background-color: var(--background-tertiary-med);
+					}
+				}
 			}
 		}
 	}

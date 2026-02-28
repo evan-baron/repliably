@@ -3,7 +3,7 @@ import { getAllContacts } from '@/services/contactsService';
 import { getAllSequencesByUserId } from '@/services/sequenceService';
 import {
 	getAllPendingMessages,
-	getAllMessagesByUserId,
+	getAllRecentMessagesByUserId,
 } from '@/services/messageService';
 import { getAllRepliesByUserId } from '@/services/repliesService';
 
@@ -23,7 +23,7 @@ const Dashboard = async () => {
 		getAllSequencesByUserId(),
 		getAllPendingMessages(),
 		getAllRepliesByUserId(),
-		getAllMessagesByUserId(),
+		getAllRecentMessagesByUserId(),
 	]);
 
 	const invalidContacts = contacts.filter(

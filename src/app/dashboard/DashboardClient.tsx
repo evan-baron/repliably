@@ -16,6 +16,9 @@ import { useGetAllReplies } from '@/hooks/useReplies';
 // Styles imports
 import styles from './dashboard.module.scss';
 
+// Icon imports
+import { KeyboardArrowLeft, KeyboardArrowRight } from '@mui/icons-material';
+
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
 import { SanitizedSequence } from '@/types/sequenceTypes';
@@ -113,7 +116,6 @@ const DashboardClient = ({
 			return result;
 		}, []);
 
-	console.log('sentMessages in DashboardClient:', sentMessages);
 	return (
 		<div className={styles.dashboardHome}>
 			{needsAttention && <NeedsAttention invalidContacts={invalidContacts} />}
@@ -160,10 +162,49 @@ const DashboardClient = ({
 					Recent Activity
 				</h2>
 				{sentMessages.length > 0 ?
-					<AllActivities
-						parentDiv={'DashboardClient'}
-						messages={sentMessages[activitiesPage]}
-					/>
+					<>
+						<AllActivities
+							multiPage={sentMessages.length > 1}
+							parentDiv={'DashboardClient'}
+							messages={sentMessages[activitiesPage]}
+						/>
+						{sentMessages.length > 1 && (
+							<div className={styles.pagination}>
+								<button
+									className={styles.paginationButton}
+									onClick={() => {
+										if (activitiesPage === 0) {
+											return;
+										}
+
+										setActivitiesPage((prev) => prev - 1);
+									}}
+								>
+									<KeyboardArrowLeft className={styles.icon} />
+								</button>
+								{sentMessages.map((_, index) => (
+									<button
+										key={index}
+										className={`${index === activitiesPage ? styles.active : ''} ${styles.paginationButton}`}
+										onClick={() => setActivitiesPage(index)}
+									>
+										{index + 1}
+									</button>
+								))}
+								<button
+									className={styles.paginationButton}
+									onClick={() => {
+										if (activitiesPage === sentMessages.length - 1) {
+											return;
+										}
+										setActivitiesPage((prev) => prev + 1);
+									}}
+								>
+									<KeyboardArrowRight className={styles.icon} />
+								</button>
+							</div>
+						)}
+					</>
 				:	<div className={styles.activity}>
 						<p>Any recent email activity will appear here</p>{' '}
 					</div>

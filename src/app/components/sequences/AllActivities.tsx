@@ -16,15 +16,18 @@ import MasterTable from '../masterTable/MasterTable';
 // Helper functions imports
 
 const AllActivities = ({
+	multiPage = false,
 	messages,
 	parentDiv,
 }: {
+	multiPage?: boolean;
 	messages: MessagesWithActiveSequence[] | MessageWithContact[];
 	parentDiv?: string;
 }) => {
 	const columnHeaders =
 		parentDiv === 'DashboardClient' ?
 			[
+				{ label: 'Contact', size: 'sm' },
 				{ label: 'Type', size: 'sm' },
 				{ label: 'Email', size: 'lrg' },
 				{ label: 'Send Date', size: 'sm', sortable: true },
@@ -57,23 +60,36 @@ const AllActivities = ({
 						message.scheduledAt!,
 					).toLocaleDateString()}`;
 
+			const { contact } = message as MessageWithContact;
+			const contactName =
+				contact && contact.firstName && contact.lastName ?
+					`${contact.firstName} ${contact.lastName}`
+				:	'Unknown';
+
 			const cellData: CellData[] =
 				parentDiv === 'DashboardClient' ?
 					[
 						{
+							value: contactName,
+							size: columnHeaders[0].size,
+							isLink: true,
+							href: `/dashboard/contacts/${contact?.id}`,
+							cellStyling: 'link',
+						},
+						{
 							value:
 								message.sequenceId ? 'Sequence Email' : 'Stand-alone Email',
-							size: columnHeaders[0].size,
+							size: columnHeaders[1].size,
 						},
 						{
 							value: '<div>' + message.subject + '</div>' + message.contents,
-							size: columnHeaders[1].size,
+							size: columnHeaders[2].size,
 							contentCell: true,
 							subjectContentCell: true,
 						},
 						{
 							value: sendDate,
-							size: columnHeaders[2].size,
+							size: columnHeaders[3].size,
 							cellOrientation: 'right',
 							cellStyling:
 								message.status === 'pending' || message.status === 'scheduled' ?
@@ -86,7 +102,7 @@ const AllActivities = ({
 								message.hasReply ? 'Yes'
 								: message.status === 'sent' ? 'No'
 								: 'N/A',
-							size: columnHeaders[3].size,
+							size: columnHeaders[4].size,
 							cellOrientation: 'right',
 							cellStyling:
 								message.status === 'scheduled' || message.status === 'pending' ?
@@ -148,6 +164,7 @@ const AllActivities = ({
 
 	return (
 		<MasterTable
+			multiPage={multiPage}
 			parentDiv={parentDiv}
 			tableData={tableData}
 			tableType='allActivities'
