@@ -14,10 +14,11 @@ export async function getAllMessagesByUserId() {
 
 	const messages = await prisma.message.findMany({
 		where: { ownerId: user.id },
+		include: { contact: true },
 		orderBy: { createdAt: 'desc' },
 	});
 
-	return { messages: sanitizeMessages(messages) };
+	return { messages: sanitizeMessagesWithContact(messages) };
 }
 
 export async function getAllPendingMessages() {

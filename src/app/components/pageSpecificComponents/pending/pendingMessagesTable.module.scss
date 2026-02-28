@@ -64,6 +64,10 @@
 
 		&.dashboardTableHeader {
 			display: block;
+
+			tr {
+				background: var(--gradient-green-light);
+			}
 		}
 	}
 
@@ -80,7 +84,7 @@
 
 			@media (hover: hover) {
 				&:hover:not(:has(.action:hover, .rte-wrapper)) {
-					background: var(--gradient-primary-lighter);
+					background: var(--gradient-green-lighter);
 					cursor: pointer;
 				}
 			}
@@ -298,7 +302,7 @@
 		&.dashboardTableBody {
 			display: block;
 			width: 100%;
-			max-height: 15rem;
+			max-height: 16rem;
 			overflow-y: auto;
 
 			tr {

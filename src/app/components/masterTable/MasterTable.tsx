@@ -18,11 +18,13 @@ import NestedTable from './NestedTable';
 import { MasterTableData } from '@/types/masterTableTypes';
 
 const MasterTable = ({
+	parentDiv,
 	inModal,
 	tableData,
 	tableType,
 	tableSize,
 }: {
+	parentDiv?: string;
 	inModal?: boolean;
 	tableData: MasterTableData;
 	tableType:
@@ -106,7 +108,7 @@ const MasterTable = ({
 
 	return (
 		<table
-			className={`${styles['master-table']} ${inModal ? styles.inModal : ''}`}
+			className={`${styles['master-table']} ${inModal ? styles.inModal : ''} ${parentDiv === 'DashboardClient' ? styles.dashboardTable : ''}`}
 			role='table'
 			aria-label={`${parsedTableType} table`}
 			aria-rowcount={sortedRowData.length + 1}

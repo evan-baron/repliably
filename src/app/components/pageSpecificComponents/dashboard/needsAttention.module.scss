@@ -39,7 +39,7 @@
 				display: table;
 				table-layout: fixed;
 				width: 100%;
-				background: var(--gradient-primary-light);
+				background: var(--gradient-accent-light);
 
 				th {
 					vertical-align: middle;
@@ -59,7 +59,7 @@
 		.tableBody {
 			display: block;
 			width: 100%;
-			max-height: 10rem;
+			max-height: 9rem;
 			overflow-y: auto;
 
 			.bodyRow {
@@ -78,7 +78,7 @@
 
 				@media (hover: hover) {
 					&:hover {
-						background: var(--gradient-primary-lighter);
+						background: var(--gradient-danger-accessible);
 						cursor: pointer;
 					}
 				}
@@ -99,14 +99,15 @@
 					}
 
 					&.link {
-						color: var(--color-primary);
+						color: var(--accent-primary);
 						text-decoration: none;
 						transition: color 0.2s ease;
 						font-weight: 600;
+						text-decoration: underline;
 
 						@media (hover: hover) {
 							&:hover {
-								color: var(--color-primary-hover);
+								color: var(--accent-hover);
 							}
 						}
 					}

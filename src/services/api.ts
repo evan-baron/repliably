@@ -62,6 +62,10 @@ export const emailAPI = {
 
 // Messages API functions
 export const messageAPI = {
+	readAllByUserId: () =>
+		apiCall('/api/messages/user', {
+			method: 'GET',
+		}),
 	readStandaloneByContactId: (contactId: number) =>
 		apiCall(`/api/messages/contact/${contactId}/standalone`, {
 			method: 'GET',

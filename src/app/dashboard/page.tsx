@@ -1,7 +1,10 @@
 // Services imports
 import { getAllContacts } from '@/services/contactsService';
 import { getAllSequencesByUserId } from '@/services/sequenceService';
-import { getAllPendingMessages } from '@/services/messageService';
+import {
+	getAllPendingMessages,
+	getAllMessagesByUserId,
+} from '@/services/messageService';
 import { getAllRepliesByUserId } from '@/services/repliesService';
 
 // Components imports
@@ -9,13 +12,19 @@ import DashboardClient from './DashboardClient';
 import PageTemplate from '../components/pageSpecificComponents/PageTemplate';
 
 const Dashboard = async () => {
-	const [contacts, { sequences }, { messages }, { replies }] =
-		await Promise.all([
-			getAllContacts(),
-			getAllSequencesByUserId(),
-			getAllPendingMessages(),
-			getAllRepliesByUserId(),
-		]);
+	const [
+		contacts,
+		{ sequences },
+		{ messages },
+		{ replies },
+		{ messages: activities },
+	] = await Promise.all([
+		getAllContacts(),
+		getAllSequencesByUserId(),
+		getAllPendingMessages(),
+		getAllRepliesByUserId(),
+		getAllMessagesByUserId(),
+	]);
 
 	const invalidContacts = contacts.filter(
 		(contact) => contact.validEmail === false || contact.firstName === null,
@@ -31,6 +40,7 @@ const Dashboard = async () => {
 				initialSequences={sequences}
 				initialPendingMessages={messages}
 				initialReplies={replies}
+				initialActivities={activities}
 			/>
 		</PageTemplate>
 	);

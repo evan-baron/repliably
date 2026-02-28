@@ -98,7 +98,15 @@ export const sendEmailSchema = z.object({
 	body: z
 		.string()
 		.min(1, 'Email body is required')
-		.max(4500, 'Email body must be less than 4500 characters'),
+		.max(4500, 'Email body must be less than 4500 characters')
+		.refine(
+			(val) =>
+				val
+					.replace(/<[^>]*>/g, '')
+					.replace(/&nbsp;/g, '')
+					.trim().length > 0,
+			{ message: 'Email body cannot be empty' },
+		),
 	autoSend: z.boolean(),
 	cadenceType: z.enum(
 		['none', '1day', '3day', '31day', 'weekly', 'biweekly', 'monthly'],

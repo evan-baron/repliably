@@ -8,7 +8,10 @@ import Link from 'next/link';
 // Hooks imports
 import { useContactsGetAll } from '@/hooks/useContact';
 import { useAllSequencesByUserId } from '@/hooks/useSequence';
-import { useMessagesGetAllPending } from '@/hooks/useMessages';
+import {
+	useMessagesGetAllPending,
+	useAllMessagesByUserId,
+} from '@/hooks/useMessages';
 import { useGetAllReplies } from '@/hooks/useReplies';
 
 // Styles imports
@@ -17,18 +20,20 @@ import styles from './dashboard.module.scss';
 // Types imports
 import { ContactFromDB } from '@/types/contactTypes';
 import { SanitizedSequence } from '@/types/sequenceTypes';
-import { MessageFromDB } from '@/types/messageTypes';
+import { MessageFromDB, MessageWithContact } from '@/types/messageTypes';
 import { RepliesFromDB } from '@/types/repliesTypes';
 
 // Components Imports
 import NeedsAttention from '../components/pageSpecificComponents/dashboard/NeedsAttention';
 import PendingMessagesClient from './pending/PendingMessagesClient';
+import AllActivities from '../components/sequences/AllActivities';
 
 interface DashboardClientProps {
 	initialInvalidEmailContacts: ContactFromDB[];
 	initialSequences: SanitizedSequence[];
 	initialPendingMessages: MessageFromDB[];
 	initialReplies: RepliesFromDB[];
+	initialActivities: MessageWithContact[];
 }
 
 const DashboardClient = ({
@@ -36,6 +41,7 @@ const DashboardClient = ({
 	initialSequences,
 	initialPendingMessages,
 	initialReplies,
+	initialActivities,
 }: DashboardClientProps) => {
 	const queryClient = useQueryClient();
 
@@ -56,17 +62,30 @@ const DashboardClient = ({
 				replies: initialReplies,
 			});
 		}
-	}, [initialSequences, initialPendingMessages, initialReplies, queryClient]);
+		if (initialActivities && initialActivities.length > 0) {
+			queryClient.setQueryData(['activities-get-all'], {
+				activities: initialActivities,
+			});
+		}
+	}, [
+		initialSequences,
+		initialPendingMessages,
+		initialReplies,
+		initialActivities,
+		queryClient,
+	]);
 
 	// Subscribe to live data
 	const { data: contactsData } = useContactsGetAll();
 	const { data: sequencesData } = useAllSequencesByUserId();
 	const { data: pendingData } = useMessagesGetAllPending();
+	const { data: activitiesData } = useAllMessagesByUserId();
 	const { data: repliesData } = useGetAllReplies();
 
 	const contacts = contactsData?.contacts || [];
 	const sequences = sequencesData?.sequences || [];
 	const pendingMessages = pendingData?.messages || [];
+	const activities = activitiesData?.messages || [];
 	const replies = repliesData?.replies || [];
 
 	console.log('pendingMessages in DashboardClient:', pendingMessages);
@@ -81,6 +100,11 @@ const DashboardClient = ({
 	const bounces = replies.filter((reply) => reply.isBounce);
 	const needsAttention = invalidContacts.length > 0 || bounces.length > 0;
 
+	// filter only messages with status of sent from activities
+	const sentMessages = activities.filter(
+		(message) => message.status === 'sent',
+	);
+
 	return (
 		<div className={styles.dashboardHome}>
 			{needsAttention && <NeedsAttention invalidContacts={invalidContacts} />}
@@ -94,7 +118,10 @@ const DashboardClient = ({
 						Expiring Soon
 					</h2>
 					<div className={styles.activity}>
-						<p>Sequences expiring within 7 days will appear here</p>
+						<p>
+							Sequences expiring within 7 days will appear here. You currently
+							have no sequences expiring in the next 7 days.
+						</p>
 					</div>
 				</section>
 				<section
@@ -123,9 +150,15 @@ const DashboardClient = ({
 				<h2 className={styles.sectionTitle} id='recent-activity-title'>
 					Recent Activity
 				</h2>
-				<div className={styles.activity}>
-					<p>Any recent email activity will appear here</p>
-				</div>
+				{sentMessages.length > 0 ?
+					<AllActivities
+						parentDiv={'DashboardClient'}
+						messages={sentMessages}
+					/>
+				:	<div className={styles.activity}>
+						<p>Any recent email activity will appear here</p>{' '}
+					</div>
+				}
 			</section>
 		</div>
 	);

@@ -4,8 +4,11 @@
 import styles from './tableStyles.module.scss';
 
 // Types imports
-import { MessagesWithActiveSequence } from '@/types/messageTypes';
-import { MasterTableData } from '@/types/masterTableTypes';
+import {
+	MessagesWithActiveSequence,
+	MessageWithContact,
+} from '@/types/messageTypes';
+import { MasterTableData, CellData } from '@/types/masterTableTypes';
 
 // Components
 import MasterTable from '../masterTable/MasterTable';
@@ -14,16 +17,26 @@ import MasterTable from '../masterTable/MasterTable';
 
 const AllActivities = ({
 	messages,
+	parentDiv,
 }: {
-	messages: MessagesWithActiveSequence[];
+	messages: MessagesWithActiveSequence[] | MessageWithContact[];
+	parentDiv?: string;
 }) => {
-	const columnHeaders = [
-		{ label: 'Type', size: 'sm' },
-		{ label: 'Status', size: 'sm' },
-		{ label: 'Email', size: 'lrg' },
-		{ label: 'Send Date', size: 'sm', sortable: true },
-		{ label: 'Replied', size: 'sm' },
-	];
+	const columnHeaders =
+		parentDiv === 'DashboardClient' ?
+			[
+				{ label: 'Type', size: 'sm' },
+				{ label: 'Email', size: 'lrg' },
+				{ label: 'Send Date', size: 'sm', sortable: true },
+				{ label: 'Replied', size: 'sm' },
+			]
+		:	[
+				{ label: 'Type', size: 'sm' },
+				{ label: 'Status', size: 'sm' },
+				{ label: 'Email', size: 'lrg' },
+				{ label: 'Send Date', size: 'sm', sortable: true },
+				{ label: 'Replied', size: 'sm' },
+			];
 
 	const tableData: MasterTableData = {
 		columnHeaders,
@@ -44,50 +57,90 @@ const AllActivities = ({
 						message.scheduledAt!,
 					).toLocaleDateString()}`;
 
+			const cellData: CellData[] =
+				parentDiv === 'DashboardClient' ?
+					[
+						{
+							value:
+								message.sequenceId ? 'Sequence Email' : 'Stand-alone Email',
+							size: columnHeaders[0].size,
+						},
+						{
+							value: '<div>' + message.subject + '</div>' + message.contents,
+							size: columnHeaders[1].size,
+							contentCell: true,
+							subjectContentCell: true,
+						},
+						{
+							value: sendDate,
+							size: columnHeaders[2].size,
+							cellOrientation: 'right',
+							cellStyling:
+								message.status === 'pending' || message.status === 'scheduled' ?
+									'italic'
+								:	null,
+							isDate: message.status !== 'cancelled' ? true : false,
+						},
+						{
+							value:
+								message.hasReply ? 'Yes'
+								: message.status === 'sent' ? 'No'
+								: 'N/A',
+							size: columnHeaders[3].size,
+							cellOrientation: 'right',
+							cellStyling:
+								message.status === 'scheduled' || message.status === 'pending' ?
+									'transparent'
+								:	null,
+						},
+					]
+				:	[
+						{
+							value:
+								message.sequenceId ? 'Sequence Email' : 'Stand-alone Email',
+							size: columnHeaders[0].size,
+						},
+						{
+							value: messageStatus,
+							size: columnHeaders[1].size,
+							cellStyling:
+								message.status === 'pending' ? 'pending'
+								: message.status === 'scheduled' ? 'scheduled'
+								: null,
+						},
+						{
+							value: '<div>' + message.subject + '</div>' + message.contents,
+							size: columnHeaders[2].size,
+							contentCell: true,
+							subjectContentCell: true,
+						},
+						{
+							value: sendDate,
+							size: columnHeaders[3].size,
+							cellOrientation: 'right',
+							cellStyling:
+								message.status === 'pending' || message.status === 'scheduled' ?
+									'italic'
+								:	null,
+							isDate: message.status !== 'cancelled' ? true : false,
+						},
+						{
+							value:
+								message.hasReply ? 'Yes'
+								: message.status === 'sent' ? 'No'
+								: 'N/A',
+							size: columnHeaders[4].size,
+							cellOrientation: 'right',
+							cellStyling:
+								message.status === 'scheduled' || message.status === 'pending' ?
+									'transparent'
+								:	null,
+						},
+					];
+
 			return {
 				rowId: message.id,
-				cellData: [
-					{
-						value: message.sequenceId ? 'Sequence Email' : 'Stand-alone Email',
-						size: columnHeaders[0].size,
-					},
-					{
-						value: messageStatus,
-						size: columnHeaders[1].size,
-						cellStyling:
-							message.status === 'pending' ? 'pending'
-							: message.status === 'scheduled' ? 'scheduled'
-							: null,
-					},
-					{
-						value: '<div>' + message.subject + '</div>' + message.contents,
-						size: columnHeaders[2].size,
-						contentCell: true,
-						subjectContentCell: true,
-					},
-					{
-						value: sendDate,
-						size: columnHeaders[3].size,
-						cellOrientation: 'right',
-						cellStyling:
-							message.status === 'pending' || message.status === 'scheduled' ?
-								'italic'
-							:	null,
-						isDate: message.status !== 'cancelled' ? true : false,
-					},
-					{
-						value:
-							message.hasReply ? 'Yes'
-							: message.status === 'sent' ? 'No'
-							: 'N/A',
-						size: columnHeaders[4].size,
-						cellOrientation: 'right',
-						cellStyling:
-							message.status === 'scheduled' || message.status === 'pending' ?
-								'transparent'
-							:	null,
-					},
-				],
+				cellData: cellData,
 				rowStyling: message.status === 'cancelled' ? 'cancelled' : null,
 			};
 		}),
@@ -95,6 +148,7 @@ const AllActivities = ({
 
 	return (
 		<MasterTable
+			parentDiv={parentDiv}
 			tableData={tableData}
 			tableType='allActivities'
 			tableSize={columnHeaders.length}

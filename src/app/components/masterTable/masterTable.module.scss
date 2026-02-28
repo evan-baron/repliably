@@ -194,6 +194,32 @@
 			}
 		}
 	}
+
+	&.dashboardTable {
+		.tableHeader {
+			display: block;
+
+			tr {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
+				background: var(--gradient-primary-light);
+			}
+		}
+
+		.tableBody {
+			display: block;
+			width: 100%;
+			max-height: 22rem;
+			overflow-y: auto;
+
+			tr {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
+			}
+		}
+	}
 }
 
 .nested-table {

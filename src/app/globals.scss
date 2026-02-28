@@ -55,6 +55,36 @@
 		hsla(187, 88%, 83%) 50%,
 		hsl(157, 70%, 83%) 100%
 	);
+	--gradient-primary-light: linear-gradient(
+		135deg,
+		hsl(188, 84%, 76%) 0%,
+		hsla(187, 88%, 83%) 50%,
+		hsl(157, 70%, 83%) 100%
+	);
+	--gradient-purple-light: linear-gradient(
+		135deg,
+		hsl(270, 84%, 76%) 0%,
+		hsl(280, 88%, 83%) 50%,
+		hsl(300, 70%, 83%) 100%
+	);
+	--gradient-purple-lighter: linear-gradient(
+		135deg,
+		hsla(270, 84%, 76%, 0.5) 0%,
+		hsla(280, 88%, 83%, 0.5) 50%,
+		hsla(300, 70%, 83%, 0.5) 100%
+	);
+	--gradient-green-light: linear-gradient(
+		135deg,
+		hsl(140, 84%, 76%) 0%,
+		hsl(90, 88%, 83%) 50%,
+		hsl(55, 70%, 83%) 100%
+	);
+	--gradient-green-lighter: linear-gradient(
+		135deg,
+		hsla(140, 84%, 76%, 0.5) 0%,
+		hsla(90, 88%, 83%, 0.5) 50%,
+		hsla(55, 70%, 83%, 0.5) 100%
+	);
 	// --gradient-primary-light: linear-gradient(
 	// 	135deg,
 	// 	hsla(188, 86%, 53%, 0.5) 0%,

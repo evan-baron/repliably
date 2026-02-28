@@ -153,7 +153,10 @@ const NewEmailForm = ({
 	}, [resetForm, setResetForm]);
 
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
-		const strippedContent = editorContent
+		const bodyWithoutSignature = signature
+			? editorContent.replace(signature, '')
+			: editorContent;
+		const strippedContent = bodyWithoutSignature
 			.replace(/<[^>]*>/g, '')
 			.replace(/&nbsp;/g, '')
 			.trim();
