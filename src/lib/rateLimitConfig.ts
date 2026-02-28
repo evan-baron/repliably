@@ -17,15 +17,15 @@ type BucketConfig = {
 
 export const RATE_LIMIT_CONFIG: Record<RateLimitBucket, BucketConfig> = {
 	'send-email': {
-		windowSeconds: 3600,
+		windowSeconds: 300,
 		maxRequests: { free: 10, basic: 30, pro: 100, elite: 300, anonymous: 0 },
 	},
 	generate: {
-		windowSeconds: 3600,
+		windowSeconds: 300,
 		maxRequests: { free: 15, basic: 50, pro: 150, elite: 500, anonymous: 0 },
 	},
 	'contacts-write': {
-		windowSeconds: 3600,
+		windowSeconds: 300,
 		maxRequests: { free: 20, basic: 60, pro: 200, elite: 500, anonymous: 0 },
 	},
 	'check-replies': {
@@ -41,11 +41,11 @@ export const RATE_LIMIT_CONFIG: Record<RateLimitBucket, BucketConfig> = {
 		maxRequests: { free: 30, basic: 60, pro: 120, elite: 300, anonymous: 0 },
 	},
 	'auth-action': {
-		windowSeconds: 3600,
+		windowSeconds: 300,
 		maxRequests: { free: 10, basic: 10, pro: 20, elite: 20, anonymous: 0 },
 	},
 	waitlist: {
-		windowSeconds: 3600,
+		windowSeconds: 300,
 		maxRequests: { free: 0, basic: 0, pro: 0, elite: 0, anonymous: 5 },
 	},
 };

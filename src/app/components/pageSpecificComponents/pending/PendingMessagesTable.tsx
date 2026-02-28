@@ -246,8 +246,6 @@ const PendingMessagesTable = ({
 							message.contact.firstName + ' ' + message.contact?.lastName
 						:	'Unknown';
 
-					console.log('Rendering message:', message.id === 58 && message);
-
 					return (
 						<tr
 							key={message.id}

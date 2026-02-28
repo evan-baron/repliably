@@ -1,9 +1,8 @@
 'use client';
 
 // Library imports
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 
 // Hooks imports
 import { useContactsGetAll } from '@/hooks/useContact';
@@ -82,13 +81,14 @@ const DashboardClient = ({
 	const { data: activitiesData } = useAllMessagesByUserId();
 	const { data: repliesData } = useGetAllReplies();
 
+	const [activitiesPage, setActivitiesPage] = useState<number>(0);
+
 	const contacts = contactsData?.contacts || [];
 	const sequences = sequencesData?.sequences || [];
 	const pendingMessages = pendingData?.messages || [];
 	const activities = activitiesData?.messages || [];
 	const replies = repliesData?.replies || [];
 
-	console.log('pendingMessages in DashboardClient:', pendingMessages);
 	// Derived data for dashboard sections
 	// Use live contacts data if available, fall back to server-fetched initial data
 	const invalidContacts =
@@ -100,11 +100,20 @@ const DashboardClient = ({
 	const bounces = replies.filter((reply) => reply.isBounce);
 	const needsAttention = invalidContacts.length > 0 || bounces.length > 0;
 
-	// filter only messages with status of sent from activities
-	const sentMessages = activities.filter(
-		(message) => message.status === 'sent',
-	);
+	// filter only messages with status of sent from activities, limit to 200 most recent then organize it as an array of arrays with lengths of 20 for pagination
+	const sentMessages = activities
+		.filter((message) => message.status === 'sent')
+		.slice(0, 200)
+		.reduce((result: MessageWithContact[][], message, index) => {
+			const chunkIndex = Math.floor(index / 20);
+			if (!result[chunkIndex]) {
+				result[chunkIndex] = [];
+			}
+			result[chunkIndex].push(message);
+			return result;
+		}, []);
 
+	console.log('sentMessages in DashboardClient:', sentMessages);
 	return (
 		<div className={styles.dashboardHome}>
 			{needsAttention && <NeedsAttention invalidContacts={invalidContacts} />}
@@ -153,7 +162,7 @@ const DashboardClient = ({
 				{sentMessages.length > 0 ?
 					<AllActivities
 						parentDiv={'DashboardClient'}
-						messages={sentMessages}
+						messages={sentMessages[activitiesPage]}
 					/>
 				:	<div className={styles.activity}>
 						<p>Any recent email activity will appear here</p>{' '}
