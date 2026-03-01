@@ -17,8 +17,10 @@ import {
 import PendingMessagesTable from '@/app/components/pageSpecificComponents/pending/PendingMessagesTable';
 
 export default function PendingMessagesClient({
+	parentDiv,
 	initialMessages = [],
 }: {
+	parentDiv?: string;
 	initialMessages: MessageWithContact[];
 }) {
 	const queryClient = useQueryClient();
@@ -30,7 +32,7 @@ export default function PendingMessagesClient({
 				['pending-messages-get-all'],
 				{
 					messages: initialMessages,
-				}
+				},
 			);
 		}
 	}, [initialMessages, queryClient]);
@@ -38,5 +40,5 @@ export default function PendingMessagesClient({
 	const { data } = useMessagesGetAllPending();
 	const messages = data?.messages || [];
 
-	return <PendingMessagesTable messages={messages} />;
+	return <PendingMessagesTable parentDiv={parentDiv} messages={messages} />;
 }

@@ -1,0 +1,71 @@
+.statsRow {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	gap: 1.25rem;
+}
+
+.statCard {
+	position: relative;
+	overflow: hidden;
+	background: var(--background-secondary);
+	border-radius: var(--border-radius-md);
+	box-shadow: var(--shadow-lg);
+	padding: 1.25rem 1rem 1rem;
+	transition:
+		box-shadow 0.2s ease,
+		transform 0.2s ease;
+
+	@media (hover: hover) {
+		&:hover {
+			box-shadow: var(--shadow-md);
+			transform: translateY(-1px);
+		}
+	}
+
+	// Gradient top stripe
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 0.375rem;
+		background: var(--gradient-primary);
+	}
+
+	&.urgent::before {
+		background: var(--gradient-accent);
+	}
+}
+
+.statContent {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+}
+
+.statNumber {
+	font-size: 1.875rem;
+	font-weight: 700;
+	color: var(--text-primary);
+	line-height: 1.2;
+
+	.urgent & {
+		color: var(--accent-primary);
+	}
+}
+
+.statLabel {
+	font-size: 0.875rem;
+	color: var(--text-muted);
+	font-weight: 500;
+}
+
+.statIcon {
+	position: absolute;
+	top: 0.75rem;
+	right: 0.75rem;
+	font-size: 1.75rem !important;
+	opacity: 0.1875;
+	color: var(--text-primary);
+}

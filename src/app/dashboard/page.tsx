@@ -1,53 +1,48 @@
-// Library imports
-
-// Styles imports
-import styles from './dashboard.module.scss';
+// Services imports
+import { getAllContacts } from '@/services/contactsService';
+import { getAllSequencesByUserId } from '@/services/sequenceService';
+import {
+	getAllPendingMessages,
+	getAllRecentMessagesByUserId,
+} from '@/services/messageService';
+import { getAllRepliesByUserId } from '@/services/repliesService';
 
 // Components imports
-import PreviewTile from '../components/pageSpecificComponents/dashboard/previewTile/PreviewTile';
+import DashboardClient from './DashboardClient';
+import PageTemplate from '../components/pageSpecificComponents/PageTemplate';
 
-const Dashboard = () => {
+const Dashboard = async () => {
+	const [
+		contacts,
+		{ sequences },
+		{ messages },
+		{ replies },
+		{ messages: activities },
+	] = await Promise.all([
+		getAllContacts(),
+		getAllSequencesByUserId(),
+		getAllPendingMessages(),
+		getAllRepliesByUserId(),
+		getAllRecentMessagesByUserId(),
+	]);
+
+	const invalidContacts = contacts.filter(
+		(contact) => contact.validEmail === false || contact.firstName === null,
+	);
+
 	return (
-		<div className={styles.dashboardHome} aria-labelledby='dashboard-title'>
-			<section
-				className={styles.welcomeSection}
-				aria-labelledby='dashboard-title'
-			>
-				<h1 className={styles.welcomeTitle} id='dashboard-title'>
-					Dashboard Overview
-				</h1>
-				<p
-					className={styles.welcomeSubtitle}
-					aria-describedby='dashboard-title'
-				>
-					Welcome to your follow-up management center
-				</p>
-			</section>
-
-			<section
-				className={styles.previewTiles}
-				aria-labelledby='preview-tiles-title'
-			>
-				<PreviewTile title='Active Contacts' href='/dashboard/contacts'>
-					<div></div>
-				</PreviewTile>
-				<PreviewTile
-					title='Pending & Scheduled Emails'
-					href='/dashboard/pending'
-				>
-					<div></div>
-				</PreviewTile>
-			</section>
-
-			<section
-				className={styles.recentActivity}
-				aria-labelledby='recent-activity-title'
-			>
-				<h2 className={styles.sectionTitle} id='recent-activity-title'>
-					Recent Activity
-				</h2>
-			</section>
-		</div>
+		<PageTemplate
+			title='Dashboard Overview'
+			description='Welcome to your follow-up management center'
+		>
+			<DashboardClient
+				initialInvalidEmailContacts={invalidContacts}
+				initialSequences={sequences}
+				initialPendingMessages={messages}
+				initialReplies={replies}
+				initialActivities={activities}
+			/>
+		</PageTemplate>
 	);
 };
 

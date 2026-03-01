@@ -1,0 +1,74 @@
+.compactList {
+	display: flex;
+	flex-direction: column;
+}
+
+.listItem {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem 1.25rem;
+	border-bottom: 1px solid var(--border-light);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: hsl(180, 100%, 97%);
+		}
+	}
+}
+
+.itemInfo {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.itemName {
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.itemTitle {
+	font-size: 0.8125rem;
+	color: var(--text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.daysBadge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 0.2rem 0.625rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	white-space: nowrap;
+
+	&.safe {
+		background: hsl(152, 60%, 92%);
+		color: hsl(152, 60%, 30%);
+	}
+
+	&.warning {
+		background: var(--accent-subtle);
+		color: var(--accent-hover);
+	}
+
+	&.critical {
+		background: hsl(0, 80%, 95%);
+		color: var(--accent-danger-dark);
+	}
+}

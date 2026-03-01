@@ -71,6 +71,32 @@ export async function processMessage(gmail: any, messageId: string) {
 			);
 
 			if (isBounceSenderResult) {
+				const existingBounce = await prisma.emailReply.findFirst({
+					where: { replyMessageId: messageId },
+				});
+
+				if (!existingBounce) {
+					const subject = headers.find(
+						(header: any) => header.name === 'Subject',
+					)?.value;
+
+					await prisma.emailReply.create({
+						data: {
+							sequenceId: sentMessage.sequenceId,
+							threadId: threadId,
+							contactId: sentMessage.contactId,
+							ownerId: sentMessage.ownerId || sentMessage.contact.ownerId,
+							originalMessageId: sentMessage.messageId || '',
+							replyMessageId: messageId,
+							replySubject: subject || 'Delivery Failed',
+							replyContent:
+								'This email could not be delivered. The email address may be invalid.',
+							replyDate: new Date(parseInt(message.data.internalDate)),
+							isBounce: true,
+						},
+					});
+				}
+
 				await prisma.contact.update({
 					where: { id: sentMessage.contactId },
 					data: { validEmail: false },
@@ -126,14 +152,29 @@ export async function processMessage(gmail: any, messageId: string) {
 			const bounceInfo = detectBounce(message.data);
 
 			if (bounceInfo.bounced) {
-				// Update contact as invalid email, deactivate sequence, etc.
 				await prisma.$transaction(async (transaction) => {
-					transaction.contact.update({
+					await transaction.emailReply.create({
+						data: {
+							sequenceId: sentMessage.sequenceId,
+							threadId: threadId,
+							contactId: sentMessage.contactId,
+							ownerId: sentMessage.ownerId || sentMessage.contact.ownerId,
+							originalMessageId: sentMessage.messageId || '',
+							replyMessageId: messageId,
+							replySubject: subject || 'Delivery Failed',
+							replyContent:
+								bounceInfo.reason || 'This email could not be delivered.',
+							replyDate: new Date(parseInt(message.data.internalDate)),
+							isBounce: true,
+						},
+					});
+
+					await transaction.contact.update({
 						where: { id: sentMessage.contactId },
 						data: { validEmail: false, active: false },
 					});
 
-					transaction.sequence.updateMany({
+					await transaction.sequence.updateMany({
 						where: { contactId: sentMessage.contactId, active: true },
 						data: { active: false, endDate: new Date() },
 					});

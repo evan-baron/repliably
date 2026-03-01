@@ -62,6 +62,10 @@ export const emailAPI = {
 
 // Messages API functions
 export const messageAPI = {
+	readAllByUserId: () =>
+		apiCall('/api/messages/user', {
+			method: 'GET',
+		}),
 	readStandaloneByContactId: (contactId: number) =>
 		apiCall(`/api/messages/contact/${contactId}/standalone`, {
 			method: 'GET',
@@ -111,6 +115,11 @@ export const sequenceAPI = {
 	deactivateAll: () =>
 		apiCall('/api/sequences/deactivate-all', {
 			method: 'PUT',
+		}),
+	changeEndDate: (sequenceId: number, endDate: string) =>
+		apiCall(`/api/sequences/${sequenceId}/change-end-date`, {
+			method: 'PUT',
+			body: JSON.stringify({ endDate }),
 		}),
 };
 

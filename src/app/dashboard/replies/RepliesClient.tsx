@@ -38,7 +38,7 @@ const RepliesClient = ({
 
 	const { data: repliesData } = useGetAllReplies();
 
-	const replies = repliesData?.replies || [];
+	const replies = repliesData?.replies.filter((reply) => !reply.isBounce) || [];
 
 	return (
 		<div>

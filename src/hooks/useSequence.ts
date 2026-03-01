@@ -42,6 +42,28 @@ export const useSequenceDeactivate = (sequenceId: number) => {
 	});
 };
 
+export const useSequenceChangeEndDate = (sequenceId: number) => {
+	const queryClient = useQueryClient();
+
+	return useMutation<void, Error, string>({
+		mutationFn: (endDate: string) =>
+			sequenceAPI.changeEndDate(sequenceId, endDate),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				predicate: (query) =>
+					[
+						'sequences-by-contact-id',
+						'sequences-by-user-id',
+						'contact-get-unique',
+						'contacts-get-all',
+						'all-messages-by-contact-id',
+						'pending-messages-get-all',
+					].includes(query.queryKey[0] as string),
+			});
+		},
+	});
+};
+
 export const useSequenceDeactivateAll = () => {
 	const queryClient = useQueryClient();
 	return useMutation<void, Error, void>({

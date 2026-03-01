@@ -1,0 +1,149 @@
+.changeenddatemodal-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 2.5rem;
+
+	.message {
+		font-size: 1.25rem !important;
+		text-align: left !important;
+	}
+
+	.buttons {
+		display: flex;
+		justify-content: center;
+		gap: 1.5rem;
+	}
+}
+
+// Flatpickr overrides (scoped to the wrapper via specificity)
+.changeenddatemodal-wrapper :global(.flatpickr-calendar) {
+	background: var(--background-secondary);
+	border: 1px solid var(--border-light);
+	border-radius: var(--border-radius-md);
+	box-shadow: none;
+	width: 100%;
+	font-family: inherit;
+	overflow: hidden;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-months) {
+	background: var(--background-tertiary);
+	border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-month) {
+	background: var(--gradient-primary);
+	height: 2.5rem;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-prev-month),
+.changeenddatemodal-wrapper :global(.flatpickr-next-month) {
+	fill: var(--text-secondary);
+	stroke: var(--text-primary);
+	stroke-width: 1;
+	padding: 0.5rem 0.75rem;
+
+	@media (hover: hover) {
+		opacity: 0.5;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-current-month) {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
+	font-size: 1rem;
+	font-weight: 400;
+	color: var(--text-primary);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-monthDropdown-months) {
+	font-size: 1rem;
+	font-weight: 400;
+	color: var(--text-primary);
+}
+
+.changeenddatemodal-wrapper :global(.cur-month) {
+	font-weight: 600;
+}
+
+.changeenddatemodal-wrapper :global(input.cur-year) {
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-weekdays) {
+	background: var(--background-tertiary);
+}
+
+.changeenddatemodal-wrapper :global(span.flatpickr-weekday) {
+	color: var(--text-muted);
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-days) {
+	border: none;
+	width: 100%;
+}
+
+.changeenddatemodal-wrapper :global(.dayContainer) {
+	width: 100%;
+	min-width: 100%;
+	max-width: 100%;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day) {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-primary);
+	border-radius: var(--border-radius-sm);
+	border: 2px solid transparent;
+	font-size: 0.875rem;
+	max-width: none;
+	transition: all 0.15s ease;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day):hover {
+	background: var(--background-tertiary);
+	border-color: var(--border-light);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.today) {
+	border-color: var(--color-primary-light);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.today):hover {
+	background: var(--background-tertiary);
+	border-color: var(--color-primary);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.selected) {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
+	color: #fff;
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.selected):hover {
+	background: var(--color-primary-hover);
+	border-color: var(--color-primary-hover);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.flatpickr-disabled),
+.changeenddatemodal-wrapper :global(.flatpickr-day.prevMonthDay),
+.changeenddatemodal-wrapper :global(.flatpickr-day.nextMonthDay) {
+	color: var(--text-light-muted);
+}
+
+.changeenddatemodal-wrapper :global(.flatpickr-day.flatpickr-disabled):hover,
+.changeenddatemodal-wrapper :global(.flatpickr-day.prevMonthDay):hover,
+.changeenddatemodal-wrapper :global(.flatpickr-day.nextMonthDay):hover {
+	background: transparent;
+	border-color: transparent;
+}

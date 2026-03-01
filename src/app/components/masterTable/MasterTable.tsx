@@ -18,11 +18,15 @@ import NestedTable from './NestedTable';
 import { MasterTableData } from '@/types/masterTableTypes';
 
 const MasterTable = ({
+	multiPage = false,
+	parentDiv,
 	inModal,
 	tableData,
 	tableType,
 	tableSize,
 }: {
+	multiPage?: boolean;
+	parentDiv?: string;
 	inModal?: boolean;
 	tableData: MasterTableData;
 	tableType:
@@ -104,15 +108,22 @@ const MasterTable = ({
 
 	const { columnHeaders } = tableData;
 
+	const fillerRows = sortedRowData.length > 0 && sortedRowData.length < 15;
+
+	// If there are less than 15 rows, add empty rows to maintain table structure and height for better UX
+	const fillerRowCount = fillerRows ? 15 - sortedRowData.length : 0;
+
 	return (
 		<table
-			className={`${styles['master-table']} ${inModal ? styles.inModal : ''}`}
+			className={`${styles['master-table']} ${inModal ? styles.inModal : ''} ${parentDiv === 'DashboardClient' ? styles.dashboardTable : ''}`}
 			role='table'
 			aria-label={`${parsedTableType} table`}
 			aria-rowcount={sortedRowData.length + 1}
 		>
 			<TableHeader columnHeaders={columnHeaders} handleSort={handleSort} />
-			<tbody className={styles.tableBody}>
+			<tbody
+				className={`${styles.tableBody} ${multiPage ? styles.multiPage : ''} ${fillerRows ? styles.fillerRows : ''}`}
+			>
 				{sortedRowData.map((row, rowIndex) => {
 					const nestedRowData = row.nestedData?.value ?? null;
 					const isExpanded = selectedRow === row.rowId;
@@ -278,6 +289,16 @@ const MasterTable = ({
 								})}
 							</tr>;
 				})}
+				{Array.from({ length: fillerRowCount }).map((_, index) => (
+					<tr
+						key={`empty-row-${index}`}
+						className={`${styles.fillerRow} `}
+						aria-hidden='true'
+						tabIndex={-1}
+					>
+						<td colSpan={tableSize} />
+					</tr>
+				))}
 			</tbody>
 		</table>
 	);

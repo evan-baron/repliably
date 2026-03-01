@@ -153,8 +153,16 @@ const NewEmailForm = ({
 	}, [resetForm, setResetForm]);
 
 	const onSubmit: SubmitHandler<EmailFormData> = async (data) => {
-		if (!editorContent || editorContent.trim() === '') {
-			setErrors(['Email cannot be empty.']);
+		const bodyWithoutSignature = signature
+			? editorContent.replace(signature, '')
+			: editorContent;
+		const strippedContent = bodyWithoutSignature
+			.replace(/<[^>]*>/g, '')
+			.replace(/&nbsp;/g, '')
+			.trim();
+
+		if (!strippedContent) {
+			setErrors(['Email body cannot be empty.']);
 			setModalType('error');
 			return;
 		}

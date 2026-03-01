@@ -1,5 +1,9 @@
-.container {
+.tableContainer {
 	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	flex: 1;
+	height: 100%;
 }
 
 .table {
@@ -61,6 +65,14 @@
 				}
 			}
 		}
+
+		&.dashboardTableHeader {
+			display: block;
+
+			tr {
+				background: var(--gradient-green-light);
+			}
+		}
 	}
 
 	tbody {
@@ -76,7 +88,7 @@
 
 			@media (hover: hover) {
 				&:hover:not(:has(.action:hover, .rte-wrapper)) {
-					background: var(--gradient-primary-lighter);
+					background: var(--gradient-green-lighter);
 					cursor: pointer;
 				}
 			}
@@ -288,6 +300,19 @@
 
 			&.selectedMessage {
 				background: var(--background-tertiary) !important;
+			}
+		}
+
+		&.dashboardTableBody {
+			display: block;
+			width: 100%;
+			max-height: 16rem;
+			overflow-y: auto;
+
+			tr {
+				display: table;
+				table-layout: fixed;
+				width: 100%;
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import { sanitizeMessages, sanitizeMessagesWithContact } from '@/lib/api';
 // Services imports
 import { getApiUser } from './getUserService';
 
-export async function getAllMessagesByUserId() {
+export async function getAllRecentMessagesByUserId() {
 	const { user, error } = await getApiUser();
 
 	if (error || !user) {
@@ -14,10 +14,12 @@ export async function getAllMessagesByUserId() {
 
 	const messages = await prisma.message.findMany({
 		where: { ownerId: user.id },
+		include: { contact: true },
 		orderBy: { createdAt: 'desc' },
+		take: 75, // Limit to 75 messages for performance
 	});
 
-	return { messages: sanitizeMessages(messages) };
+	return { messages: sanitizeMessagesWithContact(messages) };
 }
 
 export async function getAllPendingMessages() {

@@ -10,6 +10,14 @@ import {
 // Tanstack React Query
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+export const useAllMessagesByUserId = () => {
+	return useQuery<MessagesWithContactResponse>({
+		queryKey: ['all-messages-by-user-id'],
+		queryFn: () => messageAPI.readAllByUserId(),
+		refetchOnWindowFocus: true,
+	});
+};
+
 export const useAllMessagesByContactId = (contactId: number) => {
 	return useQuery<MessagesResponse>({
 		queryKey: ['all-messages-by-contact-id', contactId],

@@ -1,6 +1,6 @@
 export const parseEmailContent = (htmlString: string): string[] => {
-	// Extract content from <p> tags using regex
-	const pTagRegex = /<div[^>]*>(.*?)<\/div>/gi;
+	// Extract content from <div> or <p> tags using regex
+	const pTagRegex = /<(?:div|p)[^>]*>(.*?)<\/(?:div|p)>/gi;
 	const matches = htmlString.matchAll(pTagRegex);
 
 	const textArray = Array.from(matches).map((match) => {

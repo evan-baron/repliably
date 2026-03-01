@@ -13,7 +13,7 @@ export async function getAllRepliesByUserId() {
 	}
 
 	const replies = await prisma.emailReply.findMany({
-		where: { ownerId: user.id },
+		where: { ownerId: user.id, isBounce: false },
 		orderBy: { createdAt: 'desc' },
 	});
 

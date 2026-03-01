@@ -9,6 +9,7 @@ import { SanitizedSequence } from '@/types/sequenceTypes';
 
 // Components imports
 import DeactivateSequenceButton from '@/app/components/buttons/DeactivateSequenceButton';
+import ChangeSequenceEndDateButton from '../buttons/ChangeSequenceEndDateButton';
 import ActiveSequenceTable from './ActiveSequenceTable';
 
 const ActiveSequence = ({ sequence }: { sequence: SanitizedSequence }) => {
@@ -74,6 +75,10 @@ const ActiveSequence = ({ sequence }: { sequence: SanitizedSequence }) => {
 							</div>
 						)}
 					</dl>
+					<ChangeSequenceEndDateButton
+						sequenceId={sequence.id}
+						endDate={sequence.endDate}
+					/>
 					<DeactivateSequenceButton sequenceId={sequence.id} />
 				</div>
 			</header>

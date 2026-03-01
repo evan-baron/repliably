@@ -19,6 +19,7 @@
 		z-index: 10;
 		overflow: hidden;
 		opacity: 1;
+		text-shadow: var(--text-shadow);
 
 		// &::before {
 		// 	content: '';
@@ -87,7 +88,6 @@
 				font-size: 4.5rem;
 				font-weight: 700;
 				margin: 0;
-				text-shadow: var(--text-shadow);
 			}
 
 			.home-description {
@@ -96,7 +96,6 @@
 				word-spacing: 1px;
 				line-height: 1.5;
 				margin: 0;
-				text-shadow: var(--text-shadow);
 			}
 
 			.important-links {
@@ -107,7 +106,6 @@
 					text-decoration: none;
 					font-size: 0.875rem;
 					transition: all 0.2s ease;
-					text-shadow: var(--text-shadow);
 
 					&:hover {
 						text-decoration: underline;
