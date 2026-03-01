@@ -30,7 +30,7 @@ const AllActivities = ({
 				{ label: 'Contact', size: 'sm' },
 				{ label: 'Type', size: 'sm' },
 				{ label: 'Email', size: 'lrg' },
-				{ label: 'Send Date', size: 'sm', sortable: true },
+				{ label: 'Send Date', size: 'sm' },
 				{ label: 'Replied', size: 'sm' },
 			]
 		:	[

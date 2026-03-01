@@ -1,0 +1,75 @@
+.compactList {
+	display: flex;
+	flex-direction: column;
+}
+
+.listItem {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.75rem 1.25rem;
+	border-bottom: 1px solid var(--border-light);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: hsl(152, 60%, 97%);
+		}
+	}
+}
+
+.itemHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.contactName {
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: var(--text-primary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.statusBadge {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	padding: 0.15rem 0.5rem;
+	border-radius: 999px;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+
+	&.pending {
+		background: var(--accent-subtle);
+		color: var(--accent-hover);
+	}
+
+	&.scheduled {
+		background: hsl(180, 60%, 93%);
+		color: hsl(140, 100%, 22%);
+	}
+}
+
+.itemSubject {
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.itemDate {
+	font-size: 0.75rem;
+	color: var(--text-light-muted);
+}

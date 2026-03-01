@@ -1,7 +1,7 @@
 'use client';
 
 // Library imports
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Hooks imports
@@ -26,9 +26,12 @@ import { MessageFromDB, MessageWithContact } from '@/types/messageTypes';
 import { RepliesFromDB } from '@/types/repliesTypes';
 
 // Components Imports
+import StatsRow from '../components/pageSpecificComponents/dashboard/statsRow/StatsRow';
 import NeedsAttention from '../components/pageSpecificComponents/dashboard/NeedsAttention';
-import PendingMessagesClient from './pending/PendingMessagesClient';
+import ExpiringWidget from '../components/pageSpecificComponents/dashboard/expiringWidget/ExpiringWidget';
+import PendingWidget from '../components/pageSpecificComponents/dashboard/pendingWidget/PendingWidget';
 import AllActivities from '../components/sequences/AllActivities';
+import Paginator from '../components/paginator/Paginator';
 
 interface DashboardClientProps {
 	initialInvalidEmailContacts: ContactFromDB[];
@@ -103,12 +106,45 @@ const DashboardClient = ({
 	const bounces = replies.filter((reply) => reply.isBounce);
 	const needsAttention = invalidContacts.length > 0 || bounces.length > 0;
 
-	// filter only messages with status of sent from activities, limit to 200 most recent then organize it as an array of arrays with lengths of 20 for pagination
+	// Stats computations
+	const stats = useMemo(() => {
+		const allSentMessages = activities.filter((m) => m.status === 'sent');
+
+		const now = new Date();
+		const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+		const emailsSentThisMonth = allSentMessages.filter(
+			(m) => m.sentAt && new Date(m.sentAt) >= startOfMonth,
+		).length;
+
+		const repliedCount = allSentMessages.filter((m) => m.hasReply).length;
+		const replyRate =
+			allSentMessages.length > 0 ?
+				Math.round((repliedCount / allSentMessages.length) * 100)
+			:	0;
+
+		const pendingApproval = pendingMessages.filter(
+			(m) =>
+				m.status === 'pending' ||
+				(m.status === 'scheduled' && m.needsApproval && !m.approved),
+		).length;
+
+		const activeSequences = sequences.filter((s) => s.active).length;
+
+		return {
+			totalContacts: contacts.length,
+			activeSequences,
+			emailsSentThisMonth,
+			replyRate,
+			pendingApproval,
+		};
+	}, [contacts, sequences, pendingMessages, activities]);
+
+	// filter only messages with status of sent from activities, limit to 200 most recent then organize it as an array of arrays with lengths of 15 for pagination
 	const sentMessages = activities
 		.filter((message) => message.status === 'sent')
 		.slice(0, 200)
 		.reduce((result: MessageWithContact[][], message, index) => {
-			const chunkIndex = Math.floor(index / 20);
+			const chunkIndex = Math.floor(index / 15);
 			if (!result[chunkIndex]) {
 				result[chunkIndex] = [];
 			}
@@ -118,40 +154,19 @@ const DashboardClient = ({
 
 	return (
 		<div className={styles.dashboardHome}>
+			<StatsRow
+				totalContacts={stats.totalContacts}
+				activeSequences={stats.activeSequences}
+				emailsSentThisMonth={stats.emailsSentThisMonth}
+				replyRate={stats.replyRate}
+				pendingApproval={stats.pendingApproval}
+			/>
+
 			{needsAttention && <NeedsAttention invalidContacts={invalidContacts} />}
 
 			<div className={styles.previewTiles}>
-				<section
-					className={styles.previewTile}
-					aria-labelledby='expiring-soon-title'
-				>
-					<h2 className={styles.sectionTitle} id='expiring-soon-title'>
-						Expiring Soon
-					</h2>
-					<div className={styles.activity}>
-						<p>
-							Sequences expiring within 7 days will appear here. You currently
-							have no sequences expiring in the next 7 days.
-						</p>
-					</div>
-				</section>
-				<section
-					className={styles.previewTile}
-					aria-labelledby='pending-emails-title'
-				>
-					<h2 className={styles.sectionTitle} id='pending-emails-title'>
-						Pending & Scheduled Emails
-					</h2>
-					{pendingMessages.length > 0 ?
-						<PendingMessagesClient
-							parentDiv={'DashboardClient'}
-							initialMessages={pendingMessages}
-						/>
-					:	<div className={styles.activity}>
-							<p>Pending or scheduled emails will appear here</p>
-						</div>
-					}
-				</section>
+				<ExpiringWidget sequences={sequences} />
+				<PendingWidget messages={pendingMessages as MessageWithContact[]} />
 			</div>
 
 			<section
@@ -169,40 +184,11 @@ const DashboardClient = ({
 							messages={sentMessages[activitiesPage]}
 						/>
 						{sentMessages.length > 1 && (
-							<div className={styles.pagination}>
-								<button
-									className={styles.paginationButton}
-									onClick={() => {
-										if (activitiesPage === 0) {
-											return;
-										}
-
-										setActivitiesPage((prev) => prev - 1);
-									}}
-								>
-									<KeyboardArrowLeft className={styles.icon} />
-								</button>
-								{sentMessages.map((_, index) => (
-									<button
-										key={index}
-										className={`${index === activitiesPage ? styles.active : ''} ${styles.paginationButton}`}
-										onClick={() => setActivitiesPage(index)}
-									>
-										{index + 1}
-									</button>
-								))}
-								<button
-									className={styles.paginationButton}
-									onClick={() => {
-										if (activitiesPage === sentMessages.length - 1) {
-											return;
-										}
-										setActivitiesPage((prev) => prev + 1);
-									}}
-								>
-									<KeyboardArrowRight className={styles.icon} />
-								</button>
-							</div>
+							<Paginator
+								currentPage={activitiesPage}
+								setCurrentPage={setActivitiesPage}
+								pages={sentMessages}
+							/>
 						)}
 					</>
 				:	<div className={styles.activity}>

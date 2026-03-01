@@ -28,6 +28,107 @@ function extractJsonObject(text: string): string | null {
 	return text.slice(firstBrace, lastBrace + 1);
 }
 
+const CLOSING_PHRASES = [
+	'best regards',
+	'warm regards',
+	'kind regards',
+	'regards',
+	'sincerely',
+	'yours truly',
+	'respectfully',
+	'with appreciation',
+	'all the best',
+	'take care',
+	'thank you',
+	'thanks',
+	'cheers',
+	'warmly',
+	'best',
+];
+
+function stripHtmlToText(html: string): string {
+	return html
+		.replace(/<[^>]+>/g, '')
+		.replace(/&nbsp;/g, ' ')
+		.replace(/&amp;/g, '&')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.trim();
+}
+
+function extractSignOff(html: string): {
+	body: string;
+	signOff: string | null;
+} {
+	const blockRegex = /<(?:div|p)[^>]*>.*?<\/(?:div|p)>/gi;
+	const blocks = html.match(blockRegex);
+
+	if (!blocks || blocks.length < 2) {
+		return { body: html, signOff: null };
+	}
+
+	const isBlank = (block: string): boolean => stripHtmlToText(block) === '';
+
+	// Scan from the end to find a block matching a closing phrase
+	let closingIndex = -1;
+	for (let i = blocks.length - 1; i >= 0; i--) {
+		const text = stripHtmlToText(blocks[i]);
+		const cleaned = text.replace(/[,.:;!]+$/, '').trim().toLowerCase();
+		if (CLOSING_PHRASES.includes(cleaned)) {
+			closingIndex = i;
+			break;
+		}
+	}
+
+	if (closingIndex === -1) {
+		return { body: html, signOff: null };
+	}
+
+	// Walk backwards from closingIndex to find consecutive blank blocks (the gap)
+	let gapStart = closingIndex;
+	for (let i = closingIndex - 1; i >= 0; i--) {
+		if (isBlank(blocks[i])) {
+			gapStart = i;
+		} else {
+			break;
+		}
+	}
+
+	// Body = everything before the gap; sign-off = from closing phrase onwards
+	const bodyBlocks = blocks.slice(0, gapStart);
+	const signOffBlocks = blocks.slice(closingIndex);
+
+	// Don't extract if it would leave the body empty
+	if (bodyBlocks.length === 0) {
+		return { body: html, signOff: null };
+	}
+
+	return {
+		body: bodyBlocks.join(''),
+		signOff: signOffBlocks.join(''),
+	};
+}
+
+function signOffToPlainText(signOffHtml: string): string {
+	const blockRegex = /<(?:div|p)[^>]*>(.*?)<\/(?:div|p)>/gi;
+	const matches = Array.from(signOffHtml.matchAll(blockRegex));
+	return matches
+		.map((match) => {
+			let text = match[1].replace(/<[^>]+>/g, '');
+			text = text
+				.replace(/&nbsp;/g, ' ')
+				.replace(/&amp;/g, '&')
+				.replace(/&lt;/g, '<')
+				.replace(/&gt;/g, '>')
+				.replace(/&quot;/g, '"')
+				.replace(/&#39;/g, "'");
+			return text.trim();
+		})
+		.join('\n');
+}
+
 export const generateMessage = async (
 	previousEmailContents: PreviousEmailContentsType,
 	options: GenerateOptions = {},
@@ -41,6 +142,17 @@ export const generateMessage = async (
 			options.preserveThreadContext
 		:	true;
 
+	// Extract sign-off from the previous email so we can append it verbatim
+	const { body: strippedBody, signOff } = extractSignOff(
+		previousEmailContents.previousBody,
+	);
+	const previousBodyForPrompt = signOff
+		? strippedBody
+		: previousEmailContents.previousBody;
+	const signOffInstruction = signOff
+		? 'Do NOT include any sign-off, closing phrase, or signature. End the email immediately after the CTA.'
+		: 'Sign off the exact same as the previous message did.';
+
 	const formattingNote = `CRITICAL FORMATTING: bodyHtml MUST use Gmail-compatible format: wrap each line of text in <div></div> tags. For blank lines, use <div><br></div>. DO NOT use <p> tags, <br> alone, or any other HTML structure. Example: <div>Hi John,</div><div><br></div><div>Just checking in.</div><div><br></div><div>Best regards,</div><div>-Evan</div>`;
 
 	const systemInstruction = `RETURN ONLY one MINIFIED JSON object with keys: subject, bodyHtml, bodyPlain. bodyPlain MUST be <= ${MAX_BODY_WORDS} words. NO commentary, analysis, chain-of-thought, or role-play as any recipient. ${formattingNote}. Tone: polite, concise, "checking in". No em dashes.`;
@@ -53,13 +165,13 @@ export const generateMessage = async (
 	const contactNameNote =
 		previousEmailContents.contactName ?
 			`Address the contact by name like "Hi ${previousEmailContents.contactName},".`
-		:	`No contact name was provided. If possible, use the name from the greeting/intro in the previous email: ${previousEmailContents.previousBody}; otherwise, use the generic greeting "Hello,".`;
+		:	`No contact name was provided. If possible, use the name from the greeting/intro in the previous email: ${previousBodyForPrompt}; otherwise, use the generic greeting "Hello,".`;
 
 	const userPrompt = `Context: You are a professional executive assistant acting as the original sender. You are writing a short follow-up email no longer than 3 sentences or ${MAX_BODY_WORDS} words in length. ${keepSubjectNote} ${
 		preserveThreadContext ?
 			'Preserve thread context, if it makes sense to, include a brief reference to the previous message (1-2 sentences MAX) to remind the recipient why you are reaching out, and keep key topic nouns so recipients recognize the thread.'
 		:	'Do NOT include the full original body; summarize key facts in one sentence and feel free to rewrite the body a little more freely.'
-	} ${contactNameNote} Include one short check-in CTA (e.g., "Are you available for a 15-minute call next week?"). Make sure the CTA is not identical to the previously used CTA. Also make sure the CTA is on its own line/paragraph. Sign off the exact same as the previous message did. Here is the previous message for context:\n${previousEmailContents.previousBody}\n\nProduce the compact JSON object now.`;
+	} ${contactNameNote} Include one short check-in CTA (e.g., "Are you available for a 15-minute call next week?"). Make sure the CTA is not identical to the previously used CTA. Also make sure the CTA is on its own line/paragraph. ${signOffInstruction} Here is the previous message for context:\n${previousBodyForPrompt}\n\nProduce the compact JSON object now.`;
 
 	const promptTemplate = `${systemInstruction}\n\n${userPrompt}`;
 
@@ -121,6 +233,14 @@ export const generateMessage = async (
 
 			if (!bodyPlain && !bodyHtml) throw new Error('LLM response missing body');
 
+			// Append the original sign-off if it was extracted
+			const finalBodyHtml = signOff
+				? bodyHtml + '<div><br></div>' + signOff
+				: bodyHtml;
+			const finalBodyPlain = signOff
+				? bodyPlain + '\n\n' + signOffToPlainText(signOff)
+				: bodyPlain;
+
 			const generationMeta = {
 				model,
 				// temperature: usedTemperature ? temperature : null,
@@ -130,17 +250,10 @@ export const generateMessage = async (
 				attempt,
 			};
 
-			// console.log('Generated message meta from messageGenerationService.ts:', {
-			// 	subject,
-			// 	bodyHtml,
-			// 	bodyPlain,
-			// 	generationMeta,
-			// });
-
 			return {
 				subject,
-				bodyHtml,
-				bodyPlain,
+				bodyHtml: finalBodyHtml,
+				bodyPlain: finalBodyPlain,
 				generationMeta,
 			};
 		} catch (err) {

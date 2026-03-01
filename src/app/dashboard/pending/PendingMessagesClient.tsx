@@ -20,7 +20,7 @@ export default function PendingMessagesClient({
 	parentDiv,
 	initialMessages = [],
 }: {
-	parentDiv: string;
+	parentDiv?: string;
 	initialMessages: MessageWithContact[];
 }) {
 	const queryClient = useQueryClient();

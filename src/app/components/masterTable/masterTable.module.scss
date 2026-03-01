@@ -173,36 +173,23 @@
 	}
 
 	&.dashboardTable {
-		.tableHeader {
-			display: block;
+		box-shadow: var(--shadow-lg);
 
+		.tableHeader {
 			tr {
-				display: table;
-				table-layout: fixed;
-				width: 100%;
-				background: var(--gradient-primary-light);
+				background: var(--gradient-primary);
 			}
 		}
 
 		.tableBody {
-			display: block;
-			width: 100%;
-			max-height: 22.5rem;
-			overflow-y: auto;
-
-			tr {
-				display: table;
-				table-layout: fixed;
-				width: 100%;
-			}
-
 			&.multiPage {
-				height: 22.5rem;
-				overflow-y: auto;
+				height: 33.75rem;
 			}
 
 			&.fillerRows {
 				tr {
+					height: 2.25rem;
+
 					&:nth-child(odd) {
 						background-color: var(--background-tertiary);
 					}

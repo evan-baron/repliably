@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 			where: { ownerId: user.id },
 			include: { contact: true },
 			orderBy: { createdAt: 'desc' },
-			take: 100, // Limit to 100 messages for performance
+			take: 75, // Limit to 75 messages for performance
 		});
 
 		return NextResponse.json({

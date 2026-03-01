@@ -108,10 +108,10 @@ const MasterTable = ({
 
 	const { columnHeaders } = tableData;
 
-	const fillerRows = sortedRowData.length > 0 && sortedRowData.length < 10;
+	const fillerRows = sortedRowData.length > 0 && sortedRowData.length < 15;
 
-	// If there are less than 10 rows, add empty rows to maintain table structure and height for better UX
-	const fillerRowCount = fillerRows ? 10 - sortedRowData.length : 0;
+	// If there are less than 15 rows, add empty rows to maintain table structure and height for better UX
+	const fillerRowCount = fillerRows ? 15 - sortedRowData.length : 0;
 
 	return (
 		<table

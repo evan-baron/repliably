@@ -2,117 +2,227 @@
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
+}
 
-	.md {
-		width: 30%;
+.sectionHeader {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.sectionTitle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--text-primary);
+
+	.titleIcon {
+		color: var(--accent-important);
+		font-size: 1.75rem;
+	}
+}
+
+.countBadge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 1.5rem;
+	aspect-ratio: 1 / 1;
+	border-radius: 50%;
+	background: var(--accent-primary);
+	color: #fff;
+	font-size: 0.75rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.cardList {
+	display: flex;
+	flex-direction: column;
+	gap: 0.625rem;
+}
+
+.alertCard-container {
+	display: flex;
+	align-items: center;
+	justify-content: end;
+	border-radius: var(--border-radius-md);
+	box-shadow: var(--shadow-lg);
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
+
+	&:focus-visible {
+		outline: 2px solid var(--color-primary);
 	}
 
-	.lrg {
-		width: 70%;
+	&.accentDanger {
+		background-color: var(--accent-danger);
 	}
 
-	.sectionTitle {
+	&.accentWarning {
+		background-color: var(--accent-primary);
+	}
+
+	&.accentBoth {
+		background: linear-gradient(
+			to bottom,
+			var(--accent-danger),
+			var(--accent-primary)
+		);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-md);
+		}
+	}
+
+	.alertCard {
+		width: calc(100% - 0.25rem);
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: var(--text-primary);
+		gap: 1rem;
+		padding: 0.875rem 1rem;
+		background: var(--background-secondary);
+		border-radius: var(--border-radius-md);
+		box-shadow: var(--shadow-sm);
+		cursor: pointer;
+	}
+}
 
-		.icon {
-			position: relative;
-			color: var(--accent-important);
-			font-size: 1.75rem;
-		}
+.avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 50%;
+	background: var(--gradient-primary-lighter);
+	color: var(--text-primary);
+	font-weight: 700;
+	font-size: 1rem;
+
+	.accentDanger & {
+		background: var(--gradient-danger-accessible);
 	}
 
-	.attentionTable {
-		width: 100%;
-		border-collapse: separate;
-		overflow: hidden;
-		border-radius: var(--border-radius);
+	.accentBoth & {
+		background: var(--gradient-danger-accessible);
+	}
 
-		.tableHeader {
-			display: block;
+	.avatarIcon {
+		font-size: 1.25rem;
+		color: var(--text-muted);
+	}
+}
 
-			.headerRow {
-				display: table;
-				table-layout: fixed;
-				width: 100%;
-				background: var(--gradient-accent-light);
+.contactInfo {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	flex: 0 0 auto;
+	max-width: 12rem;
+}
 
-				th {
-					vertical-align: middle;
-					padding: 0.5rem 1rem;
-					text-align: left;
-					border-bottom: 2px solid var(--border-light);
-					white-space: nowrap;
-					font-weight: 600;
+.contactName {
+	font-weight: 600;
+	color: var(--text-primary);
+	font-size: 0.9375rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
-					&:not(:last-child) {
-						border-right: 1.5px solid var(--border-light);
-					}
-				}
-			}
+.contactEmail {
+	font-size: 0.8125rem;
+	color: var(--text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.issueChips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	flex: 1;
+	justify-content: flex-end;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.25rem 0.625rem;
+	border-radius: 999px;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	white-space: nowrap;
+
+	.chipIcon {
+		font-size: 0.9375rem;
+	}
+
+	&.chipDanger {
+		background: hsla(0, 80%, 95%, 1);
+		color: var(--accent-danger-dark);
+	}
+
+	&.chipWarning {
+		background: var(--accent-subtle);
+		color: var(--accent-hover);
+	}
+}
+
+.chevron {
+	flex-shrink: 0;
+	font-size: 1.25rem !important;
+	color: var(--text-light-muted);
+	transition: color 0.2s ease;
+
+	.alertCard:hover & {
+		color: var(--text-secondary);
+	}
+}
+
+.viewAllLink {
+	align-self: center;
+	background: none;
+	border: none;
+	color: var(--color-primary);
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	border-radius: var(--border-radius-sm);
+	transition: background-color 0.2s ease;
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--gradient-subtle);
 		}
+	}
+}
 
-		.tableBody {
-			display: block;
-			width: 100%;
-			max-height: 9rem;
-			overflow-y: auto;
+// Responsive: stack chips below contact info on small screens
+@media (max-width: 640px) {
+	.alertCard {
+		flex-wrap: wrap;
+	}
 
-			.bodyRow {
-				display: table;
-				table-layout: fixed;
-				width: 100%;
-				line-height: 1.25;
+	.contactInfo {
+		max-width: none;
+		flex: 1;
+	}
 
-				&:nth-child(odd) {
-					background-color: var(--background-tertiary);
-				}
-
-				&:nth-child(even) {
-					background-color: var(--background-tertiary-med);
-				}
-
-				@media (hover: hover) {
-					&:hover {
-						background: var(--gradient-danger-accessible);
-						cursor: pointer;
-					}
-				}
-
-				td {
-					padding: 0.5rem 1rem;
-					max-width: 0; /* Force cells to respect parent column width */
-					line-height: 1.25;
-					white-space: nowrap;
-					overflow-x: auto;
-					scrollbar-width: none; /* Firefox */
-					-ms-overflow-style: none; /* IE and Edge */
-
-					&::-webkit-scrollbar {
-						width: 0;
-						height: 0;
-						background: transparent;
-					}
-
-					&.link {
-						color: var(--accent-primary);
-						text-decoration: none;
-						transition: color 0.2s ease;
-						font-weight: 600;
-						text-decoration: underline;
-
-						@media (hover: hover) {
-							&:hover {
-								color: var(--accent-hover);
-							}
-						}
-					}
-				}
-			}
-		}
+	.issueChips {
+		flex-basis: 100%;
+		justify-content: flex-start;
+		padding-left: 3.5rem; // align under contact name (avatar width + gap)
 	}
 }
